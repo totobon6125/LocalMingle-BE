@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 사용자 모델
+model User {
+  userId    Int      @id @default(autoincrement()) // Primary Key
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  UserDetail  UserDetail[]
+  HostEvents  HostEvent[]
+  GuestEvents GuestEvent[]
+
+  @@map("User")
+}
+
+// 사용자 정보 모델
+model UserDetail {
+  userDetailId Int     @id @default(autoincrement()) // Primary Key
+  UserId       Int // Foreign Key
+  nickname     String  @unique
+  intro        String?
+  profileImg   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User User @relation(fields: [UserId], references: [userId])
+
+  @@map("UserInfo")
+}
+
+// 이벤트 모델
+model Event {
+  eventId         Int      @id @default(autoincrement()) // Primary Key
+  eventName       String
+  maxSize         Int
+  eventDate       DateTime
+  signupStartDate DateTime
+  signupEndDate   DateTime
+  eventLocation   String
+  content         String
+  isVerified      Boolean
+  CategoryId      Int // Foreign Key
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  HostEvents  HostEvent[]
+  GuestEvents GuestEvent[]
+  Categories  Category[]
+
+  @@map("Event")
+}
+
+// 카테고리 모델
+model Category {
+  categoryId Int    @id @default(autoincrement()) // Primary Key
+  EventId    Int // Foreign Key
+  name       String
+
+  Event Event? @relation(fields: [EventId], references: [eventId])
+}
+
+// 호스트 이벤트 매핑 모델
+model HostEvent {
+  id      Int @id @default(autoincrement()) // Primary Key
+  HostId  Int // Foreign Key
+  EventId Int // Foreign Key
+
+  Event Event @relation(fields: [EventId], references: [eventId])
+  User  User  @relation(fields: [HostId], references: [userId])
+
+  @@map("HostEvent")
+}
+
+// 게스트 이벤트 매핑 모델
+model GuestEvent {
+  id      Int @id @default(autoincrement()) // Primary Key
+  GuestId Int // Foreign Key
+  EventId Int // Foreign Key
+
+  Event Event @relation(fields: [EventId], references: [eventId])
+  User  User  @relation(fields: [GuestId], references: [userId])
+
+  @@map("GuestEvent")
+}
