@@ -81,7 +81,7 @@ model Viewlog {
 // 카테고리 모델
 model Category {
   categoryId Int    @id @default(autoincrement()) // Primary Key
-  EventId    Int // Foreign Key
+  EventId    Int? // Foreign Key
   name       String
 
   Event Event? @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
