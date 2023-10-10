@@ -34,12 +34,22 @@ CREATE TABLE `Event` (
     `signupEndDate` DATETIME(3) NOT NULL,
     `eventLocation` VARCHAR(191) NOT NULL,
     `content` VARCHAR(191) NOT NULL,
-    `isVerified` BOOLEAN NOT NULL,
-    `CategoryId` INTEGER NOT NULL,
+    `category` VARCHAR(191) NOT NULL,
+    `isVerified` BOOLEAN NOT NULL DEFAULT false,
+    `isDeleted` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`eventId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Viewlog` (
+    `viewlogId` INTEGER NOT NULL AUTO_INCREMENT,
+    `EventId` INTEGER NOT NULL,
+    `UserId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`viewlogId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -53,36 +63,42 @@ CREATE TABLE `Category` (
 
 -- CreateTable
 CREATE TABLE `HostEvent` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `hostEventId` INTEGER NOT NULL AUTO_INCREMENT,
     `HostId` INTEGER NOT NULL,
     `EventId` INTEGER NOT NULL,
 
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`hostEventId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `GuestEvent` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `GuestId` INTEGER NOT NULL,
+    `guestEventId` INTEGER NOT NULL AUTO_INCREMENT,
+    `GuestId` INTEGER NULL,
     `EventId` INTEGER NOT NULL,
 
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`guestEventId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `UserInfo` ADD CONSTRAINT `UserInfo_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`userId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `UserInfo` ADD CONSTRAINT `UserInfo_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Category` ADD CONSTRAINT `Category_EventId_fkey` FOREIGN KEY (`EventId`) REFERENCES `Event`(`eventId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Viewlog` ADD CONSTRAINT `Viewlog_EventId_fkey` FOREIGN KEY (`EventId`) REFERENCES `Event`(`eventId`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `HostEvent` ADD CONSTRAINT `HostEvent_EventId_fkey` FOREIGN KEY (`EventId`) REFERENCES `Event`(`eventId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Viewlog` ADD CONSTRAINT `Viewlog_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `UserInfo`(`userDetailId`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `HostEvent` ADD CONSTRAINT `HostEvent_HostId_fkey` FOREIGN KEY (`HostId`) REFERENCES `User`(`userId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Category` ADD CONSTRAINT `Category_EventId_fkey` FOREIGN KEY (`EventId`) REFERENCES `Event`(`eventId`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `GuestEvent` ADD CONSTRAINT `GuestEvent_EventId_fkey` FOREIGN KEY (`EventId`) REFERENCES `Event`(`eventId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `HostEvent` ADD CONSTRAINT `HostEvent_EventId_fkey` FOREIGN KEY (`EventId`) REFERENCES `Event`(`eventId`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `GuestEvent` ADD CONSTRAINT `GuestEvent_GuestId_fkey` FOREIGN KEY (`GuestId`) REFERENCES `User`(`userId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `HostEvent` ADD CONSTRAINT `HostEvent_HostId_fkey` FOREIGN KEY (`HostId`) REFERENCES `User`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `GuestEvent` ADD CONSTRAINT `GuestEvent_EventId_fkey` FOREIGN KEY (`EventId`) REFERENCES `Event`(`eventId`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `GuestEvent` ADD CONSTRAINT `GuestEvent_GuestId_fkey` FOREIGN KEY (`GuestId`) REFERENCES `User`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE;
