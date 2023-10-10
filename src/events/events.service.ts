@@ -129,12 +129,7 @@ export class EventsService {
     });
   }
 
-  remove(eventId: number) {
-    return this.prisma.event.update({
-      where: { eventId },
-      data: {
-        isDeleted: true,
-      },
-    });
+  remove(id: number) {
+    return `This action removes a #${id} event`;
   }
 }
