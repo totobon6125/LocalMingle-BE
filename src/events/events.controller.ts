@@ -64,7 +64,6 @@ export class EventsController {
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     const isJoin = await this.eventsService.isJoin(+eventId, +userId);
-    console.log(isJoin);
     if (!isJoin) {
       this.eventsService.join(+eventId, +userId);
       return `${eventId}번 모임 참석 신청!`;
@@ -88,7 +87,7 @@ export class EventsController {
   }
 
   @Delete(':eventId')
-  @ApiOkResponse({ type: EventEntity })
+  @ApiOkResponse({ description: "isDeleted: true / soft Delete" })
   async remove(@Param('eventId') eventId: string) {
     const event = await this.eventsService.findOne(+eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
