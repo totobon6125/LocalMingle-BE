@@ -11,7 +11,7 @@ export class EventsService {
     const event = await this.prisma.event.create({
       data: createEventDto,
     });
-    console.log('event', event);
+
     await this.prisma.category.create({
       data: {
         EventId: event.eventId,
@@ -129,7 +129,12 @@ export class EventsService {
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} event`;
+  remove(eventId: number) {
+    return this.prisma.event.update({
+      where: { eventId },
+      data: {
+        isDeleted: true,
+      },
+    });
   }
 }
