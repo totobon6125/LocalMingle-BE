@@ -11,7 +11,7 @@ export class EventsService {
     const event = await this.prisma.event.create({
       data: createEventDto,
     });
-    console.log("event", event)
+    console.log('event', event);
     await this.prisma.category.create({
       data: {
         EventId: event.eventId,
@@ -36,11 +36,62 @@ export class EventsService {
   }
 
   findAll() {
-    return `This action returns all events`;
+    return this.prisma.event.findMany({
+      include: {
+        HostEvents: {
+          select: {
+            User: {
+              select: {
+                UserDetail: true,
+              },
+            },
+          },
+        },
+        GuestEvents: true,
+        _count: {
+          select: {
+            Viewlogs: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} event`;
+  async findOne(eventId: number) {
+    const event = await this.prisma.event.findUnique({
+      where: { eventId },
+      include: {
+        GuestEvents: {
+          select: {
+            GuestId: true,
+            User: {
+              select: {
+                UserDetail: true,
+              },
+            },
+          },
+        },
+        _count : {
+          select : {
+            Viewlogs : true
+          }
+        }
+      },
+    });
+
+    return event
+  }
+
+ async createViewLog(eventId: number) {
+    await this.prisma.viewlog.create({
+      data: {
+        EventId: eventId,
+        UserId: 1
+      }
+    })
   }
 
   update(id: number, updateEventDto: UpdateEventDto) {

@@ -68,12 +68,12 @@ model Event {
 
 // 조회 기록 모델
 model Viewlog {
-  viewlogId     Int         @id @default(autoincrement()) // Primary Key
+  viewlogId     Int       @id @default(autoincrement()) // Primary Key
   EventId       Int    
   UserId        Int
 
-  Events        Event      @relation(fields: [EventId], references: [eventId])
-  UserDetails   UserDetail @relation(fields: [UserId],  references: [userDetailId])
+  Event        Event      @relation(fields: [EventId], references: [eventId])
+  UserDetail   UserDetail @relation(fields: [UserId],  references: [userDetailId])
 
   @@map("Viewlog")
 }
