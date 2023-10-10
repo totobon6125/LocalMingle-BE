@@ -84,20 +84,10 @@ export class EventsController {
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     return this.eventsService.update(+eventId, updateEventDto);
-  @Patch(':eventId')
-  @ApiOkResponse({ type: EventEntity })
-  async update(
-    @Param('eventId') eventId: string,
-    @Body() updateEventDto: UpdateEventDto,
-  ) {
-    const event = await this.eventsService.findOne(+eventId);
-    if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
-
-    return this.eventsService.update(+eventId, updateEventDto);
   }
 
   @Delete(':eventId')
-  @ApiOkResponse({ description: "isDeleted: true / soft Delete" })
+  @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
   async remove(@Param('eventId') eventId: string) {
     const event = await this.eventsService.findOne(+eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
