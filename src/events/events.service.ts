@@ -11,7 +11,7 @@ export class EventsService {
     const event = await this.prisma.event.create({
       data: createEventDto,
     });
-
+    console.log('event', event);
     await this.prisma.category.create({
       data: {
         EventId: event.eventId,
