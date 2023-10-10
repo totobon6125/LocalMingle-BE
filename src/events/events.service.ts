@@ -94,6 +94,31 @@ export class EventsService {
     })
   }
 
+  async isJoin(eventId:number, userId: number) {
+    const isJoin = await this.prisma.guestEvent.findFirst({
+      where: {
+        EventId: eventId,
+        GuestId: 3
+      }
+    })
+    return isJoin
+  }
+
+  async join(eventId: number, userId: number) {
+    await this.prisma.guestEvent.create({
+      data: {
+        EventId: eventId,
+        GuestId: 3,
+      },
+    });
+  }
+
+  async cancleJoin(guestEventId: number) {
+    await this.prisma.guestEvent.delete({
+      where: { guestEventId },
+    });
+  }
+
   update(id: number, updateEventDto: UpdateEventDto) {
     return `This action updates a #${id} event`;
   }

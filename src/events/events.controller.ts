@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, Put } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -44,6 +44,25 @@ export class EventsController {
     return {data, guestList}
   }
 
+  @Put(':eventId/join')
+  @ApiCreatedResponse({description: `모임 참석 신청 / 취소`})
+  async join(@Param('eventId') eventId: string, @Body('userId') userId: string) {
+  
+    const event = await this.eventsService.findOne(+eventId);
+    if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
+    
+    const isJoin = await this.eventsService.isJoin(+eventId, +userId);
+    console.log(isJoin)
+    if (!isJoin) {
+      this.eventsService.join(+eventId, +userId)
+      return `${eventId}번 모임 참석 신청!`
+    }
+    if (isJoin) {
+      this.eventsService.cancleJoin(isJoin.guestEventId);
+      return `${eventId}번 모임 신청 취소!`
+    }
+  }
+
   @Patch(':id')
   @ApiOkResponse({type: EventEntity})
   update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
@@ -55,4 +74,5 @@ export class EventsController {
   remove(@Param('id') id: string) {
     return this.eventsService.remove(+id);
   }
+
 }
