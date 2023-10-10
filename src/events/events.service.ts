@@ -11,7 +11,7 @@ export class EventsService {
     const event = await this.prisma.event.create({
       data: createEventDto,
     });
-    console.log('event', event);
+
     await this.prisma.category.create({
       data: {
         EventId: event.eventId,
@@ -37,6 +37,9 @@ export class EventsService {
 
   findAll() {
     return this.prisma.event.findMany({
+      where: {
+        isDeleted: false,
+      },
       include: {
         HostEvents: {
           select: {
@@ -62,7 +65,7 @@ export class EventsService {
 
   async findOne(eventId: number) {
     const event = await this.prisma.event.findUnique({
-      where: { eventId },
+      where: { eventId, isDeleted: false },
       include: {
         GuestEvents: {
           select: {
@@ -74,41 +77,41 @@ export class EventsService {
             },
           },
         },
-        _count : {
-          select : {
-            Viewlogs : true
-          }
-        }
+        _count: {
+          select: {
+            Viewlogs: true,
+          },
+        },
       },
     });
 
-    return event
+    return event;
   }
 
- async createViewLog(eventId: number) {
+  async createViewLog(eventId: number) {
     await this.prisma.viewlog.create({
       data: {
         EventId: eventId,
-        UserId: 1
-      }
-    })
+        UserId: 1,
+      },
+    });
   }
 
-  async isJoin(eventId:number, userId: number) {
+  async isJoin(eventId: number, userId: number) {
     const isJoin = await this.prisma.guestEvent.findFirst({
       where: {
         EventId: eventId,
-        GuestId: 3
-      }
-    })
-    return isJoin
+        GuestId: 2,
+      },
+    });
+    return isJoin;
   }
 
   async join(eventId: number, userId: number) {
     await this.prisma.guestEvent.create({
       data: {
         EventId: eventId,
-        GuestId: 3,
+        GuestId: 2,
       },
     });
   }
@@ -119,11 +122,19 @@ export class EventsService {
     });
   }
 
-  update(id: number, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
+  update(eventId: number, updateEventDto: UpdateEventDto) {
+    return this.prisma.event.update({
+      where: { eventId },
+      data: updateEventDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} event`;
+  remove(eventId: number) {
+    return this.prisma.event.update({
+      where: { eventId },
+      data: {
+        isDeleted: true,
+      },
+    });
   }
 }

@@ -42,7 +42,7 @@ export class CreateEventDto {
 
   @ApiProperty()
   @IsBoolean()
-  isDeleted: boolean = false
+  isDeleted: boolean = false;
 
   @IsOptional()
   @IsBoolean()
