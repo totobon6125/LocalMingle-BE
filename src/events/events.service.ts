@@ -1,13 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 @Injectable()
 export class EventsService {
   constructor(private prisma: PrismaService) {}
-  create(createEventDto: CreateEventDto) {
-    return 'This action adds a new event';
+
+  async create(createEventDto: CreateEventDto) {
+    const event = await this.prisma.event.create({
+      data: createEventDto,
+    });
+    console.log("event", event)
+    await this.prisma.category.create({
+      data: {
+        EventId: event.eventId,
+        name: event.category,
+      },
+    });
+
+    await this.prisma.hostEvent.create({
+      data: {
+        HostId: 1,
+        EventId: event.eventId,
+      },
+    });
+
+    await this.prisma.guestEvent.create({
+      data: {
+        EventId: event.eventId,
+      },
+    });
+
+    return event;
   }
 
   findAll() {
