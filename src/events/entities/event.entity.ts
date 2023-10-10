@@ -1,9 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Event } from '@prisma/client';
+import { ApiProperty } from "@nestjs/swagger";
+import { Event } from "@prisma/client";
 
 export class EventEntity implements Event {
-  @ApiProperty()
-  eventId: number;
+    @ApiProperty()
+    eventId: number;
 
   @ApiProperty()
   eventName: string;
@@ -35,9 +35,10 @@ export class EventEntity implements Event {
   @ApiProperty({ default: false })
   isDeleted: boolean;
 
-  @ApiProperty()
-  createdAt: Date;
-
-  @ApiProperty()
-  updatedAt: Date;
+    @ApiProperty()
+    createdAt: Date;
+  
+    @ApiProperty()
+    updatedAt: Date;
 }
+
