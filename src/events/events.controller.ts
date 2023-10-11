@@ -16,7 +16,7 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { EventEntity } from './entities/event.entity';
 
 @Controller('events')
-@ApiTags('events')
+@ApiTags('Events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 

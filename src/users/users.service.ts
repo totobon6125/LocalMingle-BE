@@ -1,18 +1,22 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.service.ts
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDetailDto } from './dto/create-user-detail.dto';
+// import { CreateUserDetailDto } from './dto/create-user-detail.dto';
 // import { UpdateUserDetailDto } from './dto/update-user-detail.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
+import { IUsersServiceFindByEmail } from './interfaces/users-service.interface';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   // todo: after heedragon
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    /* Eric's code 
     // 이미 존재하는 유저인지 확인
     const existingUser = await this.prisma.user.findUnique({
       where: { email: createUserDto.email },
@@ -40,6 +44,34 @@ export class UsersService {
     // });
   
     return user;
+    */
+
+    const { email, password, nickname, intro, confirm, profileImg } = createUserDto;
+
+    const user = await this.findByEmail({ email });
+    if (user) {
+      throw new ConflictException('이미 등록된 이메일입니다.');
+    }
+
+   if  (password != confirm){
+      throw new BadRequestException('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+    }
+
+   const hashedPassword = await bcrypt.hash(password, 10);
+
+   return this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        UserDetail: {
+          create: {
+            nickname,
+            intro,
+            profileImg,
+          },
+        }
+      },
+    });
   }
   
 
@@ -60,6 +92,11 @@ export class UsersService {
     return await this.prisma.user.findUnique({
       where: { userId: id },
     });
+  }
+
+  findByEmail({ email }: IUsersServiceFindByEmail): Promise<User> {
+    // 이코드는 여러번 재사용 될 수 있기 떄문에 따로 빼줌
+    return this.prisma.user.findUnique({ where: { email } });
   }
 
   // user 정보를 수정한다.

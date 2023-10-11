@@ -14,6 +14,7 @@ async function bootstrap() {
     .setTitle('LocalMingle API')
     .setDescription('The LocalMingle API description')
     .setVersion('0.1')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

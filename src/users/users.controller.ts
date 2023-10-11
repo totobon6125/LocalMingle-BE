@@ -1,12 +1,14 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.controller.ts
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 // import { CreateUserDetailDto } from './dto/create-user-detail.dto';
 // import { UpdateUserDetailDto } from './dto/update-user-detail.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserEntity } from './entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('users')
 @ApiTags('Users')
@@ -14,19 +16,34 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // user 생성한다.
+  /* Eric's user
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
+  */
+  @ApiOperation({ summary: '회원가입' })
+  @ApiResponse({ status: 200, description: '회원가입이 성공하였습니다.' })
+  @Post()
+  @ApiCreatedResponse({ type: UserEntity })
+  async create(@Body() createUserDto: CreateUserDto) {
+    return new UserEntity(await this.usersService.create(createUserDto));
+  }
 
   // 전체 유저 리스트를 조회한다.
   @Get()
+  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
+  @ApiOperation({ summary: '회원 조회' })
+  @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
     const users = await this.usersService.findAll();
     if (!users) {
       throw new NotFoundException('Users does not exist');
     }
     return users;
+    // TODO: HEE's code
+    // return users.map((user) => new UserEntity(user));
   }
 
   // 자신의 사용자 정보를 조회한다.
@@ -39,7 +56,11 @@ export class UsersController {
    */
 
   // id 를 이용하여 사용자 정보를 조회한다.
+
   @Get(':id')
+  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
+  @ApiOperation({ summary: 'ID로 회원 조회' })
   async findOne(@Param('id') id: string) {
     const user = this.usersService.findOne(+id);
     if (!user) {
