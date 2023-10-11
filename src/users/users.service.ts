@@ -7,22 +7,19 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { IUsersServiceFindByEmail } from './interfaces/users-service.interface';
 import { User } from '@prisma/client';
+/* eslint-disable prettier/prettier */
+// src/users/users.service.ts
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+// import { CreateUserDetailDto } from './dto/create-user-detail.dto';
+// import { UpdateUserDetailDto } from './dto/update-user-detail.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
+import { IUsersServiceFindByEmail } from './interfaces/users-service.interface';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
-
-  findByEmail({ email }: IUsersServiceFindByEmail): Promise<User> {
-    // 이코드는 여러번 재사용 될 수 있기 떄문에 따로 빼줌
-    return this.prisma.user.findUnique({ where: { email } });
-  }
-
-  findOne(userId: number) {
-    // 이코드는 여러번 재사용 될 수 있기 떄문에 따로 빼줌
-    return this.prisma.user.findUnique({ where: { userId } });
-  }
-
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, password, nickname, intro, confirm, profileImg } =
       createUserDto;

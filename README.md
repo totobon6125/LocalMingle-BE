@@ -71,3 +71,27 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+## 프로젝트 구조
+
+📦src
+┣ 📂prisma
+┃ ┣ 📜prisma.module.ts
+┃ ┣ 📜prisma.service.spec.ts
+┃ ┗ 📜prisma.service.ts
+┣ 📂users
+┃ ┣ 📂dto
+┃ ┃ ┣ 📜create-user.dto.ts
+┃ ┃ ┗ 📜update-user.dto.ts
+┃ ┣ 📂entities
+┃ ┃ ┗ 📜user.entity.ts
+┃ ┣ 📜users.controller.spec.ts
+┃ ┣ 📜users.controller.ts
+┃ ┣ 📜users.module.ts
+┃ ┣ 📜users.service.spec.ts
+┃ ┗ 📜users.service.ts
+┣ 📜app.controller.spec.ts
+┣ 📜app.controller.ts
+┣ 📜app.module.ts
+┣ 📜app.service.ts
+┗ 📜main.ts
