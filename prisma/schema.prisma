@@ -36,7 +36,8 @@ model UserDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  User User @relation(fields: [UserId], references: [userId])
+  User     User      @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  Viewlogs Viewlog[]
 
   @@map("UserInfo")
 }
@@ -51,16 +52,30 @@ model Event {
   signupEndDate   DateTime
   eventLocation   String
   content         String
-  isVerified      Boolean
-  CategoryId      Int // Foreign Key
+  category        String
+  isVerified      Boolean  @default(false)
+  isDeleted       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   HostEvents  HostEvent[]
   GuestEvents GuestEvent[]
   Categories  Category[]
+  Viewlogs    Viewlog[]
 
   @@map("Event")
+}
+
+// 조회 기록 모델
+model Viewlog {
+  viewlogId Int @id @default(autoincrement()) // Primary Key
+  EventId   Int
+  UserId    Int
+
+  Event      Event      @relation(fields: [EventId], references: [eventId])
+  UserDetail UserDetail @relation(fields: [UserId], references: [userDetailId])
+
+  @@map("Viewlog")
 }
 
 // 카테고리 모델
@@ -69,29 +84,29 @@ model Category {
   EventId    Int? // Foreign Key
   name       String
 
-  Event Event? @relation(fields: [EventId], references: [eventId])
+  Event Event? @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
 }
 
 // 호스트 이벤트 매핑 모델
 model HostEvent {
-  id      Int @id @default(autoincrement()) // Primary Key
-  HostId  Int // Foreign Key
-  EventId Int // Foreign Key
+  hostEventId Int @id @default(autoincrement()) // Primary Key
+  HostId      Int // Foreign Key
+  EventId     Int // Foreign Key
 
-  Event Event @relation(fields: [EventId], references: [eventId])
-  User  User  @relation(fields: [HostId], references: [userId])
+  Event Event @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
+  User  User  @relation(fields: [HostId], references: [userId], onDelete: Cascade)
 
   @@map("HostEvent")
 }
 
 // 게스트 이벤트 매핑 모델
 model GuestEvent {
-  id      Int @id @default(autoincrement()) // Primary Key
-  GuestId Int // Foreign Key
-  EventId Int // Foreign Key
+  guestEventId Int  @id @default(autoincrement()) // Primary Key
+  GuestId      Int? // Foreign Key
+  EventId      Int // Foreign Key
 
-  Event Event @relation(fields: [EventId], references: [eventId])
-  User  User  @relation(fields: [GuestId], references: [userId])
+  Event Event @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
+  User  User? @relation(fields: [GuestId], references: [userId], onDelete: Cascade)
 
   @@map("GuestEvent")
 }
