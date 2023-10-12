@@ -14,36 +14,6 @@ export class UsersService {
   
   // 1. 유저를 생성한다. (회원가입)
   async create(createUserDto: CreateUserDto): Promise<User> {
-    /* Eric's code 
-    // 이미 존재하는 유저인지 확인
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: createUserDto.email },
-    });
-    if (existingUser) {
-      throw new Error('이미 존재하는 유저입니다.');
-    }
-    // 새로운 user 생성
-    const user = await this.prisma.user.create({
-      data: createUserDto,
-    });
-  
-    // 새로운 UserDetail 생성
-    // const defaultUserDetail: CreateUserDetailDto = {
-    //   nickname: 'default_nickname',  // 기본값 설정
-    //   intro: 'default_intro',  // 기본값 설정
-    //   profileImg: 'default.jpg URL',  // 기본값 설정
-    // };
-  
-    // await this.prisma.userDetail.create({
-    //   data: {
-    //     ...defaultUserDetail,
-    //     UserId: user.userId,
-    //   },
-    // });
-  
-    return user;
-    */
-
     const { email, password, nickname, intro, confirm, profileImg } = createUserDto;
     console.log(" events.controller - createUserDto", createUserDto);
     
@@ -93,12 +63,13 @@ export class UsersService {
     return await this.prisma.user.findMany({});
   }
   
-  // "TODO: implement me"
-  // 유저 단일 조회
-  findMe(id: number) {
-    return `This action returns a #${id} user`;
+  // 3. 유저 본인 조회
+  async findMe(userId: number) {
+    return await this.prisma.user.findUnique({
+      where: { userId },
+      include: { UserDetail: true },
+      });
   }
-  
 
   // 3. userId를 통한 유저 조회
   async findOne(id: number) {
@@ -123,9 +94,9 @@ export class UsersService {
   }
 
   // 6. 회원 탈퇴를 한다.
-  async remove(id: number) {
+  async remove(userId: number, password: string) {
     return await this.prisma.user.delete({
-      where: { userId: id },
+      where: { userId: userId, password: password},
     });
   }
 
@@ -133,7 +104,13 @@ export class UsersService {
   async findHostedEvents(id: number) {
     return await this.prisma.user.findUnique({
       where: { userId: id },
-      include: { HostEvents: true },
+      include: { 
+        HostEvents: {
+          select: {
+            Event: true,
+          },
+        },
+      },
     });
   }
 
@@ -141,7 +118,13 @@ export class UsersService {
   async findJoinedEvents(id: number) {
     return await this.prisma.user.findUnique({
       where: { userId: id },
-      include: { GuestEvents: true },
+      include: { 
+        GuestEvents: {
+          select: {
+            Event: true,
+          },
+        },
+      },
     });
   }
 }
