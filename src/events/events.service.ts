@@ -26,15 +26,15 @@ export class EventsService {
       },
     });
 
-    const guestEvent = await this.prisma.guestEvent.create({
-      data: {
-        EventId: event.eventId,
-      },
-    });
-    console.log("create in events.service:", event);
+    // const guestEvent = await this.prisma.guestEvent.create({
+    //   data: {
+    //     EventId: event.eventId,
+    //   },
+    // });
+    console.log('create in events.service:', event);
     console.log(category);
     console.log(hostEvent);
-    console.log(guestEvent);
+    // console.log(guestEvent);
     return event;
   }
 
@@ -114,7 +114,7 @@ export class EventsService {
     const isJoin = await this.prisma.guestEvent.findFirst({
       where: {
         EventId: eventId,
-        GuestId: 2,
+        GuestId: userId,
       },
     });
     return isJoin;
@@ -124,12 +124,13 @@ export class EventsService {
     await this.prisma.guestEvent.create({
       data: {
         EventId: eventId,
-        GuestId: 2,
+        GuestId: userId,
       },
     });
   }
 
-  async cancleJoin(guestEventId: number) {
+  /* TODO: 참가 취소하면 guestEvent에서 지우는게 아니라 guestEvent의 isDeleted를 true로 바꾸는 방식으로 변경 */
+  async cancelJoin(guestEventId: number) {
     await this.prisma.guestEvent.delete({
       where: { guestEventId },
     });

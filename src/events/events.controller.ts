@@ -48,7 +48,7 @@ export class EventsController {
     const event = events.map((item) => {
       return {
         event: item,
-        guestList: item.GuestEvents.length-1,
+        guestList: item.GuestEvents.length - 1,
       };
     });
     return event;
@@ -62,34 +62,35 @@ export class EventsController {
 
     await this.eventsService.createViewLog(+eventId);
 
-    const guestList = event.GuestEvents.length-1;
+    const guestList = event.GuestEvents.length - 1;
     const { ...data } = event;
-
+    console.log('events.controller data:', data);
     return { data, guestList };
   }
 
   @Put(':eventId/join')
-  @ApiOperation({ summary: '게스트로 Event 참가신청' })
+  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
+  @ApiOperation({ summary: 'Guest로서 Event 참가신청' })
   @ApiCreatedResponse({ description: `모임 참석 신청 / 취소` })
-  async join(
-    @Param('eventId') eventId: string,
-    @Body('userId') userId: string,
-  ) {
+  async join(@Param('eventId') eventId: string, @Req() req: RequestWithUser) {
     const event = await this.eventsService.findOne(+eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
-    const isJoin = await this.eventsService.isJoin(+eventId, +userId);
+    const { userId } = req.user;
+    const isJoin = await this.eventsService.isJoin(+eventId, userId);
     if (!isJoin) {
-      this.eventsService.join(+eventId, +userId);
+      this.eventsService.join(+eventId, userId);
       return `${eventId}번 모임 참석 신청!`;
     }
     if (isJoin) {
-      this.eventsService.cancleJoin(isJoin.guestEventId);
+      this.eventsService.cancelJoin(isJoin.guestEventId);
       return `${eventId}번 모임 신청 취소!`;
     }
   }
 
   @Patch(':eventId')
+  @ApiOperation({ summary: 'Host로서 Event 수정' })
   @ApiOkResponse({ type: EventEntity })
   async update(
     @Param('eventId') eventId: string,

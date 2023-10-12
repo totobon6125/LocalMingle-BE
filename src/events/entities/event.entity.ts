@@ -2,8 +2,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Event } from "@prisma/client";
 
 export class EventEntity implements Event {
-    @ApiProperty()
-    eventId: number;
+  @ApiProperty()
+  eventId: number;
 
   @ApiProperty()
   eventName: string;
