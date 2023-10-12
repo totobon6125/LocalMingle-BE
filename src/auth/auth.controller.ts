@@ -10,6 +10,15 @@ import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
 import { AuthEntity } from './entity/auth.entity';
 
+interface IOAuthUser {
+  //interface 설정
+  user: {
+    name: string;
+    email: string;
+    password: string;
+  };
+}
+
 @Controller('users')
 @ApiTags('Auth')
 @ApiOkResponse({ type: AuthEntity })
