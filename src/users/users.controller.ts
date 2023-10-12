@@ -23,7 +23,7 @@ export class UsersController {
   }
   */
   @ApiOperation({ summary: '회원가입' })
-  @ApiResponse({ status: 200, description: '회원가입이 성공하였습니다.' })
+  @ApiResponse({ status: 201, description: '회원가입이 성공하였습니다.' })
   @Post()
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
