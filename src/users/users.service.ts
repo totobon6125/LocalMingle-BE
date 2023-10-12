@@ -14,7 +14,9 @@ import { IUsersServiceFindByEmail } from './interfaces/users-service.interface';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  // todo: after heedragon
+
+  
+  // 1. 유저를 생성한다. (회원가입)
   async create(createUserDto: CreateUserDto): Promise<User> {
     /* Eric's code 
     // 이미 존재하는 유저인지 확인
@@ -48,18 +50,32 @@ export class UsersService {
 
     const { email, password, nickname, intro, confirm, profileImg } = createUserDto;
 
-    const user = await this.findByEmail({ email });
-    if (user) {
-      throw new ConflictException('이미 등록된 이메일입니다.');
-    }
+    console.log(" events.controller - createUserDto", createUserDto);
+    
+  // 비밀번호 확인
+  if (password !== confirm) {
+    throw new BadRequestException('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+  }
 
-   if  (password != confirm){
-      throw new BadRequestException('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
-    }
+  // 이메일 중복 체크
+  const existingUser = await this.findByEmail({ email });
+  if (existingUser) {
+    throw new ConflictException('이미 등록된 이메일입니다.');
+  }
 
-   const hashedPassword = await bcrypt.hash(password, 10);
+  // 닉네임 중복 체크
+  const existingNickname = await this.prisma.userDetail.findUnique({
+    where: { nickname },
+  });
+  if (existingNickname) {
+    throw new ConflictException('이미 사용 중인 닉네임입니다.');
+  }
 
-   return this.prisma.user.create({
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // 트랜잭션을 사용하여 user와 UserDetail 생성
+  const [user] = await this.prisma.$transaction([
+    this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
@@ -69,12 +85,15 @@ export class UsersService {
             intro,
             profileImg,
           },
-        }
+        },
       },
-    });
+    }),
+  ]);
+
+  return user;
   }
   
-  // 전체 유저 리스트를 조회한다.
+  // 2. 전체 유저 리스트를 조회한다.
   async findAll() {
     return await this.prisma.user.findMany({});
   }
@@ -86,19 +105,21 @@ export class UsersService {
   }
   **/
 
-  // user와 연결된 가져온다
+  // 3. userId를 통한 유저 조회
   async findOne(id: number) {
     return await this.prisma.user.findUnique({
       where: { userId: id },
+      include: { UserDetail: true, HostEvents: true, GuestEvents: true},
     });
   }
 
+  // 4. 이메일을 통한 유저 찾기
   findByEmail({ email }: IUsersServiceFindByEmail): Promise<User> {
     // 이코드는 여러번 재사용 될 수 있기 떄문에 따로 빼줌
     return this.prisma.user.findUnique({ where: { email } });
   }
 
-  // user 정보를 수정한다.
+  // 5. user 정보 수정한다.
   async update(id: number, updateUserDto: UpdateUserDto) {
     return await this.prisma.user.update({
       where: { userId: id },
@@ -106,14 +127,14 @@ export class UsersService {
     });
   }
 
-  // 회원 탈퇴를 한다.
+  // 6. 회원 탈퇴를 한다.
   async remove(id: number) {
     return await this.prisma.user.delete({
       where: { userId: id },
     });
   }
 
-  // 사용자가 생성한 모임(Event) 리스트를 조회한다. HostEvents
+  // 7. 사용자가 생성한 모임(Event) 리스트를 조회한다. HostEvents
   async findHostedEvents(id: number) {
     return await this.prisma.user.findUnique({
       where: { userId: id },
@@ -121,105 +142,7 @@ export class UsersService {
     });
   }
 
-  // 사용자가 참가한 모임(Event) 리스트를 조회한다. GuestEvents의 guestId, eventId를 이용하여 Event를 찾는다.
-  async findJoinedEvents(id: number) {
-    return await this.prisma.user.findUnique({
-      where: { userId: id },
-      include: { GuestEvents: true },
-    });
-  }
-
-
-  /* TODO: userDetail 
-  // UserDetail 조회
-  // async createUserDetail(createUserDetailDto: CreateUserDetailDto, id: number) {
-  //     // 이미 존재하는 user detail 이 있는지 확인
-  //     const existingUserDetail = await this.prisma.userDetail.findUnique({
-  //       where: { UserId: id },
-  //     });
-
-  //     // 이미 존재하는 user detail 이 있는 경우
-  //     if (existingUserDetail) {
-  //       throw Error('이미 존재하는 user detail 입니다.');
-  //     }
-
-  //     // 존재하지 않는 경우
-  //     return await this.prisma.userDetail.create({
-  //       data: {
-  //         ...createUserDetailDto,
-  //         User: {
-  //           connect: { userId: id },
-  //         },
-  //       },
-  //     });
-  // }
-
-  // UserDetail를 조회한다.
-  async findUserDetail(id: number) {
-    return await this.prisma.userDetail.findUnique({
-      where: { UserId: id },
-    });
-  }
-
-  // UserDetail을 수정한다.
-  async updateUserDetail(updateUserDetailDto: UpdateUserDetailDto, id: number) {
-    // user를 찾는다.
-    const existingUser = await this.prisma.user.findUnique({
-      where: { userId: id },
-    });
-
-    // user가 존재하지 않는 경우
-    if (!existingUser) {
-      throw Error('존재하지 않는 user 입니다.');
-    }
-
-    // user가 존재하는 경우
-    const user = await this.prisma.user.findUnique({
-      where: { userId: id },
-      include: { UserDetail: true },
-    });
-
-    // user에 연결될 userDetail를 불러와서 수정한다.
-    return await this.prisma.userDetail.update({
-      where: { UserId: id },
-      data: {
-        ...updateUserDetailDto,
-      },
-    }); 
-  }
-  */ 
-
-  // user와 연결된 가져온다
-  async findOne(id: number) {
-    return await this.prisma.user.findUnique({
-      where: { userId: id },
-    });
-  }
-
-  // user 정보를 수정한다.
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    return await this.prisma.user.update({
-      where: { userId: id },
-      data: updateUserDto,
-    });
-  }
-
-  // 회원 탈퇴를 한다.
-  async remove(id: number) {
-    return await this.prisma.user.delete({
-      where: { userId: id },
-    });
-  }
-
-  // 사용자가 생성한 모임(Event) 리스트를 조회한다. HostEvents
-  async findHostedEvents(id: number) {
-    return await this.prisma.user.findUnique({
-      where: { userId: id },
-      include: { HostEvents: true },
-    });
-  }
-
-  // 사용자가 참가한 모임(Event) 리스트를 조회한다. GuestEvents의 guestId, eventId를 이용하여 Event를 찾는다.
+  // 8. 사용자가 참가한 모임(Event) 리스트를 조회한다. GuestEvents의 guestId, eventId를 이용하여 Event를 찾는다.
   async findJoinedEvents(id: number) {
     return await this.prisma.user.findUnique({
       where: { userId: id },

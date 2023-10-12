@@ -35,10 +35,9 @@ export class EventEntity implements Event {
   @ApiProperty({ default: false })
   isDeleted: boolean;
 
-    @ApiProperty()
-    createdAt: Date;
-  
-    @ApiProperty()
-    updatedAt: Date;
-}
+  @ApiProperty()
+  createdAt: Date;
 
+  @ApiProperty()
+  updatedAt: Date;
+}

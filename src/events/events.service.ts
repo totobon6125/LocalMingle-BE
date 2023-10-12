@@ -7,31 +7,34 @@ import { UpdateEventDto } from './dto/update-event.dto';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createEventDto: CreateEventDto) {
+  async create(userId: number, createEventDto: CreateEventDto) {
     const event = await this.prisma.event.create({
       data: createEventDto,
     });
 
-    await this.prisma.category.create({
+    const category = await this.prisma.category.create({
       data: {
         EventId: event.eventId,
         name: event.category,
       },
     });
 
-    await this.prisma.hostEvent.create({
+    const hostEvent = await this.prisma.hostEvent.create({
       data: {
-        HostId: 1,
+        HostId: userId,
         EventId: event.eventId,
       },
     });
 
-    await this.prisma.guestEvent.create({
+    const guestEvent = await this.prisma.guestEvent.create({
       data: {
         EventId: event.eventId,
       },
     });
-
+    console.log("create in events.service:", event);
+    console.log(category);
+    console.log(hostEvent);
+    console.log(guestEvent);
     return event;
   }
 
@@ -67,6 +70,16 @@ export class EventsService {
     const event = await this.prisma.event.findUnique({
       where: { eventId, isDeleted: false },
       include: {
+        HostEvents: {
+          select: {
+            HostId: true,
+            User: {
+              select: {
+                UserDetail: true,
+              },
+            },
+          },
+        },
         GuestEvents: {
           select: {
             GuestId: true,

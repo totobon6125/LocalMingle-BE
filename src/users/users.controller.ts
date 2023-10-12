@@ -15,22 +15,16 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // user 생성한다.
-  /* Eric's user
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-  */
+  // 1. 유저를 생성한다. (회원가입)
   @ApiOperation({ summary: '회원가입' })
-  @ApiResponse({ status: 200, description: '회원가입이 성공하였습니다.' })
+  @ApiResponse({ status: 201, description: '회원가입이 성공하였습니다.' })
   @Post()
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
   }
 
-  // 전체 유저 리스트를 조회한다.
+  // 2. 전체 유저 리스트를 조회한다.
   @Get()
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
@@ -41,9 +35,13 @@ export class UsersController {
     if (!users) {
       throw new NotFoundException('Users does not exist');
     }
-    return users;
+
     // TODO: HEE's code
+    const userEntity = users.map((user) => new UserEntity(user));
+    console.log(userEntity);
     // return users.map((user) => new UserEntity(user));
+
+    return users;
   }
 
   // 자신의 사용자 정보를 조회한다.
@@ -55,12 +53,13 @@ export class UsersController {
   }
    */
 
-  // id 를 이용하여 사용자 정보를 조회한다.
-
+  // 3. userId를 통한 유저 조회
   @Get(':id')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'ID로 회원 조회' })
+  @ApiResponse({ status: 200, description: '유저 정보 조회 성공' })
+
   async findOne(@Param('id') id: string) {
     const user = this.usersService.findOne(+id);
     if (!user) {
@@ -69,8 +68,11 @@ export class UsersController {
     return user;
   }
 
-  // 사용자 정보를 수정한다.
+  // 5. user 정보 수정한다.
   @Patch(':id')
+  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
+  @ApiOperation({ summary: '회원 정보 수정' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const updatedUser = await this.usersService.update(+id, updateUserDto);
     if (!updatedUser) {
@@ -79,7 +81,7 @@ export class UsersController {
     return updatedUser;
   }
 
-  // 회원 탈퇴를 한다.
+  // 6. 회원 탈퇴를 한다.
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const user = await this.usersService.findOne(+id);
@@ -90,14 +92,14 @@ export class UsersController {
     return {'message' : '탈퇴되었습니다'};    
   }
 
-  // 사용자가 생성한 모임 리스트를 조회한다.
+  // 7. 사용자가 생성한 모임 리스트를 조회한다.
   @Get(':id/hostedEvents')
   async findHostedEvents(@Param('id') id: string) {
     const hostedEvents = await this.usersService.findHostedEvents(+id);
     return hostedEvents;
   }
 
-  // 사용자가 참가한 모임 리스트를 조회한다.
+  // 8. 사용자가 참가한 모임 리스트를 조회한다.
   @Get(':id/joinedEvents')
   findJoinedEvents(@Param('id') id: string) {
     const joinedEvents = this.usersService.findJoinedEvents(+id);

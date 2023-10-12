@@ -2,7 +2,7 @@
 .env
 
 # packagelock JSON
-.package-lock.json
+package-lock.json
 
 # compiled output
 /dist
