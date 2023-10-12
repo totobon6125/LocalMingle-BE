@@ -95,8 +95,23 @@ export class UsersService {
 
   // 6. 회원 탈퇴를 한다.
   async remove(userId: number, password: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { userId: userId },
+    });
+
+    if (!user) {
+      throw new BadRequestException('회원 정보가 존재하지 않습니다.');
+    }
+    
+    // bcrypt를 사용하여 패스워드를 비교한다.
+    const isPasswordMatching = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatching) {
+      throw new BadRequestException('비밀번호가 일치하지 않습니다.');
+    }
+    
+    // 패스워드가 일치하면 유저 삭제
     return await this.prisma.user.delete({
-      where: { userId: userId, password: password},
+      where: { userId: userId},
     });
   }
 

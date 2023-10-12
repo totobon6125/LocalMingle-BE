@@ -4,10 +4,12 @@ import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundExcepti
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
+
 
 // request에 user 객체를 추가하기 위한 인터페이스
 interface RequestWithUser extends Request {
@@ -85,17 +87,17 @@ export class UsersController {
   }
 
   // 6. 회원 탈퇴를 한다.
-  @Delete(':id')
+  @Delete('withdrawal')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '회원 탈퇴' })
-  async remove(@Req() req: RequestWithUser, @Body() password: string) {
+  async remove(@Req() req: RequestWithUser, @Body() DeleteUserDto: DeleteUserDto) {
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당 ) {
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
-    await this.usersService.remove(userId, password);
+    await this.usersService.remove(userId, DeleteUserDto.password);
     return {'message' : '탈퇴되었습니다'};    
   }
 
@@ -109,7 +111,7 @@ export class UsersController {
 
   // 8. 사용자가 참가한 모임 리스트를 조회한다.
   @Get(':id/joinedEvents')
-  @ApiOperation({ summary: '내가 참가한 이벤트 조회' })
+  @ApiOperation({ summary: '내가 참가한 이벤트 회' })
   findJoinedEvents(@Param('id') id: string) {
     console.log('findJoinedEvents in users.controller.ts - id:', id);
     const joinedEvents = this.usersService.findJoinedEvents(+id);
