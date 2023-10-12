@@ -17,8 +17,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ summary: '로그인' })
-  @ApiResponse({ status: 200, description: '로그인에 성공하셨습니다.' })
-  @ApiResponse({ status: 400, description: '이메일이 없습니다.' })
+  @ApiResponse({ status: 201, description: '로그인에 성공하셨습니다.' })
+  @ApiResponse({ status: 404, description: '이메일이 없습니다.' })
   @ApiResponse({ status: 401, description: '비밀번호가 일치하지 않습니다.' })
   @Post('login')
   async login(
