@@ -24,7 +24,7 @@ export class UsersController {
   */
   @ApiOperation({ summary: '회원가입' })
   @ApiResponse({ status: 201, description: '회원가입이 성공하였습니다.' })
-  @Post()
+  @Post('/signup')
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));

@@ -3,7 +3,7 @@ export interface IUsersServiceCreate {
   password: string;
   nickname: string;
   intro: string;
-  confirm: string;
+  confirmPassword: string;
 }
 
 export interface IUsersServiceFindByEmail {

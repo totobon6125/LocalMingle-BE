@@ -96,7 +96,7 @@ export class CreateUserDto {
     description: 'password',
     example: 'abc123456789!',
   })
-  confirm: string;
+  confirmPassword: string;
 
   @IsString()
   @IsNotEmpty()

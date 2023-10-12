@@ -26,7 +26,8 @@ async function bootstrap() {
     //origin: ['http://localhost:5173', 'http://localhost:3000'],
     //origin: '*', // 클라이언트 애플리케이션의 주소로 변경 개발단계라서 *로 한것 배포시 수정해야함/ 허용할 도메인 주소 확인
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: false, // 쿠키를 사용하려면 true로 설정
+    credentials: true, // 쿠키를 사용하려면 true로 설정
+    exposedHeaders: ['accessToken', 'refreshToken'],
   });
 
   await app.listen(3000);
