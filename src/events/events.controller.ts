@@ -13,7 +13,13 @@ import {
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { EventEntity } from './entities/event.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
@@ -39,7 +45,7 @@ export class EventsController {
     const event = events.map((item) => {
       return {
         event: item,
-        guestList: item.GuestEvents.length-1,
+        guestList: item.GuestEvents.length - 1,
       };
     });
     return event;
@@ -53,7 +59,7 @@ export class EventsController {
 
     await this.eventsService.createViewLog(+eventId);
 
-    const guestList = event.GuestEvents.length-1;
+    const guestList = event.GuestEvents.length - 1;
     const { GuestEvents, ...data } = event;
 
     return { data, guestList };

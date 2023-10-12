@@ -55,7 +55,7 @@ CREATE TABLE `Viewlog` (
 -- CreateTable
 CREATE TABLE `Category` (
     `categoryId` INTEGER NOT NULL AUTO_INCREMENT,
-    `EventId` INTEGER NOT NULL,
+    `EventId` INTEGER NULL,
     `name` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`categoryId`)

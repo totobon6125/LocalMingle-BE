@@ -37,6 +37,7 @@ export class UsersController {
   @ApiOperation({ summary: '회원 조회' })
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
+
     const users = await this.usersService.findAll();
     if (!users) {
       throw new NotFoundException('Users does not exist');
