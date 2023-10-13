@@ -48,8 +48,8 @@ export class UpdateEventDto {
   @IsOptional()
   category?: string;
 
-  @ApiProperty({ required: false, default: false })
+  @ApiProperty({ required: false, default: "no" })
   @IsOptional()
-  @IsBoolean()
-  isVerified?: boolean;
+  @IsString()
+  isVerified?: string;
 }

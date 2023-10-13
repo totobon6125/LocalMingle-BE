@@ -1,9 +1,9 @@
 export interface Verify {
-    verify: string;
+    verify: string
   }
   
   const verifies: Verify[] = [
-    {verify: 'yes'},
-    {verify: 'no'}
+    {verify: "yes"},
+    {verify: "no"}
   ]
   

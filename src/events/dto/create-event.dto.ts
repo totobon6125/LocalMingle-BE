@@ -43,12 +43,12 @@ export class CreateEventDto {
   @IsString()
   category: string;
 
-  @ApiProperty()
+  @ApiProperty({required: false, default: false})
   @IsBoolean()
   isDeleted: boolean = false;
 
-  @ApiProperty({ required: false, default: false })
+  @ApiProperty({ required: false, default: "no" })
   @IsOptional()
-  @IsBoolean()
-  isVerified?: boolean;
+  @IsString()
+  isVerified?: string;
 }
