@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Category } from 'src/interface/category';
 import { City } from 'src/interface/city';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -23,6 +24,12 @@ export class DataService {
   filteredEventByCity(query: City) {
     return this.prisma.event.findMany({
       where: {eventLocation: query.doName}
+    })
+  }
+
+  filteredEventByCategory(query: Category) {
+    return this.prisma.event.findMany({
+      where: {category: query.category}
     })
   }
 }
