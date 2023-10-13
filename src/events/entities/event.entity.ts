@@ -29,8 +29,8 @@ export class EventEntity implements Event {
   @ApiProperty()
   category: string;
 
-  @ApiProperty({ required: false, default: false })
-  isVerified: boolean;
+  @ApiProperty({ required: false, default: "no" })
+  isVerified: string;
 
   @ApiProperty({ default: false })
   isDeleted: boolean;

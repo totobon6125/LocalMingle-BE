@@ -1,6 +1,11 @@
+#migrations
+
+/prisma/migrations
 # .env
 .env
 
+# package-lock.json
+package-lock.json
 
 # compiled output
 /dist

@@ -12,12 +12,12 @@ export class EventsService {
       data: createEventDto,
     });
 
-    await this.prisma.category.create({
-      data: {
-        EventId: event.eventId,
-        name: event.category,
-      },
-    });
+    // await this.prisma.category.create({
+    //   data: {
+    //     EventId: event.eventId,
+    //     name: event.category,
+    //   },
+    // });
 
     await this.prisma.hostEvent.create({
       data: {
@@ -64,6 +64,7 @@ export class EventsService {
   }
 
   async findOne(eventId: number) {
+    
     const event = await this.prisma.event.findUnique({
       where: { eventId, isDeleted: false },
       include: {

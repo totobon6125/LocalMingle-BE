@@ -18,8 +18,9 @@ export class UsersController {
   // user 생성한다.
   /* Eric's user
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @ApiCreatedResponse({ type: UserEntity })
+  async create(@Body() createUserDto: CreateUserDto) {
+    return new UserEntity(await this.usersService.create(createUserDto));
   }
   */
   @ApiOperation({ summary: '회원가입' })
