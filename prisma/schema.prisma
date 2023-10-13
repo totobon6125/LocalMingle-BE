@@ -89,6 +89,14 @@ model HostEvent {
   @@map("HostEvent")
 }
 
+model Category {
+  categoryId Int    @id @default(autoincrement()) // Primary Key
+  EventId    Int? // Foreign Key
+  name       String
+
+  Event Event? @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
+}
+
 // 게스트 이벤트 매핑 모델
 model GuestEvent {
   guestEventId      Int    @id @default(autoincrement()) // Primary Key
