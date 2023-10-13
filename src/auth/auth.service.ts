@@ -43,7 +43,7 @@ export class AuthService {
   async getAccessToken({ user, res }): Promise<string> {
     const accessToken = this.jwtService.sign(
       { sub: user.userId },
-      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '60s' },
+      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '3600s' },
     );
 
     return accessToken;
