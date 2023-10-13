@@ -5,11 +5,13 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
 import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mails/mail.module';
+import { ConfigModule } from '@nestjs/config';
 import { DataModule } from './data/data.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, EventsModule, DataModule],
+  imports: [ConfigModule.forRoot({isGlobal: true,}), PrismaModule, UsersModule, AuthModule, EventsModule, MailModule, DataModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

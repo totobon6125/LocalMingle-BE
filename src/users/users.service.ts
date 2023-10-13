@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.service.ts
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException,  Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 // import { CreateUserDetailDto } from './dto/create-user-detail.dto';
@@ -9,6 +9,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { IUsersServiceFindByEmail } from './interfaces/users-service.interface';
+
+
 
 @Injectable()
 export class UsersService {
@@ -189,5 +191,6 @@ export class UsersService {
     }); 
   }
   */ 
+
 
 }
