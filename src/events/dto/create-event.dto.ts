@@ -5,27 +5,29 @@ import {
   IsDate,
   IsOptional,
   IsBoolean,
+  IsNotEmpty,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateEventDto {
   @ApiProperty()
+  @IsNotEmpty()
   @IsString()
+  @MaxLength(50)
   eventName: string;
 
   @ApiProperty()
+  @IsNotEmpty()
   @IsInt()
   maxSize: number;
 
   @ApiProperty()
-  @IsDate()
   eventDate: Date;
 
   @ApiProperty()
-  @IsDate()
   signupStartDate: Date;
 
   @ApiProperty()
-  @IsDate()
   signupEndDate: Date;
 
   @ApiProperty()
@@ -34,6 +36,7 @@ export class CreateEventDto {
 
   @ApiProperty()
   @IsString()
+  @MaxLength(200)
   content: string;
 
   @ApiProperty()
@@ -44,8 +47,8 @@ export class CreateEventDto {
   @IsBoolean()
   isDeleted: boolean = false;
 
+  @ApiProperty({ required: false, default: false })
   @IsOptional()
   @IsBoolean()
-  @ApiProperty({ required: false, default: false })
   isVerified?: boolean;
 }

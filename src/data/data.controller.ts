@@ -26,4 +26,12 @@ export class DataController {
   async guNameData(@Query() query: City) {
     return await this.dataService.guNameData(query)
   }
+
+  
+  @Get('filter/city')
+  @ApiOperation({summary: '이벤트 필터링(시/도)'})
+  @ApiQuery({name: 'doName', type: String, required: true})
+  filteredEventByCity(@Query() query: City) {
+    return this.dataService.filteredEventByCity(query) 
+  }
 }

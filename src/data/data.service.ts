@@ -17,7 +17,12 @@ export class DataService {
       where: { doName: query.doName },
       select: { guName: true },
     });
-    console.log(data)
     return data
+  }
+
+  filteredEventByCity(query: City) {
+    return this.prisma.event.findMany({
+      where: {eventLocation: query.doName}
+    })
   }
 }
