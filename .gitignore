@@ -4,6 +4,9 @@
 # packagelock JSON
 package-lock.json
 
+# migrations
+/prisma/migrations
+
 # compiled output
 /dist
 /node_modules
