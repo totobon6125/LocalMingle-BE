@@ -1,26 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { CreateDatumDto } from './dto/create-datum.dto';
-import { UpdateDatumDto } from './dto/update-datum.dto';
+import { City } from 'src/interface/city';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DataService {
-  create(createDatumDto: CreateDatumDto) {
-    return 'This action adds a new datum';
+  constructor(private prisma: PrismaService) {}
+  async cityData() {
+    const doName = await this.prisma.region.findMany({
+      select: {
+        doName: true,
+      },
+    });
+    return doName;
   }
 
-  findAll() {
-    return `This action returns all data`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} datum`;
-  }
-
-  update(id: number, updateDatumDto: UpdateDatumDto) {
-    return `This action updates a #${id} datum`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} datum`;
+  async guNameData(query: City) {
+    const guName = await this.prisma.region.findMany({
+      where: {doName: query.doName},
+      select: {guName: true},
+    });
+    return guName;
   }
 }

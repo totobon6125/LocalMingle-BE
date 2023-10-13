@@ -25,13 +25,14 @@ export class EventsController {
   @Post()
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
-  @ApiOperation({ summary: 'Event 전체 조회' })
+  @ApiOperation({ summary: 'Event 생성' })
   @ApiCreatedResponse({ type: EventEntity })
   create(@Body() createEventDto: CreateEventDto) {
     return this.eventsService.create(createEventDto);
   }
 
   @Get()
+  @ApiOperation({summary: 'Event 전체 조회'})
   @ApiOkResponse({ type: EventEntity, isArray: true })
   async findAll() {
     const events = await this.eventsService.findAll();
@@ -46,6 +47,7 @@ export class EventsController {
   }
 
   @Get(':eventId')
+  @ApiOperation({summary: 'Event 상세 조회'})
   @ApiOkResponse({ type: EventEntity })
   async findOne(@Param('eventId') eventId: string) {
     const event = await this.eventsService.findOne(+eventId);
@@ -60,7 +62,7 @@ export class EventsController {
   }
 
   @Put(':eventId/join')
-  @ApiCreatedResponse({ description: `모임 참석 신청 / 취소` })
+  @ApiOperation({summary: 'Event 참석 신청 / 취소'})
   async join(
     @Param('eventId') eventId: string,
     @Body('userId') userId: string,
@@ -80,6 +82,7 @@ export class EventsController {
   }
 
   @Patch(':eventId')
+  @ApiOperation({summary: 'Event 수정'})
   @ApiOkResponse({ type: EventEntity })
   async update(
     @Param('eventId') eventId: string,
@@ -92,6 +95,7 @@ export class EventsController {
   }
 
   @Delete(':eventId')
+  @ApiOperation({summary: 'Event 삭제'})
   @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
   async remove(@Param('eventId') eventId: string) {
     const event = await this.eventsService.findOne(+eventId);

@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query} from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 import { DataService } from './data.service';
-import { CreateDatumDto } from './dto/create-datum.dto';
-import { UpdateDatumDto } from './dto/update-datum.dto';
+import { City } from 'src/interface/city';
 
 @Controller('data')
 export class DataController {
   constructor(private readonly dataService: DataService) {}
 
-  @Post()
-  create(@Body() createDatumDto: CreateDatumDto) {
-    return this.dataService.create(createDatumDto);
+  @Get('city')
+  @ApiOperation({summary: '이벤트 시/도 데이터목록'})
+  async cityData() {
+    const region = await this.dataService.cityData()
+    
+    const city = region.filter((item, index) => {
+      return region.findIndex((x) => x.doName === item.doName) === index;
+    });
+
+    return city
   }
 
-  @Get()
-  findAll() {
-    return this.dataService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.dataService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDatumDto: UpdateDatumDto) {
-    return this.dataService.update(+id, updateDatumDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.dataService.remove(+id);
+  @Get('gu_name')
+  @ApiOperation({summary: '이벤트 구/군 데이터 목록'})
+  async guNameData(@Query() query: City) {
+    const guName = await this.dataService.guNameData(query)
+    return guName
   }
 }
