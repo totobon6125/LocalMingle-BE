@@ -110,7 +110,7 @@ export class EventsController {
   }
 
   @Delete(':eventId')
-  @ApiOperation({ summary: 'Event 삭제' })
+  @ApiOperation({ summary: 'Host로서 Event 삭제' })
   @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
   async remove(@Param('eventId') eventId: string) {
     const event = await this.eventsService.findOne(+eventId);
