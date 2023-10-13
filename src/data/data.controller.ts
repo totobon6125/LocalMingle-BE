@@ -37,7 +37,7 @@ export class DataController {
   }
 
   @Get('filter/category')
-  @ApiOperation({summary: '이벤트 필터링(카테고리'})
+  @ApiOperation({summary: '이벤트 필터링(카테고리)'})
   @ApiQuery({name: 'category', type: String, required: true})
   filteredEventByCategory(@Query() query: Category) {
     return this.dataService.filteredEventByCategory(query)
