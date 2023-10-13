@@ -36,8 +36,8 @@ model UserDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  User     User      @relation(fields: [UserId], references: [userId], onDelete: Cascade)
-  Viewlogs Viewlog[]
+  User      User     @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  Viewlogs  Viewlog[] 
 
   @@map("UserInfo")
 }
@@ -53,14 +53,13 @@ model Event {
   eventLocation   String
   content         String
   category        String
-  isVerified      Boolean  @default(false)
+  isVerified      String   @default("no") 
   isDeleted       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   HostEvents  HostEvent[]
   GuestEvents GuestEvent[]
-  Categories  Category[]
   Viewlogs    Viewlog[]
 
   @@map("Event")
@@ -68,17 +67,28 @@ model Event {
 
 // 조회 기록 모델
 model Viewlog {
-  viewlogId Int @id @default(autoincrement()) // Primary Key
-  EventId   Int
-  UserId    Int
+  viewlogId     Int       @id @default(autoincrement()) // Primary Key
+  EventId       Int    
+  UserId        Int
 
-  Event      Event      @relation(fields: [EventId], references: [eventId])
-  UserDetail UserDetail @relation(fields: [UserId], references: [userDetailId])
+  Event        Event      @relation(fields: [EventId], references: [eventId])
+  UserDetail   UserDetail @relation(fields: [UserId],  references: [userDetailId])
 
   @@map("Viewlog")
 }
 
-// 카테고리 모델
+// 호스트 이벤트 매핑 모델
+model HostEvent {
+  hostEventId      Int @id @default(autoincrement()) // Primary Key
+  HostId           Int // Foreign Key
+  EventId          Int // Foreign Key
+
+  Event Event @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
+  User  User  @relation(fields: [HostId], references: [userId], onDelete: Cascade)
+
+  @@map("HostEvent")
+}
+
 model Category {
   categoryId Int    @id @default(autoincrement()) // Primary Key
   EventId    Int? // Foreign Key
@@ -87,26 +97,20 @@ model Category {
   Event Event? @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
 }
 
-// 호스트 이벤트 매핑 모델
-model HostEvent {
-  hostEventId Int @id @default(autoincrement()) // Primary Key
-  HostId      Int // Foreign Key
-  EventId     Int // Foreign Key
-
-  Event Event @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
-  User  User  @relation(fields: [HostId], references: [userId], onDelete: Cascade)
-
-  @@map("HostEvent")
-}
-
 // 게스트 이벤트 매핑 모델
 model GuestEvent {
-  guestEventId Int  @id @default(autoincrement()) // Primary Key
-  GuestId      Int? // Foreign Key
-  EventId      Int // Foreign Key
+  guestEventId      Int    @id @default(autoincrement()) // Primary Key
+  GuestId           Int? // Foreign Key
+  EventId           Int // Foreign Key
 
   Event Event @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
-  User  User? @relation(fields: [GuestId], references: [userId], onDelete: Cascade)
+  User  User?  @relation(fields: [GuestId], references: [userId], onDelete: Cascade)
 
   @@map("GuestEvent")
+}
+
+model Region {
+  RegionId      Int      @default(autoincrement())   @id
+  doName        String    
+  guName        String
 }

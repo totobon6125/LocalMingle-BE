@@ -83,7 +83,6 @@ export class CreateUserDto {
   nickname: string;
 
   @IsString()
-  @IsNotEmpty()
   @ApiProperty({
     description: 'intro',
     example: '안녕하세요',
@@ -96,10 +95,9 @@ export class CreateUserDto {
     description: 'password',
     example: 'abc123456789!',
   })
-  confirm: string;
+  confirmPassword: string;
 
   @IsString()
-  @IsNotEmpty()
   @ApiProperty({
     description: 'profileImg',
     example: 'string',

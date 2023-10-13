@@ -17,8 +17,10 @@ export interface IAuthServiceLogin {
 
 export interface IAuthServiceGetAccessToken {
   user: User;
+  res: any; // res 매개 변수 추가
 }
 
 export interface IAuthServiceGetRefereshToken {
   user: User;
+  res: any; // res 매개 변수 추가
 }

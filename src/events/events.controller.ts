@@ -47,6 +47,7 @@ export class EventsController {
   }
 
   @Get()
+  @ApiOperation({summary: 'Event 전체 조회'})
   @ApiOkResponse({ type: EventEntity, isArray: true })
   async findAll() {
     const events = await this.eventsService.findAll();
@@ -61,6 +62,7 @@ export class EventsController {
   }
 
   @Get(':eventId')
+  @ApiOperation({summary: 'Event 상세 조회'})
   @ApiOkResponse({ type: EventEntity })
   async findOne(@Param('eventId') eventId: string) {
     const event = await this.eventsService.findOne(+eventId);
@@ -70,7 +72,6 @@ export class EventsController {
 
     const guestList = event.GuestEvents.length - 1;
     const { ...data } = event;
-    console.log('events.controller data:', data);
     return { data, guestList };
   }
 
@@ -109,6 +110,7 @@ export class EventsController {
   }
 
   @Delete(':eventId')
+  @ApiOperation({ summary: 'Event 삭제' })
   @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
   async remove(@Param('eventId') eventId: string) {
     const event = await this.eventsService.findOne(+eventId);

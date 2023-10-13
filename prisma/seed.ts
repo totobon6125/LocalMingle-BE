@@ -179,7 +179,6 @@
 //   console.log({ user1, user2, user3, user4, event1, event2, event3, event4 });
 // }
 
-
 // main()
 //   .catch((e) => {
 //     throw e;
@@ -187,7 +186,6 @@
 //   .finally(async () => {
 //     await prisma.$disconnect();
 //   });
-
 
 // import { PrismaClient } from '@prisma/client';
 // const prisma = new PrismaClient();
@@ -367,7 +365,6 @@
 
 //   console.log({ user1, user2, user3, user4, event1, event2, event3, event4 });
 // }
-
 
 // main()
 //   .catch((e) => {

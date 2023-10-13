@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.service.ts
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException,  Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,20 +8,19 @@ import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { IUsersServiceFindByEmail } from './interfaces/users-service.interface';
 
+
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
   
   // 1. 유저를 생성한다. (회원가입)
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { email, password, nickname, intro, confirm, profileImg } = createUserDto;
-    console.log(" events.controller - createUserDto", createUserDto);
-    
-  // 비밀번호 확인
-  if (password !== confirm) {
-    throw new BadRequestException('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
-  }
-
+  const { email, password, nickname, intro, confirmPassword, profileImg } = createUserDto;
+  // 리팩토링시 !== 로 변경
+  if  (password != confirmPassword){
+      throw new BadRequestException('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+    }
   // 이메일 중복 체크
   const existingUser = await this.findByEmail({ email });
   if (existingUser) {
