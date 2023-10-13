@@ -28,6 +28,12 @@ export class MailService {
     return token;
   };
 
+  // generateRandomNumber = (max, min) => {
+  //   const randomnumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
+  //   return randomnumber;
+  // };
+
   async sendMail(to: string, subject: string, content: string, req: Request) {
     try {
       const email = req.body.to; // 이메일을 req.body에서 가져옵니다.

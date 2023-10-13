@@ -48,14 +48,14 @@ export class UsersService {
     return user;
     */
 
-    const { email, password, nickname, intro, confirm, profileImg } = createUserDto;
+    const { email, password, nickname, intro, confirmPassword, profileImg } = createUserDto;
 
     const user = await this.findByEmail({ email });
     if (user) {
       throw new ConflictException('이미 등록된 이메일입니다.');
     }
-
-   if  (password != confirm){
+  // 리팩토링시 !== 로 변경
+   if  (password != confirmPassword){
       throw new BadRequestException('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
     }
 

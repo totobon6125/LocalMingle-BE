@@ -23,8 +23,8 @@ export class UsersController {
   }
   */
   @ApiOperation({ summary: '회원가입' })
-  @ApiResponse({ status: 200, description: '회원가입이 성공하였습니다.' })
-  @Post()
+  @ApiResponse({ status: 201, description: '회원가입이 성공하였습니다.' })
+  @Post('/signup')
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
@@ -37,6 +37,7 @@ export class UsersController {
   @ApiOperation({ summary: '회원 조회' })
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
+
     const users = await this.usersService.findAll();
     if (!users) {
       throw new NotFoundException('Users does not exist');
