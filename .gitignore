@@ -1,3 +1,6 @@
+#migrations
+
+/prisma/migrations
 # .env
 .env
 
