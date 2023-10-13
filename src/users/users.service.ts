@@ -48,7 +48,7 @@ export class UsersService {
           create: {
             nickname,
             intro,
-            profileImg,
+            profileImg: '기본 이미지 URL',
           },
         },
       },
@@ -85,6 +85,7 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
+  /* FiXME */
   // 5. user 정보 수정한다.
   async update(id: number, updateUserDto: UpdateUserDto) {
     return await this.prisma.user.update({
@@ -140,6 +141,27 @@ export class UsersService {
           },
         },
       },
+    });
+  }
+
+  // 9. 프로필 이미지를 업데이트 한다.
+  async updateProfileImage(id: number, profileImg: string) {
+    // 먼저 UserId를 통해 UserDetail을 찾고, UserDetail의 profileImg를 업데이트 한다.
+    const userDetail = await this.prisma.userDetail.findFirst({
+      where: { UserId: id },
+    });
+
+    console.log('User Detail:', userDetail);
+    console.log('User Detail ID:', userDetail.userDetailId);
+
+    if (!userDetail) {
+      throw new BadRequestException('회원 상세 정보가 존재하지 않습니다.');
+    }
+    
+    // userDetailId를 사용하여 프로필 이미지를 업데이트한다.
+    return await this.prisma.userDetail.update({
+      where: { userDetailId: userDetail.userDetailId },
+      data: { profileImg: profileImg },
     });
   }
 }

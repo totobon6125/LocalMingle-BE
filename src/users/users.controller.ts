@@ -5,10 +5,13 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
+import { AwsS3Service } from 'src/aws/aws.s3';
+import { UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 // request에 user 객체를 추가하기 위한 인터페이스
@@ -18,7 +21,10 @@ interface RequestWithUser extends Request {
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly awsS3Service: AwsS3Service, 
+    ) {}
 
   // 1. 유저를 생성한다. (회원가입)
   @ApiOperation({ summary: '회원가입' })
@@ -73,6 +79,7 @@ export class UsersController {
     return user;
   }
 
+  /* FIXME */
   // 5. user 정보 수정한다.
   @Patch(':id')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
@@ -117,6 +124,44 @@ export class UsersController {
     const joinedEvents = this.usersService.findJoinedEvents(+id);
     return joinedEvents;
   }
+
+  // 9. 사용자 유저 프로필 이미지를 업로드 한다.
+  @Post('upload')
+  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
+  @ApiOperation({ summary: '프로필 이미지 업로드' })
+  @ApiConsumes('multipart/form-data')  
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBody({
+    description: 'User profile image',
+    type: 'multipart/form-data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async updateProfileImage(@Req() req: RequestWithUser, @UploadedFile() file) {
+    const { userId } = req.user;
+
+    console.log('updateProfileImage in users.controller.ts - userId:', userId);
+    console.log('updateProfileImage in users.controller.ts - file:', file);
+    
+    const user = await this.usersService.findOne(userId);
+    console.log('User:', user);
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+
+    const uploadedFile = await this.awsS3Service.uploadFile(file) as { Location: string };
+    return this.usersService.updateProfileImage(userId, uploadedFile.Location);
+  }
+
   // 사용자가 관심 등록한 모임 리스트를 조회한다.
   // TODO
   /* 
@@ -126,24 +171,5 @@ export class UsersController {
   }
   */
 
-  /* TODO: UserDetail 
-  // User Detail 정보 생성
-// @Post('/:id/user-detail')
-// createUserDetail(@Body() createUserDetailDto: CreateUserDetailDto, @Param('id') id: string) {
-//   return this.usersService.createUserDetail(createUserDetailDto, +id);
-// }
-
-// User Detail 정보 조회
-@Get('/:id/user-detail')
-findUserDetail(@Param('id') id: string) {
-  return this.usersService.findUserDetail(+id);
 }
 
-// User Detail 정보 업데이트
-@Patch('/:id/user-detail')
-updateUserDetail(@Body() updateUserDetailDto: UpdateUserDetailDto, @Param('id') id: string) {
-  return this.usersService.updateUserDetail(updateUserDetailDto, +id);
-}
-*/
-
-}
