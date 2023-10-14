@@ -16,7 +16,7 @@ export class UsersService {
   
   // 1. 유저를 생성한다. (회원가입)
   async create(createUserDto: CreateUserDto): Promise<User> {
-  const { email, password, nickname, intro, confirmPassword, profileImg } = createUserDto;
+  const { email, password, nickname, intro, confirmPassword/* , profileImg */ } = createUserDto;
   // 리팩토링시 !== 로 변경
   if  (password != confirmPassword){
       throw new BadRequestException('비밀번호와 비밀번호 확인이 일치하지 않습니다.');

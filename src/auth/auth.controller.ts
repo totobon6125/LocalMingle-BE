@@ -113,7 +113,6 @@ export class AuthController {
   ) {
     this.authService.OAuthLogin({ req, res });
   }
-
   //-----------------------구글 로그인-----------------------------//
   // @Get('/login/google') //restAPI만들기. 엔드포인트는 /login/google.
   // @UseGuards(AuthGuard('google')) //인증과정을 거쳐야하기때문에 UseGuards를 써주고 passport인증으로 AuthGuard를 써준다. 이름은 google로

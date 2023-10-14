@@ -99,11 +99,18 @@ export class CreateUserDto {
   })
   confirmPassword: string;
 
-  @IsOptional()
+  /*  @IsOptional() */
   @IsString()
   @ApiProperty({
     description: 'profileImg',
     example: '프로필이미지 url',
   })
   profileImg?: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'refreshToken',
+    example: 'refreshToken',
+  })
+  refreshToken?: string;
 }
