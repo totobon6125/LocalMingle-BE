@@ -11,7 +11,7 @@ on:
 
 env:
   PROJECT_NAME: local_mingle
-  BUCKET_NAME: S3-bucket-localMingle
+  BUCKET_NAME: s3-bucket-local-mingle
   CODE_DEPLOY_APP_NAME: CD-app-local-mingle
   DEPLOYMENT_GROUP_NAME: CD-app-group-local-mingle
 
@@ -56,7 +56,7 @@ jobs:
 
     # S3로 업로드하기
     - name: upload to S3
-      run: aws s3 cp ./$GITHUB_SHA.zip s3://S3-bucket-localMingle/local_mingle/$GITHUB_SHA.zip
+      run: aws s3 cp ./$GITHUB_SHA.zip s3://s3-bucket-local-mingle/local_mingle/$GITHUB_SHA.zip
 
     # codeDeploy 실행
     - name: request deploy to codedeploy
@@ -64,4 +64,4 @@ jobs:
               --application-name CD-app-local-mingle
               --deployment-config-name CodeDeployDefault.AllAtOnce
               --deployment-group-name CD-app-group-local-mingle
-              --s3-location bucket=S3-bucket-localMingle,bundleType=zip,key=local_mingle/$GITHUB_SHA.zip
+              --s3-location bucket=s3-bucket-local-mingle,bundleType=zip,key=local_mingle/$GITHUB_SHA.zip
