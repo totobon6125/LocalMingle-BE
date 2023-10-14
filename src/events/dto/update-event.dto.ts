@@ -19,17 +19,14 @@ export class UpdateEventDto {
   maxSize?: number;
 
   @ApiProperty({ required: false })
-  @IsDate()
   @IsOptional()
   eventDate?: Date;
 
   @ApiProperty({ required: false })
-  @IsDate()
   @IsOptional()
   signupStartDate?: Date;
 
   @ApiProperty({ required: false })
-  @IsDate()
   @IsOptional()
   signupEndDate?: Date;
 
