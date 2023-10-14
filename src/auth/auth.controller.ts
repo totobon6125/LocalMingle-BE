@@ -36,7 +36,7 @@ interface IOAuthUser {
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UsersService,
+    private readonly usersService: UsersService
   ) {}
 
   @ApiOperation({ summary: '로그인' })
@@ -47,7 +47,7 @@ export class AuthController {
   async login(
     @Body() { email, password }: LoginDto,
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response, // Response 객체 주입
+    @Res({ passthrough: true }) res: Response // Response 객체 주입
   ): Promise<void> {
     const { accessToken, refreshToken } = await this.authService.login({
       email,
@@ -84,7 +84,7 @@ export class AuthController {
   @Post('refresh')
   async refreshAccessToken(
     @Headers('refreshToken') refreshToken: string, // 요청 헤더에서 refresh-token 값을 추출
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response
   ): Promise<void> {
     try {
       // 리프레시 토큰을 사용하여 새로운 엑세스 토큰 발급
@@ -109,7 +109,7 @@ export class AuthController {
   @UseGuards(AuthGuard('kakao'))
   async loginKakao(
     @Req() req: Request & IOAuthUser, //
-    @Res() res: Response,
+    @Res() res: Response
   ) {
     this.authService.OAuthLogin({ req, res });
   }

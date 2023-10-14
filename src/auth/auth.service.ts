@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import {
   Injectable,
   NotFoundException,
@@ -14,7 +15,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private prisma: PrismaService,
-    private jwtService: JwtService,
+    private jwtService: JwtService
   ) {}
   async login({ email, password, res }): Promise<{
     accessToken: string;
@@ -43,7 +44,7 @@ export class AuthService {
   async getAccessToken({ user, res }): Promise<string> {
     const accessToken = this.jwtService.sign(
       { sub: user.userId },
-      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '3600s' },
+      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '3600s' }
     );
 
     return accessToken;
@@ -53,7 +54,7 @@ export class AuthService {
     // 리프레시 토큰을 생성하는 로직을 구현
     const refreshToken = this.jwtService.sign(
       { sub: user.userId },
-      { secret: process.env.JWT_REFRESH_KEY, expiresIn: '2w' },
+      { secret: process.env.JWT_REFRESH_KEY, expiresIn: '2w' }
     );
     return refreshToken;
   }
@@ -81,7 +82,7 @@ export class AuthService {
       // 이 부분에서 아이디 생성과 관련된 코드를 추가해야 합니다.
       const createUser = {
         email: req.user.email, // 사용자의 이메일을 사용하여 아이디 생성
-        nickname: req.user.name,
+        nickname: req.user.name, // TODO: email@email.com 에서 email만 빼서 받겠음
         password: req.user.password, // 비밀번호를 해싱하여 저장
         confirmPassword: req.user.password, // 비밀번호를 해싱하여 저장
         intro: req.user.intro,

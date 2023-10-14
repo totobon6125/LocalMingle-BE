@@ -1,7 +1,10 @@
+#migrations
+
+/prisma/migrations
 # .env
 .env
 
-# packagelock JSON
+# package-lock.json
 package-lock.json
 
 # migrations
