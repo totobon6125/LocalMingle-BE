@@ -12,12 +12,12 @@ export class EventsService {
       data: createEventDto,
     });
 
-    // await this.prisma.category.create({
-    //   data: {
-    //     EventId: event.eventId,
-    //     name: event.category,
-    //   },
-    // });
+    await this.prisma.category.create({
+      data: {
+        EventId: event.eventId,
+        name: event.category,
+      },
+    });
 
     await this.prisma.hostEvent.create({
       data: {
