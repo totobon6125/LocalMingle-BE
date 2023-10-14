@@ -7,27 +7,21 @@ import { UpdateEventDto } from './dto/update-event.dto';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createEventDto: CreateEventDto) {
+  async create(userId: number, createEventDto: CreateEventDto) {
     const event = await this.prisma.event.create({
       data: createEventDto,
     });
 
-    await this.prisma.category.create({
+    const category = await this.prisma.category.create({
       data: {
         EventId: event.eventId,
         name: event.category,
       },
     });
 
-    await this.prisma.hostEvent.create({
+    const hostEvent = await this.prisma.hostEvent.create({
       data: {
-        HostId: 1,
-        EventId: event.eventId,
-      },
-    });
-
-    await this.prisma.guestEvent.create({
-      data: {
+        HostId: userId,
         EventId: event.eventId,
       },
     });
@@ -68,6 +62,16 @@ export class EventsService {
     const event = await this.prisma.event.findUnique({
       where: { eventId, isDeleted: false },
       include: {
+        HostEvents: {
+          select: {
+            HostId: true,
+            User: {
+              select: {
+                UserDetail: true,
+              },
+            },
+          },
+        },
         GuestEvents: {
           select: {
             GuestId: true,
@@ -102,7 +106,7 @@ export class EventsService {
     const isJoin = await this.prisma.guestEvent.findFirst({
       where: {
         EventId: eventId,
-        GuestId: 2,
+        GuestId: userId,
       },
     });
     return isJoin;
@@ -112,12 +116,13 @@ export class EventsService {
     await this.prisma.guestEvent.create({
       data: {
         EventId: eventId,
-        GuestId: 2,
+        GuestId: userId,
       },
     });
   }
 
-  async cancleJoin(guestEventId: number) {
+  /* TODO: 참가 취소하면 guestEvent에서 지우는게 아니라 guestEvent의 isDeleted를 true로 바꾸는 방식으로 변경 */
+  async cancelJoin(guestEventId: number) {
     await this.prisma.guestEvent.delete({
       where: { guestEventId },
     });

@@ -81,7 +81,7 @@ export class AuthService {
       // 이 부분에서 아이디 생성과 관련된 코드를 추가해야 합니다.
       const createUser = {
         email: req.user.email, // 사용자의 이메일을 사용하여 아이디 생성
-        nickname: req.user.name,
+        nickname: req.user.name, // TODO: email@email.com 에서 email만 빼서 받겠음
         password: req.user.password, // 비밀번호를 해싱하여 저장
         confirmPassword: req.user.password, // 비밀번호를 해싱하여 저장
         intro: req.user.intro,
