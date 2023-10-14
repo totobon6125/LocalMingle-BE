@@ -10,6 +10,7 @@ import {
   NotFoundException,
   Put,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -47,7 +48,7 @@ export class EventsController {
   }
 
   @Get()
-  @ApiOperation({summary: 'Event 전체 조회'})
+  @ApiOperation({ summary: 'Event 전체 조회' })
   @ApiOkResponse({ type: EventEntity, isArray: true })
   async findAll() {
     const events = await this.eventsService.findAll();
@@ -55,22 +56,22 @@ export class EventsController {
     const event = events.map((item) => {
       return {
         event: item,
-        guestList: item.GuestEvents.length
+        guestList: item.GuestEvents.length,
       };
     });
     return event;
   }
 
   @Get(':eventId')
-  @ApiOperation({summary: 'Event 상세 조회'})
+  @ApiOperation({ summary: 'Event 상세 조회' })
   @ApiOkResponse({ type: EventEntity })
-  async findOne(@Param('eventId') eventId: string) {
-    const event = await this.eventsService.findOne(+eventId);
+  async findOne(@Param('eventId', ParseIntPipe) eventId: number) {
+    const event = await this.eventsService.findOne(eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
-    await this.eventsService.createViewLog(+eventId);
+    await this.eventsService.createViewLog(eventId);
 
-    const guestList = event.GuestEvents.length
+    const guestList = event.GuestEvents.length;
     const { ...data } = event;
     return { data, guestList };
   }
@@ -100,22 +101,22 @@ export class EventsController {
   @ApiOperation({ summary: 'Host로서 Event 수정' })
   @ApiOkResponse({ type: EventEntity })
   async update(
-    @Param('eventId') eventId: string,
-    @Body() updateEventDto: UpdateEventDto,
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Body() updateEventDto: UpdateEventDto
   ) {
-    const event = await this.eventsService.findOne(+eventId);
+    const event = await this.eventsService.findOne(eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
-    return this.eventsService.update(+eventId, updateEventDto);
+    return this.eventsService.update(eventId, updateEventDto);
   }
 
   @Delete(':eventId')
   @ApiOperation({ summary: 'Host로서 Event 삭제' })
   @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
-  async remove(@Param('eventId') eventId: string) {
-    const event = await this.eventsService.findOne(+eventId);
+  async remove(@Param('eventId', ParseIntPipe) eventId: number) {
+    const event = await this.eventsService.findOne(eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
-    return this.eventsService.remove(+eventId);
+    return this.eventsService.remove(eventId);
   }
 }
