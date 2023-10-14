@@ -53,15 +53,15 @@ model Event {
   eventLocation   String
   content         String
   category        String
-  isVerified      Boolean  @default(false)
+  isVerified      String   @default("no")
   isDeleted       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   HostEvents  HostEvent[]
   GuestEvents GuestEvent[]
-  Categories  Category[]
   Viewlogs    Viewlog[]
+  Category    Category[]
 
   @@map("Event")
 }
@@ -78,15 +78,6 @@ model Viewlog {
   @@map("Viewlog")
 }
 
-// 카테고리 모델
-model Category {
-  categoryId Int    @id @default(autoincrement()) // Primary Key
-  EventId    Int? // Foreign Key
-  name       String
-
-  Event Event? @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
-}
-
 // 호스트 이벤트 매핑 모델
 model HostEvent {
   hostEventId Int @id @default(autoincrement()) // Primary Key
@@ -99,6 +90,14 @@ model HostEvent {
   @@map("HostEvent")
 }
 
+model Category {
+  categoryId Int    @id @default(autoincrement()) // Primary Key
+  EventId    Int? // Foreign Key
+  name       String
+
+  Event Event? @relation(fields: [EventId], references: [eventId], onDelete: Cascade)
+}
+
 // 게스트 이벤트 매핑 모델
 model GuestEvent {
   guestEventId Int  @id @default(autoincrement()) // Primary Key
@@ -109,4 +108,10 @@ model GuestEvent {
   User  User? @relation(fields: [GuestId], references: [userId], onDelete: Cascade)
 
   @@map("GuestEvent")
+}
+
+model Region {
+  RegionId Int    @id @default(autoincrement())
+  doName   String
+  guName   String
 }
