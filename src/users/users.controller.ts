@@ -152,6 +152,7 @@ export class UsersController {
   async updateProfileImage(@Req() req: RequestWithUser, @UploadedFile() file) {
     const { userId } = req.user;
 
+    console.log("1. file in users.controller.ts:", file);
     const user = await this.usersService.findOne(userId);
     // console.log('User:', user);
     if (!user) {
