@@ -6,7 +6,7 @@ import {
 import { PrismaService } from './../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { IAuthServiceLogin } from './interface/auth-service.interface';
+//import { IAuthServiceLogin } from './interface/auth-service.interface';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -46,6 +46,10 @@ export class AuthService {
         refreshToken: refreshToken,
       },
     });
+
+    //Authorization로 보내도록 결정되면 이렇게 수정(피드백 받으면 좋을 내용)
+    // res.header('Authorization', `Bearer ${accessToken}`);
+    // res.header('Refresh-Token', refreshToken);
 
     return { accessToken, refreshToken };
   }
@@ -116,6 +120,10 @@ export class AuthService {
         refreshToken: refreshToken,
       },
     });
+
+    //Authorization로 보내도록 결정되면 이렇게 수정(피드백 받으면 좋을 내용)
+    // res.header('Authorization', `Bearer ${accessToken}`);
+    // res.header('Refresh-Token', refreshToken);
 
     res.header(accessToken);
     res.header(refreshToken);
