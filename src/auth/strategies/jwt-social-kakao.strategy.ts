@@ -2,9 +2,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-kakao';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma/prisma.service'; // 프리즈마 서비스 파일 경로를 사용하는 경로로 수정해야 합니다.
+import { Inject } from '@nestjs/common';
 
 export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(PrismaService) private readonly prismaService: PrismaService // 추가
+  ) {
     super({
       clientID: process.env.KAKAO_CLIENT_ID,
       clientSecret: process.env.KAKAO_CLIENT_SECRET,
@@ -52,16 +56,16 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
 
       const anonymousName = `${anonymousPrefix}${randomString}`;
 
-      return anonymousName;
+      //return anonymousName; // 밑의 로직이 작동안하면 임시적으로 사용
 
       // // 프리즈마를 사용하여 중복 확인
-      // const existingUser = await this.prisma.userDetail.findUnique({
-      //   where: { nickname: anonymousName },
-      // });
+      const existingUser = await this.prisma.userDetail.findUnique({
+        where: { nickname: anonymousName },
+      });
 
-      // if (!existingUser) {
-      //   return anonymousName; // 중복되지 않는 이름 반환
-      // }
+      if (!existingUser) {
+        return anonymousName; // 중복되지 않는 이름 반환
+      }
     }
   }
 }
