@@ -32,6 +32,7 @@ export class AwsS3Service {
         if (err) {
           return reject(err);
         }
+        console.log("2.1. file in aws.s3.ts: ", file);
         resolve(data);
       });
     });
