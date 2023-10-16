@@ -66,7 +66,7 @@ export class AuthService {
       { sub: user.userId },
       { secret: process.env.JWT_REFRESH_KEY, expiresIn: '2w' }
     );
-    console.log('리프레시 토큰 확인용 로그', user);
+    //console.log('리프레시 토큰 확인용 로그', user);
     return refreshToken;
     // return res.header(refreshToken);
   }
