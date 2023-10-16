@@ -18,6 +18,7 @@ export class AwsS3Service {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
+    console.log("2. file in aws.s3.ts: ", file);
 
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME || 's3-image-local-mingle', // AWS S3 버킷 이름

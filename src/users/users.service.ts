@@ -185,6 +185,7 @@ export class UsersService {
       throw new BadRequestException('회원 상세 정보가 존재하지 않습니다.');
     }
     
+    console.log("3. profileImg URL in usrs.service", profileImg);
     // userDetailId를 사용하여 프로필 이미지를 업데이트한다.
     const updatedProfileImage = await this.prisma.userDetail.update({
       where: { userDetailId: userDetail.userDetailId },
