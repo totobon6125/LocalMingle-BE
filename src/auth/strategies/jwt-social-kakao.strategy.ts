@@ -1,9 +1,10 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-kakao';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../../prisma/prisma.service'; // 프리즈마 서비스 파일 경로를 사용하는 경로로 수정해야 합니다.
 
 export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
-  constructor() {
+  constructor(private readonly prisma: PrismaService) {
     super({
       clientID: process.env.KAKAO_CLIENT_ID,
       clientSecret: process.env.KAKAO_CLIENT_SECRET,
@@ -13,17 +14,17 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any) {
-    console.log('카카오에서 주는 accessToken:' + accessToken); //이건 카카오에서 주는 엑세스토큰
-    console.log('카카오에서 주는 refreshToken:' + refreshToken); // 이건 카카오에서 주는 리프레시 토큰임
-    console.log(profile);
-    console.log(profile._json.kakao_account.email);
+    //console.log('카카오에서 주는 accessToken:' + accessToken);
+    //console.log('카카오에서 주는 refreshToken:' + refreshToken);
+    //console.log(profile);
+    //console.log(profile._json.kakao_account.email);
 
-    //비밀번호 암호화
+    // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(profile.id.toString(), 10);
 
-    // 랜덤 nickname 생성
-    const nickname = this.generateRandomNickname();
-
+    // 고유한 익명 nickname 생성
+    const nickname = await this.generateUniqueAnonymousName();
+    //console.log('닉네임 확인', nickname);
     return {
       name: profile.displayName,
       email: profile._json.kakao_account.email,
@@ -36,20 +37,31 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     };
   }
 
-  private generateRandomNickname() {
+  private async generateUniqueAnonymousName(): Promise<string> {
+    const anonymousPrefix = '익명';
+    const randomLength = 6;
     const characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz가갸거겨고교구규그기끼끄나냐너녀노뇨누뉴눼뉘뉴다댜더데도됴두듀뒤듸라랴러려로료루류뤼르리리끼끄마먀머며모묘무뮤뮈뮤나냐너녀노뇨누뉴눼뉘뉴다댜더데도됴두듀뒤듸바뱌버벼보뵤부뷔뷰뷸뷰사싸서셔소쇼수슈수아야어여오요우유윈유자작저져조주쥐쥬쥐키';
-    const minLength = 2; // 최소 길이
-    const maxLength = 8; // 최대 길이
-    const nicknameLength =
-      Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-    let nickname = '';
-    for (let i = 0; i < nicknameLength; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      nickname += characters.charAt(randomIndex);
+    while (true) {
+      let randomString = '';
+      for (let i = 0; i < randomLength; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomString += characters.charAt(randomIndex);
+      }
+
+      const anonymousName = `${anonymousPrefix}${randomString}`;
+
+      return anonymousName;
+
+      // // 프리즈마를 사용하여 중복 확인
+      // const existingUser = await this.prisma.userDetail.findUnique({
+      //   where: { nickname: anonymousName },
+      // });
+
+      // if (!existingUser) {
+      //   return anonymousName; // 중복되지 않는 이름 반환
+      // }
     }
-
-    return nickname;
   }
 }

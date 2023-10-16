@@ -16,8 +16,9 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService
   ) {}
+
   async login({ email, password, res }): Promise<{
-    //리펙토링시 res 를 뺴도 작동하는지 테스트
+    // 리팩토링 시 res 빼도 작동하는지 테스트
     accessToken: string;
     refreshToken: string;
   }> {
@@ -54,9 +55,9 @@ export class AuthService {
       { sub: user.userId },
       { secret: process.env.JWT_ACCESS_KEY, expiresIn: '3600s' }
     );
-    console.log('엑세스  토큰 확인용 로그', user);
+    //console.log('엑세스 토큰 확인용 로그', user);
     return accessToken;
-    //return res.header(accessToken);
+    // return res.header(accessToken);
   }
 
   setRefreshToken({ user, res }): string {
@@ -87,13 +88,12 @@ export class AuthService {
 
   async OAuthLogin({ req, res }) {
     // 1. 회원조회
-    let user = await this.usersService.findByEmail({ email: req.user.email }); //user를 찾아서
+    let user = await this.usersService.findByEmail({ email: req.user.email }); // user를 찾아서
 
     if (!user) {
-      // 이 부분에서 아이디 생성과 관련된 코드를 추가해야 합니다.
+      // 아이디 생성 관련 코드 추가
       const createUser = {
         email: req.user.email, // 사용자의 이메일을 사용하여 아이디 생성
-        //nickname: req.user.name,
         nickname: req.user.nickname, // TODO: 랜덤 문자 생성 로직 구현
         password: req.user.password, // 비밀번호를 해싱하여 저장
         confirmPassword: req.user.password, // 비밀번호를 해싱하여 저장
@@ -101,17 +101,15 @@ export class AuthService {
         profileImg: req.user.profileImg,
         // 다른 필드도 설정해야 할 수 있음
       };
-      console.log('소셜로그인회원가입 : ', createUser); // createUser 정보를 콘솔에 출력
+      // console.log('소셜 로그인 회원가입 : ', createUser); // createUser 정보를 콘솔에 출력
       user = await this.usersService.create(createUser);
     }
 
-    // 3. 회원가입이 되어있다면? 로그인(AT, RT를 생성해서 브라우저에 전송)한다
+    // 3. 회원가입이 되어 있다면? 로그인(AT, RT를 생성해서 브라우저에 전송)한다
     const accessToken = this.getAccessToken({ user, res }); // res를 전달
     const refreshToken = this.setRefreshToken({ user, res }); // res를 전달
-    // this.getAccessToken({ user, res }); // res를 전달
-    // this.setRefreshToken({ user, res }); // res를 전달
 
-    // 4. 로그인이 되면 DB에 refresh토큰을 저장한다.
+    // 4. 로그인이 되면 DB에 리프레시 토큰을 저장한다.
     await this.prisma.user.update({
       where: { userId: user.userId },
       data: {
@@ -121,11 +119,11 @@ export class AuthService {
 
     res.header(accessToken);
     res.header(refreshToken);
-    console.log('로컬 엑세스토큰', accessToken);
-    console.log('로컬 리프레시토큰', refreshToken);
+    console.log('로컬 엑세스 토큰', accessToken);
+    console.log('로컬 리프레시 토큰', refreshToken);
 
-    //리다이렉션
-    res.redirect('http://127.0.0.1:5500');
+    // 리다이렉션
+    res.redirect('http://127.0.0.1:5500'); // 메인페이지 url 을 입력해야합니다.
 
     return { accessToken, refreshToken };
   }
