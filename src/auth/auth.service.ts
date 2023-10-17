@@ -25,7 +25,6 @@ export class AuthService {
 
     //user: User; // User 정보를 반환하기 위한 타입
     userId: number; // userId만 반환
-
   }> {
     // 1. 이메일이 일치하는 유저를 DB에서 찾기
     const user = await this.usersService.findByEmail({ email });
@@ -56,10 +55,8 @@ export class AuthService {
     // res.header('Authorization', `Bearer ${accessToken}`);
     // res.header('RefreshToken', refreshToken);
 
-
     //TODO : user값 대신 userId값만 넘어가게 수정해야함 ()
     return { accessToken, refreshToken, userId: user.userId }; //리턴값
-
   }
 
   getAccessToken({ user, res }): string {
