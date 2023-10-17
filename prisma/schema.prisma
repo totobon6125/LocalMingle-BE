@@ -17,6 +17,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  refreshToken String?  @db.Text
 
   UserDetail  UserDetail[]
   HostEvents  HostEvent[]

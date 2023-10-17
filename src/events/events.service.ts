@@ -67,7 +67,6 @@ export class EventsService {
   }
 
   async findOne(eventId: number) {
-    
     const event = await this.prisma.event.findUnique({
       where: { eventId, isDeleted: false },
       include: {

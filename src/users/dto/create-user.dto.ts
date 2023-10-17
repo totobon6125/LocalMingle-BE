@@ -8,6 +8,7 @@ import {
   MaxLength,
   IsEmail,
   Matches,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -27,16 +28,17 @@ export class CreateUserDto {
   @Matches(/^(?=.*[A-Za-z가-힣]).*[A-Za-z가-힣0-9]*$/)
   @ApiProperty({
     description: 'nickname',
-    example: '닉네임',
+    example: '닉네임1',
   })
   nickname: string;
 
+  @IsOptional()
   @IsString()
   @ApiProperty({
     description: 'intro',
     example: '안녕하세요',
   })
-  intro: string;
+  intro?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -58,10 +60,18 @@ export class CreateUserDto {
   })
   confirmPassword: string;
 
+  /*  @IsOptional() */
   @IsString()
   @ApiProperty({
     description: 'profileImg',
-    example: 'string',
+    example: '프로필이미지 url',
   })
-  profileImg: string;
+  profileImg?: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'refreshToken',
+    example: 'refreshToken',
+  })
+  refreshToken?: string;
 }

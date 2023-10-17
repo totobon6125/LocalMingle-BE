@@ -47,7 +47,7 @@ export class EventsController {
   }
 
   @Get()
-  @ApiOperation({summary: 'Event 전체 조회'})
+  @ApiOperation({ summary: 'Event 전체 조회' })
   @ApiOkResponse({ type: EventEntity, isArray: true })
   async findAll() {
     const events = await this.eventsService.findAll();
@@ -62,7 +62,7 @@ export class EventsController {
   }
 
   @Get(':eventId')
-  @ApiOperation({summary: 'Event 상세 조회'})
+  @ApiOperation({ summary: 'Event 상세 조회' })
   @ApiOkResponse({ type: EventEntity })
   async findOne(@Param('eventId') eventId: string) {
     const event = await this.eventsService.findOne(+eventId);
@@ -101,7 +101,7 @@ export class EventsController {
   @ApiOkResponse({ type: EventEntity })
   async update(
     @Param('eventId') eventId: string,
-    @Body() updateEventDto: UpdateEventDto,
+    @Body() updateEventDto: UpdateEventDto
   ) {
     const event = await this.eventsService.findOne(+eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
