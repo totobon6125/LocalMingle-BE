@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Category } from 'src/interface/category';
-import { City } from 'src/interface/city';
-import { Verify } from 'src/interface/verify';
+import { Category } from 'src/data/interface/category';
+import { City } from 'src/data/interface/city';
+import { Verify } from 'src/data/interface/verify';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

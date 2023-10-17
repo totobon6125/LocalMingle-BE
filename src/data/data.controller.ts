@@ -1,8 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { DataService } from './data.service';
-import { City } from 'src/interface/city';
-import { Category } from 'src/interface/category';
+import { City } from 'src/data/interface/city';
+import { Category } from 'src/data/interface/category';
+import { Verify, toss } from './interface/verify';
 
 @Controller('data')
 @ApiTags('Data')
@@ -28,6 +29,13 @@ export class DataController {
     return await this.dataService.guNameData(query);
   }
 
+  @Get('toss')
+  @ApiOperation({ summary: '카테고리, 위치인증 여부 목록' })
+  categoryData() {
+    const data = toss;
+    return data
+  }
+
   @Get('filter/city')
   @ApiOperation({ summary: '이벤트 필터링(시/도)' })
   @ApiQuery({ name: 'doName', type: String, required: true })
@@ -40,5 +48,12 @@ export class DataController {
   @ApiQuery({ name: 'category', type: String, required: true })
   filteredEventByCategory(@Query() query: Category) {
     return this.dataService.filteredEventByCategory(query);
+  }
+
+  @Get('filter/verifiy')
+  @ApiOperation({ summary: '이벤트 필터링(위치인증)' })
+  @ApiQuery({ name: 'verify', type: String, required: true })
+  filteredEventByVerify(@Query() query: Verify) {
+    return this.dataService.filteredEventByVerify(query);
   }
 }

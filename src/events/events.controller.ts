@@ -11,6 +11,8 @@ import {
   Put,
   UseGuards,
   ParseIntPipe,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -21,10 +23,13 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiConsumes,
+  ApiBody
 } from '@nestjs/swagger';
 import { EventEntity } from './entities/event.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 // request에 user 객체를 추가하기 위한 인터페이스
 interface RequestWithUser extends Request {
@@ -45,6 +50,32 @@ export class EventsController {
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
 
     return this.eventsService.create(userId, createEventDto);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Event 이미지 업로드' })
+  @ApiConsumes('multipart/form-data')  
+  @ApiBody({
+    description: 'event image',
+    type: 'multipart/form-data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  uploadFile(
+    @UploadedFile()
+    file: Express.Multer.File
+  ) {
+    console.log("file", file)
+    return this.eventsService.upladFile(file)
   }
 
   @Get()
@@ -81,8 +112,8 @@ export class EventsController {
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Guest로서 Event 참가신청' })
   @ApiCreatedResponse({ description: `모임 참석 신청 / 취소` })
-  async join(@Param('eventId') eventId: string, @Req() req: RequestWithUser) {
-    const event = await this.eventsService.findOne(+eventId);
+  async join(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+    const event = await this.eventsService.findOne(eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     const { userId } = req.user;

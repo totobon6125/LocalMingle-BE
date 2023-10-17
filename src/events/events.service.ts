@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -27,6 +27,11 @@ export class EventsService {
     });
 
     return event;
+  }
+
+  upladFile (file: Express.Multer.File) {
+    if (!file) throw new BadRequestException()
+    return file.path
   }
 
   findAll() {
