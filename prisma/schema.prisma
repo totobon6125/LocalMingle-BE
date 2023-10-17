@@ -50,6 +50,7 @@ model Event {
   eventDate       DateTime
   signupStartDate DateTime
   signupEndDate   DateTime
+  eventImg        String?
   eventLocation   String
   content         String
   category        String

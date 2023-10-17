@@ -30,6 +30,7 @@ import { EventEntity } from './entities/event.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AwsS3Service } from 'src/aws/aws.s3';
 
 // request에 user 객체를 추가하기 위한 인터페이스
 interface RequestWithUser extends Request {
@@ -39,7 +40,11 @@ interface RequestWithUser extends Request {
 @Controller('events')
 @ApiTags('Events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(
+    private readonly eventsService: EventsService,
+    private readonly awsS3Service: AwsS3Service, 
+    ) {}
+
 
   @Post()
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
@@ -53,9 +58,11 @@ export class EventsController {
   }
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Event 이미지 업로드' })
   @ApiConsumes('multipart/form-data')  
+  @UseInterceptors(FileInterceptor('file'))
   @ApiBody({
     description: 'event image',
     type: 'multipart/form-data',
@@ -70,12 +77,16 @@ export class EventsController {
       },
     },
   })
-  uploadFile(
+  async uploadFile(
     @UploadedFile()
-    file: Express.Multer.File
+    file
   ) {
     console.log("file", file)
-    return this.eventsService.upladFile(file)
+    const img = this.eventsService.uploadFile(file)
+    console.log(img)
+
+    // const uploadedFile = await this.awsS3Service.uploadEventFile(file) as { Location: string };
+    // return uploadedFile
   }
 
   @Get()

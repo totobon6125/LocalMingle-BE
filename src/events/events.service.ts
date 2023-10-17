@@ -29,7 +29,7 @@ export class EventsService {
     return event;
   }
 
-  upladFile (file: Express.Multer.File) {
+  uploadFile (file: Express.Multer.File) {
     if (!file) throw new BadRequestException()
     return file.path
   }

@@ -49,4 +49,9 @@ export class UpdateEventDto {
   @IsOptional()
   @IsString()
   isVerified?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  eventImg?: string
 }
