@@ -7,6 +7,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
+  // 1. 이벤트 생성
   async create(userId: number, createEventDto: CreateEventDto) {
     const event = await this.prisma.event.create({
       data: createEventDto,
@@ -29,6 +30,7 @@ export class EventsService {
     return event;
   }
 
+  // 이벤트 이미지 업로드
   uploadFile (file: Express.Multer.File) {
     if (!file) throw new BadRequestException()
     return file.path
@@ -125,10 +127,20 @@ export class EventsService {
     });
   }
 
-  /* TODO: 참가 취소하면 guestEvent에서 지우는게 아니라 guestEvent의 isDeleted를 true로 바꾸는 방식으로 변경 */
   async cancelJoin(guestEventId: number) {
     await this.prisma.guestEvent.delete({
       where: { guestEventId },
+    });
+  }
+
+  async createRsvpLog(eventId: number, userId: number, status: string) {
+    await this.prisma.rsvpLog.create({
+      data: {
+        EventId: eventId,
+        UserId: userId,
+        status: status,
+        createdAt: new Date(),
+      },
     });
   }
 
@@ -147,4 +159,6 @@ export class EventsService {
       },
     });
   }
+
+
 }
