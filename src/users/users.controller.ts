@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.controller.ts
-import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -35,44 +35,31 @@ export class UsersController {
     return new UserEntity(await this.usersService.create(createUserDto));
   }
 
-  //이메일 중복 체크
+  //이메일 중복 검증
   @Post('checkEmail')
   @ApiBody({})
   @ApiOperation({ summary: '이메일 중복 확인' })
-  @ApiResponse({ status: 200, description: 'Email is available' }) // 중복이 아닌 경우 200 상태 코드
-  @ApiResponse({ status: 400, description: 'Email is already registered' }) // 중복된 경우 400 상태 코드
   async checkEmail(@Body() { email }: { email: string }) {
-    try {
-      const existingUser = await this.usersService.findByEmail({ email });
-      if (existingUser) {
-        throw new Error('Email is already registered.');
-      } else {
-        return { message: 'Email is available.' };
-      }
-    } catch (error) {
-      throw new HttpException('Email is already registered', HttpStatus.BAD_REQUEST);
+    const existingUser = await this.usersService.findByEmail({ email });
+    if (existingUser) {
+      return { message: '201' };
+    } else{
+      return { message: '200'};
     }
   }
-
-  //닉네임 중복 체크
+  
+  //닉네임 중복 검증
   @Post('checkNickname')
   @ApiBody({})
-  @ApiOperation({ summary: '닉네임 중복 확인' })
-  @ApiResponse({ status: 200, description: 'Nickname is available' }) // Available nickname
-  @ApiResponse({ status: 400, description: 'Nickname is already in use' }) // Duplicate nickname
   async checkNickname(@Body() { nickname }: { nickname: string }) {
-    try {
-      const existingNickname = await this.usersService.findByNickname({ nickname });
-      if (existingNickname) {
-        throw new Error('Nickname is already in use.');
-      } else {
-        return { message: 'Nickname is available.' };
-      }
-    } catch (error) {
-      throw new HttpException('Nickname is already in use', HttpStatus.BAD_REQUEST);
+    const existingNickname = await this.usersService.findByNickname({ nickname });
+    if (existingNickname) {
+      return{ message: '201' };
+    } else {
+      //return res.status(200).json({ message: 'Nickname is available.' });
+      return { message: '200' };
     }
   }
-
 
   // 2. 전체 유저 리스트를 조회한다.
   @Get()
