@@ -60,7 +60,9 @@ export class UsersService {
   
   // 2. 전체 유저 리스트를 조회한다.
   async findAll() {
-    return await this.prisma.user.findMany({});
+    return await this.prisma.user.findMany({
+      where : { deletedAt: null },
+    });
   }
   
   // 3. 유저 본인 조회
@@ -73,10 +75,15 @@ export class UsersService {
 
   // 3. userId를 통한 유저 조회
   async findOne(id: number) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { userId: id },
       include: { UserDetail: true, HostEvents: true, GuestEvents: true},
     });
+    
+    if (!user || user.deletedAt !== null) {
+      throw new BadRequestException('삭제된 회원이거나 존재하지 않는 회원입니다.');  
+    }
+    return user;
   }
 
   // 4. 이메일을 통한 유저 찾기
@@ -142,8 +149,9 @@ export class UsersService {
     }
     
     // 패스워드가 일치하면 유저 삭제
-    return await this.prisma.user.delete({
-      where: { userId: userId},
+    return await this.prisma.user.update({
+      where: { userId: userId },
+      data: { deletedAt: new Date() },
     });
   }
 
