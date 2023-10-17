@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { MulterOptionsFactory } from '@nestjs/platform-express';
 
+// 이미지 파일 로컬에 저장 현재 사용 X 모듈 미장착
 @Injectable()
 export class MulterConfigService implements MulterOptionsFactory {
   dirPath: string;

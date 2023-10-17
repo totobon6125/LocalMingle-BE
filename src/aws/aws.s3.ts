@@ -38,14 +38,12 @@ export class AwsS3Service {
 
   // 이벤트 이미지 업로드
   async uploadEventFile(file) {
-    console.log("file1", file)
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME || 'aws-s3-local-mingle', // AWS S3 버킷 이름
       Key: `eventImg/${String(Date.now())}`, // 폴더와 파일 이름
       Body: file.buffer, // 파일 내용
       ContentType: file.mimetype, // 파일 타입
     };
-    console.log(params)
 
     return new Promise((resolve, reject) => {
       this.s3.upload(params, (err, data) => {

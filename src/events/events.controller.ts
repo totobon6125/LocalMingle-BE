@@ -24,7 +24,7 @@ import {
   ApiOperation,
   ApiTags,
   ApiConsumes,
-  ApiBody
+  ApiBody,
 } from '@nestjs/swagger';
 import { EventEntity } from './entities/event.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -42,8 +42,8 @@ interface RequestWithUser extends Request {
 export class EventsController {
   constructor(
     private readonly eventsService: EventsService,
-    private readonly awsS3Service: AwsS3Service, 
-    ) {}
+    private readonly awsS3Service: AwsS3Service
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
@@ -60,7 +60,7 @@ export class EventsController {
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Event 이미지 업로드' })
-  @ApiConsumes('multipart/form-data')  
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   @ApiBody({
     description: 'event image',
@@ -76,16 +76,18 @@ export class EventsController {
       },
     },
   })
-  async uploadFile(
-    @UploadedFile()
-    file
-  ) {
-    console.log("file", file)
-    const img = this.eventsService.uploadFile(file)
-    console.log(img)
+  async uploadFile(@UploadedFile() file) {
+    console.log('file', file);
+    // const img = this.eventsService.uploadFile(file);
+    // console.log(img);
 
-    // const uploadedFile = await this.awsS3Service.uploadEventFile(file) as { Location: string };
-    // return uploadedFile
+    const uploadedFile = (await this.awsS3Service.uploadEventFile(file)) as {
+      Location: string;
+    };
+    return {
+      message: '이미지가 업로드되었습니다',
+      ImgURL: uploadedFile,
+    };
   }
 
   @Get()
@@ -97,7 +99,7 @@ export class EventsController {
     const event = events.map((item) => {
       const { GuestEvents, HostEvents, ...rest } = item;
       const hostUser = item.HostEvents[0].User.UserDetail;
-      const guestUser = item.GuestEvents[0]
+      const guestUser = item.GuestEvents[0];
 
       return {
         event: rest,
@@ -124,7 +126,7 @@ export class EventsController {
       event: rest,
       guestList: event.GuestEvents.length,
       hostUser: HostEvents[0].User.UserDetail,
-      guestUser: GuestEvents[0]?.User?.UserDetail
+      guestUser: GuestEvents[0]?.User?.UserDetail,
     };
   }
 
@@ -133,7 +135,10 @@ export class EventsController {
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Guest로서 Event 참가신청' })
   @ApiCreatedResponse({ description: `모임 참석 신청 / 취소` })
-  async join(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+  async join(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req: RequestWithUser
+  ) {
     const event = await this.eventsService.findOne(eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 

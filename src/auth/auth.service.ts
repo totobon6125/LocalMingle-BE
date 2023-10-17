@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 //import { IAuthServiceLogin } from './interface/auth-service.interface';
 import { UsersService } from 'src/users/users.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -21,10 +22,11 @@ export class AuthService {
     // 리팩토링 시 res 빼도 작동하는지 테스트
     accessToken: string;
     refreshToken: string;
+    user: User; // User 정보를 반환하기 위한 타입
   }> {
     // 1. 이메일이 일치하는 유저를 DB에서 찾기
     const user = await this.usersService.findByEmail({ email });
-
+    console.log(user);
     // 2. 일치하는 유저가 없으면 에러
     if (!user) throw new NotFoundException('이메일이 없습니다.');
 
@@ -37,7 +39,7 @@ export class AuthService {
     const refreshToken = this.setRefreshToken({ user, res });
 
     // 5. 액세스 토큰 및 리프레시 토큰을 반환
-    const accessToken = await this.getAccessToken({ user, res });
+    const accessToken = this.getAccessToken({ user, res });
 
     // 6. DB에 리프레시 토큰을 저장한다.
     await this.prisma.user.update({
@@ -51,13 +53,13 @@ export class AuthService {
     // res.header('Authorization', `Bearer ${accessToken}`);
     // res.header('RefreshToken', refreshToken);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, user }; //리턴값
   }
 
   getAccessToken({ user, res }): string {
     const accessToken = this.jwtService.sign(
       { sub: user.userId },
-      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '3600s' }
+      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '36000s' }
     );
     //console.log('엑세스 토큰 확인용 로그', user);
     return accessToken;
