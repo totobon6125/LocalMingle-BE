@@ -8,7 +8,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 //import { IAuthServiceLogin } from './interface/auth-service.interface';
 import { UsersService } from 'src/users/users.service';
-import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +21,8 @@ export class AuthService {
     // 리팩토링 시 res 빼도 작동하는지 테스트
     accessToken: string;
     refreshToken: string;
-    user: User; // User 정보를 반환하기 위한 타입
+    //user: User; // User 정보를 반환하기 위한 타입
+    userId: number; // userId만 반환
   }> {
     // 1. 이메일이 일치하는 유저를 DB에서 찾기
     const user = await this.usersService.findByEmail({ email });
@@ -54,7 +54,7 @@ export class AuthService {
     // res.header('RefreshToken', refreshToken);
 
     //TODO : user값 대신 userId값만 넘어가게 수정해야함 ()
-    return { accessToken, refreshToken, user }; //리턴값
+    return { accessToken, refreshToken, userId: user.userId }; //리턴값
   }
 
   getAccessToken({ user, res }): string {
@@ -136,6 +136,6 @@ export class AuthService {
     // 리다이렉션
     res.redirect('http://127.0.0.1:5500'); // 메인페이지 url 을 입력해야합니다.
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, userId: user.userId };
   }
 }
