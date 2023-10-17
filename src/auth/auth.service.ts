@@ -49,7 +49,7 @@ export class AuthService {
 
     //Authorization로 보내도록 결정되면 이렇게 수정(피드백 받으면 좋을 내용)
     // res.header('Authorization', `Bearer ${accessToken}`);
-    // res.header('Refresh-Token', refreshToken);
+    // res.header('RefreshToken', refreshToken);
 
     return { accessToken, refreshToken };
   }
@@ -98,7 +98,7 @@ export class AuthService {
       // 아이디 생성 관련 코드 추가
       const createUser = {
         email: req.user.email, // 사용자의 이메일을 사용하여 아이디 생성
-        nickname: req.user.nickname, // TODO: 랜덤 문자 생성 로직 구현
+        nickname: req.user.nickname, //닉네임 익명 닉네임 생성 로직
         password: req.user.password, // 비밀번호를 해싱하여 저장
         confirmPassword: req.user.password, // 비밀번호를 해싱하여 저장
         intro: req.user.intro,
@@ -123,7 +123,7 @@ export class AuthService {
 
     //Authorization로 보내도록 결정되면 이렇게 수정(피드백 받으면 좋을 내용)
     // res.header('Authorization', `Bearer ${accessToken}`);
-    // res.header('Refresh-Token', refreshToken);
+    // res.header('RefreshToken', refreshToken);
 
     res.header(accessToken);
     res.header(refreshToken);
