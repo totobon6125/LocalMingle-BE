@@ -1,0 +1,22 @@
+version: 0.0
+os: linux
+
+# S3로부터 받은 .zip file의 압축해제 경로 설정
+files:
+  - source: /
+    destination: /home/ubuntu/LocalMingle-BE
+    overwrite: yes
+file_exists_behavior: OVERWRITE
+
+# 압축해제 된 파일들의 권한 설정
+permissions:
+  - object: /home/ubuntu/LocalMingle-BE
+    owner: ubuntu
+    group: ubuntu
+
+# codedeploy가 참조할 스크립트의 경로 설정
+hooks:
+  AfterInstall:
+    - location: scripts/deploy.sh
+      timeout: 60
+      runas: ubuntu
