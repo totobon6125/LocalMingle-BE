@@ -49,7 +49,9 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response // Response 객체 주입
   ): Promise<void> {
+
     const { accessToken, refreshToken, userId } = await this.authService.login({
+
       email,
       password,
       res,
@@ -65,7 +67,9 @@ export class AuthController {
     // 리프레시 토큰을 HTTP 응답 헤더에 추가
     res.header('refreshToken', refreshToken);
 
+
     res.status(200).json({ userId }); // 클라이언트에게 JSON 응답을 보냄
+
 
     //res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false });
 
