@@ -53,6 +53,7 @@ export class AuthService {
     // res.header('Authorization', `Bearer ${accessToken}`);
     // res.header('RefreshToken', refreshToken);
 
+    //TODO : user값 대신 userId값만 넘어가게 수정해야함 ()
     return { accessToken, refreshToken, user }; //리턴값
   }
 
