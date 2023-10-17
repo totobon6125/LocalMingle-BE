@@ -1,6 +1,6 @@
 // src/aws/aws.s3.ts
 import * as AWS from 'aws-sdk';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AwsS3Service {
@@ -15,8 +15,12 @@ export class AwsS3Service {
 
   // S3 업로드 로직
   async uploadFile(file) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
     const params = {
-      Bucket: process.env.AWS_BUCKET_NAME || 'aws-s3-local-mingle', // AWS S3 버킷 이름
+      Bucket: process.env.AWS_BUCKET_NAME || 's3-image-local-mingle', // AWS S3 버킷 이름
       Key: `profileImg/${String(Date.now())}`, // 폴더와 파일 이름
       Body: file.buffer, // 파일 내용
       ContentType: file.mimetype, // 파일 타입

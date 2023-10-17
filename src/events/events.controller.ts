@@ -45,7 +45,6 @@ export class EventsController {
     private readonly awsS3Service: AwsS3Service, 
     ) {}
 
-
   @Post()
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
@@ -96,9 +95,15 @@ export class EventsController {
     const events = await this.eventsService.findAll();
 
     const event = events.map((item) => {
+      const { GuestEvents, HostEvents, ...rest } = item;
+      const hostUser = item.HostEvents[0].User.UserDetail;
+      const guestUser = item.GuestEvents[0]
+
       return {
-        event: item,
+        event: rest,
         guestList: item.GuestEvents.length,
+        hostUser: hostUser,
+        guestUser: guestUser,
       };
     });
     return event;
@@ -113,9 +118,14 @@ export class EventsController {
 
     await this.eventsService.createViewLog(eventId);
 
-    const guestList = event.GuestEvents.length;
-    const { ...data } = event;
-    return { data, guestList };
+    const { GuestEvents, HostEvents, ...rest } = event;
+
+    return {
+      event: rest,
+      guestList: event.GuestEvents.length,
+      hostUser: HostEvents[0].User.UserDetail,
+      guestUser: GuestEvents[0]?.User?.UserDetail
+    };
   }
 
   @Put(':eventId/join')

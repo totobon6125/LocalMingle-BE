@@ -5,7 +5,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes, ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
@@ -46,7 +46,7 @@ export class UsersController {
     const users = await this.usersService.findAll();
     if (!users) {
       throw new NotFoundException('Users does not exist');
-    }
+  }
 
     // TODO: HEE's code
     const userEntity = users.map((user) => new UserEntity(user));
@@ -86,12 +86,14 @@ export class UsersController {
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '회원 정보 수정' })
+  @ApiResponse({ status: 200, description: '회원 정보가 수정되었습니다' })
+  @ApiResponse({ status: 400, description: '중복된 닉네임입니다' })
+  @ApiResponse({ status: 401, description: '패스워드가 일치하지 않습니다' })
+  @ApiResponse({ status: 404, description: '유저 정보가 존재하지 않습니다' })
+  
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const updatedUser = await this.usersService.update(+id, updateUserDto);
-    if (!updatedUser) {
-      throw new NotFoundException('User does not exist');
-    }
-    return updatedUser;
+    await this.usersService.update(+id, updateUserDto);
+    return {'message' : '회원 정보가 수정되었습니다'};
   }
 
   // 6. 회원 탈퇴를 한다.
@@ -119,7 +121,7 @@ export class UsersController {
 
   // 8. 사용자가 참가한 모임 리스트를 조회한다.
   @Get(':id/joinedEvents')
-  @ApiOperation({ summary: '내가 참가한 이벤트 회' })
+  @ApiOperation({ summary: '내가 참가한 이벤트 조회' })
   findJoinedEvents(@Param('id') id: string) {
     console.log('findJoinedEvents in users.controller.ts - id:', id);
     const joinedEvents = this.usersService.findJoinedEvents(+id);
@@ -150,17 +152,22 @@ export class UsersController {
   async updateProfileImage(@Req() req: RequestWithUser, @UploadedFile() file) {
     const { userId } = req.user;
 
-    console.log('updateProfileImage in users.controller.ts - userId:', userId);
-    console.log('updateProfileImage in users.controller.ts - file:', file);
-    
     const user = await this.usersService.findOne(userId);
-    console.log('User:', user);
+    // console.log('User:', user);
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
 
+    // 이미지를 s3에 업로드한다.
     const uploadedFile = await this.awsS3Service.uploadFile(file) as { Location: string };
-    return this.usersService.updateProfileImage(userId, uploadedFile.Location);
+
+    // s3에 업로드된 이미지 URL을 DB에 저장한다.
+    const s3ProfileImgURL = await this.usersService.updateProfileImage(userId, uploadedFile.Location);
+    
+    return {
+      'message': '이미지가 업로드되었습니다',
+      'profileImgURL' : s3ProfileImgURL,
+      }
   }
 
   // 사용자가 관심 등록한 모임 리스트를 조회한다.
