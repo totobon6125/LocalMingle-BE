@@ -10,13 +10,17 @@ import {
 } from 'class-validator';
 
 export class CreateEventDto {
-  @ApiProperty()
+  @ApiProperty({
+    example: '같이 산책하실분',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(50)
   eventName: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 10,
+  })
   @IsNotEmpty()
   @IsInt()
   maxSize: number;
@@ -30,7 +34,9 @@ export class CreateEventDto {
   @ApiProperty()
   signupEndDate: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: "서울특별시"
+  })
   @IsString()
   eventLocation: string;
 
@@ -39,16 +45,23 @@ export class CreateEventDto {
   @MaxLength(200)
   content: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: "산책"
+  })
   @IsString()
   category: string;
 
-  @ApiProperty({required: false, default: false})
+  @ApiProperty({ required: false, default: false })
   @IsBoolean()
   isDeleted: boolean = false;
 
-  @ApiProperty({ required: false, default: "no" })
+  @ApiProperty({ required: false, default: 'no' })
   @IsOptional()
   @IsString()
   isVerified?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  eventImg?: string
 }

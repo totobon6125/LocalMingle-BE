@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -26,16 +26,12 @@ export class EventsService {
       },
     });
 
-    // const guestEvent = await this.prisma.guestEvent.create({
-    //   data: {
-    //     EventId: event.eventId,
-    //   },
-    // });
-    console.log('create in events.service:', event);
-    console.log(category);
-    console.log(hostEvent);
-    // console.log(guestEvent);
     return event;
+  }
+
+  uploadFile (file: Express.Multer.File) {
+    if (!file) throw new BadRequestException()
+    return file.path
   }
 
   findAll() {
