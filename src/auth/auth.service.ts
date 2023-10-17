@@ -137,6 +137,6 @@ export class AuthService {
     // 리다이렉션
     res.redirect('http://127.0.0.1:5500'); // 메인페이지 url 을 입력해야합니다.
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, userId: user.userId };
   }
 }
