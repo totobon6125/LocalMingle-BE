@@ -62,6 +62,7 @@ export class CreateUserDto {
 
   /*  @IsOptional() */
   @IsString()
+  @IsOptional()
   @ApiProperty({
     description: 'profileImg',
     example: '프로필이미지 url',
@@ -69,6 +70,7 @@ export class CreateUserDto {
   profileImg?: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty({
     description: 'refreshToken',
     example: 'refreshToken',
