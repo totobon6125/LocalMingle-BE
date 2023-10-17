@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Category } from 'src/interface/category';
-import { City } from 'src/interface/city';
-import { Verify } from 'src/interface/verify';
+import { Category } from 'src/data/interface/category';
+import { City } from 'src/data/interface/city';
+import { Verify } from 'src/data/interface/verify';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -19,24 +19,24 @@ export class DataService {
       where: { doName: query.doName },
       select: { guName: true },
     });
-    return data
+    return data;
   }
 
   filteredEventByCity(query: City) {
     return this.prisma.event.findMany({
-      where: {eventLocation: query.doName}
-    })
+      where: { eventLocation: query.doName },
+    });
   }
 
   filteredEventByCategory(query: Category) {
     return this.prisma.event.findMany({
-      where: {category: query.category}
-    })
+      where: { category: query.category },
+    });
   }
 
   filteredEventByVerify(query: Verify) {
     return this.prisma.event.findMany({
-      where: {isVerified: query.verify}
-    })
+      where: { isVerified: query.verify },
+    });
   }
 }

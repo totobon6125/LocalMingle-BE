@@ -16,7 +16,7 @@ export class UsersService {
   
   // 1. 유저를 생성한다. (회원가입)
   async create(createUserDto: CreateUserDto): Promise<User> {
-  const { email, password, nickname, intro, confirmPassword, profileImg } = createUserDto;
+  const { email, password, nickname, intro, confirmPassword/* , profileImg */ } = createUserDto;
   // 리팩토링시 !== 로 변경
   if  (password != confirmPassword){
       throw new BadRequestException('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
@@ -85,10 +85,9 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
-  /* FiXME */
   // 5. user 정보 수정한다.
   async update(id: number, updateUserDto: UpdateUserDto) {
-    console.log('updateUserDto in users.service:', updateUserDto)
+    // console.log('updateUserDto in users.service:', updateUserDto);
     const { nickname, intro, confirmPassword } = updateUserDto;
 
     const user = await this.prisma.user.findUnique({
@@ -98,18 +97,20 @@ export class UsersService {
       throw new BadRequestException('유저 정보가 존재하지 않습니다.');
     }
 
+        // 중복된 닉네임 확인 
+        const existingNickname = await this.prisma.userDetail.findUnique({
+          where: { nickname },
+        });
+        if (existingNickname) {
+          throw new ConflictException('이미 존재하는 닉네임입니다.');
+        }
+
     // 패스워드, 패스워드 확인 일치 여부 확인
     const isPasswordMatching = await bcrypt.compare(confirmPassword, user.password);
     if (!isPasswordMatching) {
       throw new BadRequestException('패스워드가 일치하지 않습니다.');
     }
-    // 중복된 닉네임 확인 
-    const existingNickname = await this.prisma.userDetail.findUnique({
-      where: { nickname },
-    });
-    if (existingNickname) {
-      throw new ConflictException('중복된 닉네임입니다.');
-    }
+
 
     // userdetail page 업데이트 
     const updatedUser = await this.prisma.userDetail.update({
@@ -185,7 +186,6 @@ export class UsersService {
       throw new BadRequestException('회원 상세 정보가 존재하지 않습니다.');
     }
     
-    console.log("3. profileImg URL in usrs.service", profileImg);
     // userDetailId를 사용하여 프로필 이미지를 업데이트한다.
     const updatedProfileImage = await this.prisma.userDetail.update({
       where: { userDetailId: userDetail.userDetailId },

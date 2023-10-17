@@ -18,9 +18,8 @@ export class MailController {
   async sendMail(
     @Req() req: Request, // Request 객체를 주입
     @Body('to') to: string,
-    @Body('subject') subject: string,
-    @Body('content') content: string,
+    @Body('subject') subject: string
   ) {
-    await this.mailService.sendMail(to, subject, content, req);
+    await this.mailService.sendMail(to, subject, req);
   }
 }

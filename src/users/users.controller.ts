@@ -121,7 +121,7 @@ export class UsersController {
 
   // 8. 사용자가 참가한 모임 리스트를 조회한다.
   @Get(':id/joinedEvents')
-  @ApiOperation({ summary: '내가 참가한 이벤트 회' })
+  @ApiOperation({ summary: '내가 참가한 이벤트 조회' })
   findJoinedEvents(@Param('id') id: string) {
     console.log('findJoinedEvents in users.controller.ts - id:', id);
     const joinedEvents = this.usersService.findJoinedEvents(+id);
@@ -152,7 +152,6 @@ export class UsersController {
   async updateProfileImage(@Req() req: RequestWithUser, @UploadedFile() file) {
     const { userId } = req.user;
 
-    console.log("1. file in users.controller.ts:", file);
     const user = await this.usersService.findOne(userId);
     // console.log('User:', user);
     if (!user) {

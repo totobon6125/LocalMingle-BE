@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { sign } from 'jsonwebtoken'; // 'jsonwebtoken' 모듈을 추가로 임포트
 import { Request } from 'express'; // Express의 Request 객체를 사용하기 위해 추가
 
 @Injectable()
@@ -20,35 +19,25 @@ export class MailService {
     });
   }
 
-  createEmailVerifyToken = (email) => {
-    const token = sign({ email: email }, process.env.PRIVATE_KEY, {
-      expiresIn: '7d',
-    });
-
-    return token;
+  // 랜덤한 인증 번호 생성 함수
+  generateRandomNumber = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
-  // generateRandomNumber = (max, min) => {
-  //   const randomnumber = Math.floor(Math.random() * (max - min + 1)) + min;
-
-  //   return randomnumber;
-  // };
-
-  async sendMail(to: string, subject: string, content: string, req: Request) {
+  async sendMail(to: string, subject: string, req: Request) {
     try {
-      const email = req.body.to; // 이메일을 req.body에서 가져옵니다.
-      console.log('이메일확인샌드메일:', email);
+      const email = req.body.to;
+      console.log('이메일 확인 샌드 메일:', email);
 
-      const token = this.createEmailVerifyToken(email);
-      console.log('토큰확인샌드메일:', token);
+      const verificationCode = this.generateRandomNumber(10000, 99999); // 5자리 랜덤 인증 번호 생성
+      console.log('인증 번호 확인 샌드 메일:', verificationCode);
 
+      // 이메일 내용에 인증 번호 포함
       await this.transporter.sendMail({
         from: process.env.EMAIL_USER,
-        to: email, //to 대신 email사용
+        to: email,
         subject: subject,
-        html: `<h3>링크를 클릭해서 이메일을 인증하세요</h3>
-        <h3> <a href="http://localhost:3000/email/?send=${email}&token=${token}">이메일 인증하기</a></h3>
-        <h3>1시간 뒤 링크가 만료됩니다</h3>`,
+        text: `인증 번호: ${verificationCode}`,
       });
 
       console.log('메일이 전송되었습니다');

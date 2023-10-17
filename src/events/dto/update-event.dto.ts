@@ -19,21 +19,18 @@ export class UpdateEventDto {
   maxSize?: number;
 
   @ApiProperty({ required: false })
-  @IsDate()
   @IsOptional()
   eventDate?: Date;
 
   @ApiProperty({ required: false })
-  @IsDate()
   @IsOptional()
   signupStartDate?: Date;
 
   @ApiProperty({ required: false })
-  @IsDate()
   @IsOptional()
   signupEndDate?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: "경기도" })
   @IsString()
   @IsOptional()
   eventLocation?: string;
@@ -43,7 +40,7 @@ export class UpdateEventDto {
   @IsOptional()
   content?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: "산책" })
   @IsString()
   @IsOptional()
   category?: string;
@@ -52,4 +49,9 @@ export class UpdateEventDto {
   @IsOptional()
   @IsString()
   isVerified?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  eventImg?: string
 }

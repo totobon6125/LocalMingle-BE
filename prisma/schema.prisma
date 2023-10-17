@@ -17,6 +17,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  refreshToken String?  @db.Text
 
   UserDetail  UserDetail[]
   HostEvents  HostEvent[]
@@ -50,6 +51,7 @@ model Event {
   eventDate       DateTime
   signupStartDate DateTime
   signupEndDate   DateTime
+  eventImg        String?
   eventLocation   String
   content         String
   category        String
