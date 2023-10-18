@@ -5,7 +5,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes, ApiProperty } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
@@ -73,12 +73,9 @@ export class UsersController {
     if (!users) {
       throw new NotFoundException('Users does not exist');
   }
-
-    // TODO: HEE's code
     const userEntity = users.map((user) => new UserEntity(user));
     console.log(userEntity);
     // return users.map((user) => new UserEntity(user));
-
     return users;
   }
 
@@ -87,9 +84,13 @@ export class UsersController {
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '유저 본인 조회' })
-  findMe(@Req() req: RequestWithUser) {
+  async findMe(@Req() req: RequestWithUser) {
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당 
-    return this.usersService.findMe(userId);
+    const user = await this.usersService.findMe(userId);
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+    return user;
   }
 
   // 3. userId를 통한 유저 조회
@@ -106,7 +107,7 @@ export class UsersController {
     return user;
   }
 
-  /* FIXME */
+
   // 5. user 정보 수정한다.
   @Patch(':id')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
@@ -118,6 +119,11 @@ export class UsersController {
   @ApiResponse({ status: 404, description: '유저 정보가 존재하지 않습니다' })
   
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const user = await this.usersService.findOne(+id);
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+
     await this.usersService.update(+id, updateUserDto);
     return {'message' : '회원 정보가 수정되었습니다'};
   }
@@ -128,13 +134,13 @@ export class UsersController {
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '회원 탈퇴' })
   async remove(@Req() req: RequestWithUser, @Body() DeleteUserDto: DeleteUserDto) {
-    const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당 ) {
+    const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당 ) 
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
     await this.usersService.remove(userId, DeleteUserDto.password);
-    return {'message' : '탈퇴되었습니다'};    
+    return {'message' : '탈퇴되었습니다'};
   }
 
   // 7. 사용자가 생성한 모임 리스트를 조회한다.
@@ -154,7 +160,19 @@ export class UsersController {
     return joinedEvents;
   }
 
-  // 9. 사용자 유저 프로필 이미지를 업로드 한다.
+  // 9. 사용자가 북마크한 이벤트 리스트를 조회한다.
+  @Get(':id/bookmarkedEvents')
+  @ApiOperation({ summary: '내가 북마크한 이벤트 조회' })
+  async findBookmarkedEvents(@Param('id') id: string) {
+    try {
+      const bookmarkedEvents = await this.usersService.findBookmarkedEvents(+id, 'bookmarked');
+      return bookmarkedEvents;
+    } catch (error) {
+      throw new NotFoundException('북마크한 이벤트를 찾을 수 없습니다.');
+    }
+  }
+
+  // 10. 사용자 유저 프로필 이미지를 업로드 한다.
   @Post('upload')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
@@ -179,7 +197,6 @@ export class UsersController {
     const { userId } = req.user;
 
     const user = await this.usersService.findOne(userId);
-    // console.log('User:', user);
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
@@ -195,15 +212,5 @@ export class UsersController {
       'profileImgURL' : s3ProfileImgURL,
       }
   }
-
-  // 사용자가 관심 등록한 모임 리스트를 조회한다.
-  // TODO
-  /* 
-  @Get(':id/savedEvents')
-  findSavedEvents(@Param('id') id: string) {
-    return this.usersService.findSavedEvent(+id);
-  }
-  */
-
 }
 

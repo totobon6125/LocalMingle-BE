@@ -41,7 +41,7 @@ export class AuthService {
     const refreshToken = this.setRefreshToken({ user, res });
 
     // 5. 액세스 토큰 및 리프레시 토큰을 반환
-    const accessToken = await this.getAccessToken({ user, res });
+    const accessToken = this.getAccessToken({ user, res });
 
     // 6. DB에 리프레시 토큰을 저장한다.
     await this.prisma.user.update({
@@ -62,7 +62,7 @@ export class AuthService {
   getAccessToken({ user, res }): string {
     const accessToken = this.jwtService.sign(
       { sub: user.userId },
-      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '3600s' }
+      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '36000s' }
     );
     //console.log('엑세스 토큰 확인용 로그', user);
     return accessToken;
