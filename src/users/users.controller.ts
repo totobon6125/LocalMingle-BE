@@ -134,7 +134,19 @@ export class UsersController {
     return joinedEvents;
   }
 
-  // 9. 사용자 유저 프로필 이미지를 업로드 한다.
+  // 9. 사용자가 북마크한 이벤트 리스트를 조회한다.
+  @Get(':id/bookmarkedEvents')
+  @ApiOperation({ summary: '내가 북마크한 이벤트 조회' })
+  async findBookmarkedEvents(@Param('id') id: string) {
+    try {
+      const bookmarkedEvents = await this.usersService.findBookmarkedEvents(+id, 'bookmarked');
+      return bookmarkedEvents;
+    } catch (error) {
+      throw new NotFoundException('북마크한 이벤트를 찾을 수 없습니다.');
+    }
+  }
+
+  // 10. 사용자 유저 프로필 이미지를 업로드 한다.
   @Post('upload')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
@@ -174,15 +186,5 @@ export class UsersController {
       'profileImgURL' : s3ProfileImgURL,
       }
   }
-
-  // 사용자가 관심 등록한 모임 리스트를 조회한다.
-  // TODO
-  /* 
-  @Get(':id/savedEvents')
-  findSavedEvents(@Param('id') id: string) {
-    return this.usersService.findSavedEvent(+id);
-  }
-  */
-
 }
 

@@ -173,4 +173,24 @@ export class EventsController {
 
     return this.eventsService.remove(eventId);
   }
+
+  // 북마크 추가
+  @Post(':eventId/bookmark')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Event 북마크 추가' })
+  async addBookmark(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+    const { userId } = req.user;
+    return this.eventsService.addBookmark(eventId, userId, 'bookmarked');
+  }
+
+  // 북마크 제거
+  @Delete(':eventId/bookmark')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Event 북마크 제거' })
+  async removeBookmark(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+    const { userId } = req.user;
+    return this.eventsService.removeBookmark(eventId, userId, 'unbookmarked');
+  }
 }

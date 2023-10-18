@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.service.ts
-import { BadRequestException, ConflictException,  Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException,  Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -164,6 +164,7 @@ export class UsersService {
           select: {
             Event: true,
           },
+          where: { Event: { isDeleted: false } },
         },
       },
     });
@@ -178,10 +179,28 @@ export class UsersService {
           select: {
             Event: true,
           },
+          where: { Event: { isDeleted: false } },
         },
       },
     });
   }
+
+// 10. 사용자가 북마크한 이벤트 리스트를 조회한다. 
+async findBookmarkedEvents(id: number, status: string) {
+  try {
+    const bookmarkedEvents = await this.prisma.eventBookmark.findMany({
+      where: { UserId: id, status: status},
+      include: { Event: true },
+    });
+  
+    if (!bookmarkedEvents.length) {
+      throw new BadRequestException('북마크한 이벤트가 없습니다.');
+    }
+    return bookmarkedEvents
+  } catch (error) {
+    throw new NotFoundException('북마크한 이벤트를 찾을 수 없습니다.');
+  }
+}
 
   // 9. 프로필 이미지를 업데이트 한다.
   async updateProfileImage(id: number, profileImg: string) {
@@ -200,5 +219,5 @@ export class UsersService {
       data: { profileImg: profileImg },
     });
     return updatedProfileImage.profileImg;
-  }
+  }  
 }
