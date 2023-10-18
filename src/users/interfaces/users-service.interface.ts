@@ -9,3 +9,7 @@ export interface IUsersServiceCreate {
 export interface IUsersServiceFindByEmail {
   email: string;
 }
+
+export interface IUsersServiceFindByNickname {
+  nickname: string;
+}

@@ -78,8 +78,6 @@ export class EventsController {
   })
   async uploadFile(@UploadedFile() file) {
     console.log('file', file);
-    // const img = this.eventsService.uploadFile(file);
-    // console.log(img);
 
     const uploadedFile = (await this.awsS3Service.uploadEventFile(file)) as {
       Location: string;
@@ -95,17 +93,15 @@ export class EventsController {
   @ApiOkResponse({ type: EventEntity, isArray: true })
   async findAll() {
     const events = await this.eventsService.findAll();
-
+    console.log(events)
     const event = events.map((item) => {
       const { GuestEvents, HostEvents, ...rest } = item;
       const hostUser = item.HostEvents[0].User.UserDetail;
-      const guestUser = item.GuestEvents[0];
 
       return {
         event: rest,
         guestList: item.GuestEvents.length,
         hostUser: hostUser,
-        guestUser: guestUser,
       };
     });
     return event;
@@ -147,11 +143,13 @@ export class EventsController {
     const { userId } = req.user;
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
-      this.eventsService.join(eventId, userId);
+      this.eventsService.join(+eventId, userId);
+      this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 로그 생성
       return `${eventId}번 모임 참석 신청!`;
     }
     if (isJoin) {
       this.eventsService.cancelJoin(isJoin.guestEventId);
+      this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 로그 생성
       return `${eventId}번 모임 신청 취소!`;
     }
   }

@@ -5,8 +5,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { User } from '@prisma/client';
-import { IUsersServiceFindByEmail } from './interfaces/users-service.interface';
+import { User, UserDetail } from '@prisma/client';
+import { IUsersServiceFindByEmail, IUsersServiceFindByNickname } from './interfaces/users-service.interface';
 
 
 
@@ -58,9 +58,22 @@ export class UsersService {
   // return existingUser; // HeeDragon's OAuth code
   }
   
+  //1-1이메일 중복 체크
+  async findByEmail({ email }: IUsersServiceFindByEmail): Promise<User> {
+    return this.prisma.user.findUnique({ where: { email } });
+  }
+  
+  //1-2닉네임 중복 체크
+  async findByNickname({ nickname }: IUsersServiceFindByNickname): Promise<UserDetail> {
+    return this.prisma.userDetail.findUnique({ where: { nickname } });
+  }
+
+
   // 2. 전체 유저 리스트를 조회한다.
   async findAll() {
-    return await this.prisma.user.findMany({});
+    return await this.prisma.user.findMany({
+      where : { deletedAt: null },
+    });
   }
   
   // 3. 유저 본인 조회
@@ -73,17 +86,22 @@ export class UsersService {
 
   // 3. userId를 통한 유저 조회
   async findOne(id: number) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { userId: id },
       include: { UserDetail: true, HostEvents: true, GuestEvents: true},
     });
+    
+    if (!user || user.deletedAt !== null) {
+      throw new BadRequestException('삭제된 회원이거나 존재하지 않는 회원입니다.');  
+    }
+    return user;
   }
 
   // 4. 이메일을 통한 유저 찾기
-  findByEmail({ email }: IUsersServiceFindByEmail): Promise<User> {
-    // 이코드는 여러번 재사용 될 수 있기 떄문에 따로 빼줌
-    return this.prisma.user.findUnique({ where: { email } });
-  }
+  // findByEmail({ email }: IUsersServiceFindByEmail): Promise<User> {
+  //   // 이코드는 여러번 재사용 될 수 있기 떄문에 따로 빼줌
+  //   return this.prisma.user.findUnique({ where: { email } });
+  // }
 
   // 5. user 정보 수정한다.
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -142,8 +160,9 @@ export class UsersService {
     }
     
     // 패스워드가 일치하면 유저 삭제
-    return await this.prisma.user.delete({
-      where: { userId: userId},
+    return await this.prisma.user.update({
+      where: { userId: userId },
+      data: { deletedAt: new Date() },
     });
   }
 

@@ -12,12 +12,13 @@ datasource db {
 
 // 사용자 모델
 model User {
-  userId    Int      @id @default(autoincrement()) // Primary Key
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  refreshToken String?  @db.Text
+  userId       Int       @id @default(autoincrement()) // Primary Key
+  email        String    @unique
+  password     String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime? // null이면 삭제되지 않은 것으로 간주
+  refreshToken String?   @db.Text
 
   UserDetail  UserDetail[]
   HostEvents  HostEvent[]
@@ -39,6 +40,7 @@ model UserDetail {
 
   User     User      @relation(fields: [UserId], references: [userId], onDelete: Cascade)
   Viewlogs Viewlog[]
+  RsvpLogs RsvpLog[]
 
   @@map("UserInfo")
 }
@@ -64,6 +66,7 @@ model Event {
   GuestEvents GuestEvent[]
   Viewlogs    Viewlog[]
   Category    Category[]
+  RsvpLog     RsvpLog[]
 
   @@map("Event")
 }
@@ -78,6 +81,20 @@ model Viewlog {
   UserDetail UserDetail @relation(fields: [UserId], references: [userDetailId])
 
   @@map("Viewlog")
+}
+
+// 참가 신청/취소 기록 모델
+model RsvpLog {
+  rsvpLogId Int      @id @default(autoincrement()) // Primary Key
+  EventId   Int
+  UserId    Int
+  status    String // 'applied', 'canceled' 등의 상태
+  createdAt DateTime @default(now()) // 참석 신청이나 취소가 이루어진 시간
+
+  Event      Event      @relation(fields: [EventId], references: [eventId])
+  UserDetail UserDetail @relation(fields: [UserId], references: [userDetailId])
+
+  @@map("RsvpLog")
 }
 
 // 호스트 이벤트 매핑 모델

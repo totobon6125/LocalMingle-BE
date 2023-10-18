@@ -1,11 +1,11 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.controller.ts
-import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards } from '@nestjs/common';
+import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes, ApiProperty } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
@@ -35,6 +35,32 @@ export class UsersController {
     return new UserEntity(await this.usersService.create(createUserDto));
   }
 
+  //이메일 중복 검증
+  @Post('checkEmail')
+  @ApiBody({})
+  @ApiOperation({ summary: '이메일 중복 확인' })
+  async checkEmail(@Body() { email }: { email: string }) {
+    const existingUser = await this.usersService.findByEmail({ email });
+    if (existingUser) {
+      return { message: '201' };
+    } else{
+      return { message: '200'};
+    }
+  }
+  
+  //닉네임 중복 검증
+  @Post('checkNickname')
+  @ApiBody({})
+  async checkNickname(@Body() { nickname }: { nickname: string }) {
+    const existingNickname = await this.usersService.findByNickname({ nickname });
+    if (existingNickname) {
+      return{ message: '201' };
+    } else {
+      //return res.status(200).json({ message: 'Nickname is available.' });
+      return { message: '200' };
+    }
+  }
+
   // 2. 전체 유저 리스트를 조회한다.
   @Get()
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
@@ -47,12 +73,9 @@ export class UsersController {
     if (!users) {
       throw new NotFoundException('Users does not exist');
   }
-
-    // TODO: HEE's code
     const userEntity = users.map((user) => new UserEntity(user));
     console.log(userEntity);
     // return users.map((user) => new UserEntity(user));
-
     return users;
   }
 
@@ -61,9 +84,13 @@ export class UsersController {
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '유저 본인 조회' })
-  findMe(@Req() req: RequestWithUser) {
+  async findMe(@Req() req: RequestWithUser) {
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당 
-    return this.usersService.findMe(userId);
+    const user = await this.usersService.findMe(userId);
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+    return user;
   }
 
   // 3. userId를 통한 유저 조회
@@ -80,7 +107,7 @@ export class UsersController {
     return user;
   }
 
-  /* FIXME */
+
   // 5. user 정보 수정한다.
   @Patch(':id')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
@@ -92,6 +119,11 @@ export class UsersController {
   @ApiResponse({ status: 404, description: '유저 정보가 존재하지 않습니다' })
   
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const user = await this.usersService.findOne(+id);
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+
     await this.usersService.update(+id, updateUserDto);
     return {'message' : '회원 정보가 수정되었습니다'};
   }
@@ -102,13 +134,13 @@ export class UsersController {
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '회원 탈퇴' })
   async remove(@Req() req: RequestWithUser, @Body() DeleteUserDto: DeleteUserDto) {
-    const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당 ) {
+    const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당 ) 
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
     await this.usersService.remove(userId, DeleteUserDto.password);
-    return {'message' : '탈퇴되었습니다'};    
+    return {'message' : '탈퇴되었습니다'};
   }
 
   // 7. 사용자가 생성한 모임 리스트를 조회한다.
@@ -153,7 +185,6 @@ export class UsersController {
     const { userId } = req.user;
 
     const user = await this.usersService.findOne(userId);
-    // console.log('User:', user);
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
