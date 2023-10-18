@@ -36,8 +36,11 @@ export class EventsService {
     return file.path
   }
 
-  findAll() {
+  findAll(lastPage: number) {
     return this.prisma.event.findMany({
+      take: 10,
+      skip: lastPage ? 1 : 0,
+      ...(lastPage && {cursor: {eventId: lastPage}}),
       where: {
         isDeleted: false,
       },

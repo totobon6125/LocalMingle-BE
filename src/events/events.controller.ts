@@ -13,6 +13,7 @@ import {
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -91,9 +92,8 @@ export class EventsController {
   @Get()
   @ApiOperation({ summary: 'Event 전체 조회' })
   @ApiOkResponse({ type: EventEntity, isArray: true })
-  async findAll() {
-    const events = await this.eventsService.findAll();
-    console.log(events)
+  async findAll(@Query('lastPage', ParseIntPipe) lastPage:number) {
+    const events = await this.eventsService.findAll(lastPage);
     const event = events.map((item) => {
       const { GuestEvents, HostEvents, ...rest } = item;
       const hostUser = item.HostEvents[0].User.UserDetail;
