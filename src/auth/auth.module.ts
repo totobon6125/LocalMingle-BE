@@ -1,3 +1,4 @@
+import { JwtNaverStrategy } from './strategies/jwt-social-naver.strategy';
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -19,6 +20,7 @@ import { JwtKakaoStrategy } from './strategies/jwt-social-kakao.strategy';
     AuthService,
     UsersService,
     JwtKakaoStrategy,
+    JwtNaverStrategy,
   ],
 })
 export class AuthModule {}

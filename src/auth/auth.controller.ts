@@ -127,14 +127,14 @@ export class AuthController {
   // }
 
   //-----------------------네이버 로그인-----------------------------//
-  // @Get('/login/naver')
-  // @UseGuards(AuthGuard('naver'))
-  // async loginNaver(
-  //   @Req() req: Request & IOAuthUser, //
-  //   @Res() res: Response,
-  // ) {
-  //   this.authService.OAuthLogin({ req, res });
-  // }
+  @Get('/login/naver')
+  @UseGuards(AuthGuard('naver'))
+  async loginNaver(
+    @Req() req: Request & IOAuthUser, //
+    @Res() res: Response
+  ) {
+    this.authService.OAuthLogin({ req, res });
+  }
 
   // @Get('favicon.ico')
   // favicon(
