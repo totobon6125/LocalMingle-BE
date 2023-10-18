@@ -126,7 +126,9 @@ export class EventsController {
       event: rest,
       guestList: event.GuestEvents.length,
       hostUser: HostEvents[0].User.UserDetail,
-      guestUser: GuestEvents[0]?.User?.UserDetail,
+      guestUser: GuestEvents.map((item)=>{
+        return item.User.UserDetail
+      })
     };
   }
 
@@ -143,9 +145,9 @@ export class EventsController {
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     const { userId } = req.user;
-    const isJoin = await this.eventsService.isJoin(+eventId, userId);
+    const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
-      this.eventsService.join(+eventId, userId);
+      this.eventsService.join(eventId, userId);
       return `${eventId}번 모임 참석 신청!`;
     }
     if (isJoin) {
