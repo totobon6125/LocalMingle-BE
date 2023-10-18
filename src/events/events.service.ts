@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -160,5 +160,39 @@ export class EventsService {
     });
   }
 
+  // 북마크 추가
+  async addBookmark(eventId: number, userId: number, status: string) {
+    return await this.prisma.eventBookmark.create({
+      data: {
+        EventId: eventId,
+        UserId: userId,
+        status: status,
+        updatedAt: new Date(),
+      },
+    });
+  }
 
+  // 북마크 제거
+  async removeBookmark(eventId: number, userId: number, status: string) {
+    // 먼저 eventBookmarkId를 찾습니다.
+    const eventBookmark = await this.prisma.eventBookmark.findFirst({
+      where: {
+        EventId: eventId,
+        UserId: userId,
+      },
+    });
+
+    if (!eventBookmark) {
+      throw new NotFoundException('해당 북마크를 찾을 수 없습니다.');
+    }
+
+    // 찾은 eventBookmarkId를 통해 deletedAt을 업데이트 합니다.
+    return await this.prisma.eventBookmark.update({
+      where: { eventBookmarkId: eventBookmark.eventBookmarkId },
+      data: {
+        status: status,
+        updatedAt: new Date(),
+      },
+    });
+  }
 }

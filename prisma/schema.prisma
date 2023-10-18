@@ -20,9 +20,10 @@ model User {
   deletedAt    DateTime? // null이면 삭제되지 않은 것으로 간주
   refreshToken String?   @db.Text
 
-  UserDetail  UserDetail[]
-  HostEvents  HostEvent[]
-  GuestEvents GuestEvent[]
+  UserDetail    UserDetail[]
+  HostEvents    HostEvent[]
+  GuestEvents   GuestEvent[]
+  EventBookmark EventBookmark[]
 
   @@map("User")
 }
@@ -62,13 +63,28 @@ model Event {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  HostEvents  HostEvent[]
-  GuestEvents GuestEvent[]
-  Viewlogs    Viewlog[]
-  Category    Category[]
-  RsvpLog     RsvpLog[]
+  HostEvents    HostEvent[]
+  GuestEvents   GuestEvent[]
+  Viewlogs      Viewlog[]
+  Category      Category[]
+  RsvpLog       RsvpLog[]
+  EventBookmark EventBookmark[]
 
   @@map("Event")
+}
+
+// 북마크한 이벤트 모델
+model EventBookmark {
+  eventBookmarkId Int       @id @default(autoincrement()) // Primary Key
+  EventId         Int
+  UserId          Int
+  status          String // "bookmarked", "unbookmarked"
+  updatedAt       DateTime?
+
+  Event Event @relation(fields: [EventId], references: [eventId])
+  User  User  @relation(fields: [UserId], references: [userId])
+
+  @@map("EventBookmark")
 }
 
 // 조회 기록 모델
