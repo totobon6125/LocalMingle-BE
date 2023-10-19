@@ -29,9 +29,9 @@ export class EventsService {
     return event;
   }
 
-  uploadFile (file: Express.Multer.File) {
-    if (!file) throw new BadRequestException()
-    return file.path
+  uploadFile(file: Express.Multer.File) {
+    if (!file) throw new BadRequestException();
+    return file.path;
   }
 
   findAll() {
