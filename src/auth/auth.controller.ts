@@ -108,6 +108,7 @@ export class AuthController {
 
   //-----------------------카카오 로그인-----------------------------//
   @Get('/login/kakao')
+  @ApiOperation({ summary: '카카오 소셜 로그인' })
   @UseGuards(AuthGuard('kakao'))
   async loginKakao(
     @Req() req: Request & IOAuthUser, //
@@ -117,6 +118,7 @@ export class AuthController {
   }
   //-----------------------구글 로그인-----------------------------//
   @Get('/login/google') //restAPI만들기. 엔드포인트는 users/login/google.
+  @ApiOperation({ summary: '구글 소셜 로그인' })
   @UseGuards(AuthGuard('google')) //인증과정을 거쳐야하기때문에 UseGuards를 써주고 passport인증으로 AuthGuard를 써준다. 이름은 google로
   async loginGoogle(
     @Req() req: Request & IOAuthUser,
@@ -128,6 +130,7 @@ export class AuthController {
 
   //-----------------------네이버 로그인-----------------------------//
   @Get('/login/naver')
+  @ApiOperation({ summary: '네이버 소셜 로그인' })
   @UseGuards(AuthGuard('naver'))
   async loginNaver(
     @Req() req: Request & IOAuthUser, //

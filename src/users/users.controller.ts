@@ -51,6 +51,7 @@ export class UsersController {
   //닉네임 중복 검증
   @Post('checkNickname')
   @ApiBody({})
+  @ApiOperation({ summary: '닉네임 중복 확인' })
   async checkNickname(@Body() { nickname }: { nickname: string }) {
     const existingNickname = await this.usersService.findByNickname({ nickname });
     if (existingNickname) {
