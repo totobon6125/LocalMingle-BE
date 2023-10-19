@@ -52,6 +52,7 @@ export class EventsController {
   @ApiOperation({ summary: '호스트로 Event 생성' })
   @ApiCreatedResponse({ type: EventEntity })
   create(@Req() req: RequestWithUser, @Body() createEventDto: CreateEventDto) {
+    console.log("here", createEventDto)
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
 
     return this.eventsService.create(userId, createEventDto);
