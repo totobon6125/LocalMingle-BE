@@ -36,6 +36,7 @@ export class EventsService {
     return file.path
   }
 
+  // 이벤트 전체 조회
   findAll() {
     return this.prisma.event.findMany({
       where: {
@@ -64,6 +65,7 @@ export class EventsService {
     });
   }
 
+  // 이벤트 상세 조회
   async findOne(eventId: number) {
     const event = await this.prisma.event.findUnique({
       where: { eventId, isDeleted: false },
@@ -99,6 +101,7 @@ export class EventsService {
     return event;
   }
 
+  // 이벤트 조회 로그
   async createViewLog(eventId: number) {
     await this.prisma.viewlog.create({
       data: {
@@ -108,6 +111,7 @@ export class EventsService {
     });
   }
 
+  // 이벤트 참가여부 확인
   async isJoin(eventId: number, userId: number) {
     const isJoin = await this.prisma.guestEvent.findFirst({
       where: {
@@ -118,6 +122,7 @@ export class EventsService {
     return isJoin;
   }
 
+  // 이벤트 참가 신청
   async join(eventId: number, userId: number) {
     await this.prisma.guestEvent.create({
       data: {
@@ -127,12 +132,14 @@ export class EventsService {
     });
   }
 
+  // 이벤트 참가 취소
   async cancelJoin(guestEventId: number) {
     await this.prisma.guestEvent.delete({
       where: { guestEventId },
     });
   }
 
+  // 이벤트 신청/취소 로그
   async createRsvpLog(eventId: number, userId: number, status: string) {
     await this.prisma.rsvpLog.create({
       data: {
@@ -144,6 +151,7 @@ export class EventsService {
     });
   }
 
+  // 이벤트 수정
   update(eventId: number, updateEventDto: UpdateEventDto) {
     return this.prisma.event.update({
       where: { eventId },
@@ -151,6 +159,7 @@ export class EventsService {
     });
   }
 
+  // 이벤트 삭제
   remove(eventId: number) {
     return this.prisma.event.update({
       where: { eventId },
@@ -160,7 +169,7 @@ export class EventsService {
     });
   }
 
-  // 북마크 추가
+  // 관심있는 북마크 추가
   async addBookmark(eventId: number, userId: number, status: string) {
     return await this.prisma.eventBookmark.create({
       data: {
@@ -172,9 +181,8 @@ export class EventsService {
     });
   }
 
-  // 북마크 제거
+  // 관심있는 이벤트 북마크 제거
   async removeBookmark(eventId: number, userId: number, status: string) {
-    // 먼저 eventBookmarkId를 찾습니다.
     const eventBookmark = await this.prisma.eventBookmark.findFirst({
       where: {
         EventId: eventId,

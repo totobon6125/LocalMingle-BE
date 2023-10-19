@@ -105,9 +105,8 @@ export class UsersService {
 
   // 5. user 정보 수정한다.
   async update(id: number, updateUserDto: UpdateUserDto) {
-    // console.log('updateUserDto in users.service:', updateUserDto);
-    const { nickname, intro, confirmPassword } = updateUserDto;
-
+    const { nickname, intro, confirmPassword, nameChanged } = updateUserDto;
+    
     const user = await this.prisma.user.findUnique({
       where: { userId: id },
     });
@@ -115,32 +114,52 @@ export class UsersService {
       throw new BadRequestException('유저 정보가 존재하지 않습니다.');
     }
 
-        // 중복된 닉네임 확인 
-        const existingNickname = await this.prisma.userDetail.findUnique({
-          where: { nickname },
-        });
-        if (existingNickname) {
-          throw new ConflictException('이미 존재하는 닉네임입니다.');
-        }
+    
+    if (!nameChanged) {
+      // nameChanged == false 면 닉네임에는 변화가 없다는 것임으로 닉네임을 제외한 나머지 정보만 업데이트
+      // 패스워드, 패스워드 확인 일치 여부 확인
+      const isPasswordMatching = await bcrypt.compare(confirmPassword, user.password);
+      if (!isPasswordMatching) {
+        throw new BadRequestException('패스워드가 일치하지 않습니다.');
+      }
 
-    // 패스워드, 패스워드 확인 일치 여부 확인
-    const isPasswordMatching = await bcrypt.compare(confirmPassword, user.password);
-    if (!isPasswordMatching) {
-      throw new BadRequestException('패스워드가 일치하지 않습니다.');
-    }
-
-
-    // userdetail page 업데이트 
-    const updatedUser = await this.prisma.userDetail.update({
+      // userdetail page 자기소개 업데이트
+      const updatedUser = await this.prisma.userDetail.update({
         where: { userDetailId: user.userId},
+        data: { 
+          intro: intro,
+        },
+        });
+      return updatedUser;
+      
+    }
+    else { 
+      // nameChanged = true 면 닉네임을 바꿨다는 거니까 닉네임을 포함해서 업데이트
+      // 중복된 닉네임 확인 
+      const existingNickname = await this.prisma.userDetail.findUnique({
+        where: { nickname },
+      });
+      
+      if (existingNickname) {
+        throw new ConflictException('이미 존재하는 닉네임입니다.');
+      }
+
+      // 패스워드, 패스워드 확인 일치 여부 확인
+      const isPasswordMatching = await bcrypt.compare(confirmPassword, user.password);
+      if (!isPasswordMatching) {
+        throw new BadRequestException('패스워드가 일치하지 않습니다.');
+      }
+
+      // userdetail page 닉네임, 자기소개, 업데이트
+      const updatedUser = await this.prisma.userDetail.update({
+      where: { userDetailId: user.userId},
         data: { 
           intro: intro,
           nickname: nickname
         },
-      });
-
+        });
       return updatedUser;
-      
+    }
   }
 
   // 6. 회원 탈퇴를 한다.

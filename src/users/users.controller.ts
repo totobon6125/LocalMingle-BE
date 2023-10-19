@@ -1,11 +1,11 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.controller.ts
-import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Res } from '@nestjs/common';
+import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes, ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
@@ -33,32 +33,6 @@ export class UsersController {
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
-  }
-
-  //이메일 중복 검증
-  @Post('checkEmail')
-  @ApiBody({})
-  @ApiOperation({ summary: '이메일 중복 확인' })
-  async checkEmail(@Body() { email }: { email: string }) {
-    const existingUser = await this.usersService.findByEmail({ email });
-    if (existingUser) {
-      return { message: '201' };
-    } else{
-      return { message: '200'};
-    }
-  }
-  
-  //닉네임 중복 검증
-  @Post('checkNickname')
-  @ApiBody({})
-  async checkNickname(@Body() { nickname }: { nickname: string }) {
-    const existingNickname = await this.usersService.findByNickname({ nickname });
-    if (existingNickname) {
-      return{ message: '201' };
-    } else {
-      //return res.status(200).json({ message: 'Nickname is available.' });
-      return { message: '200' };
-    }
   }
 
   // 2. 전체 유저 리스트를 조회한다.
