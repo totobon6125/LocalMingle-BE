@@ -77,7 +77,6 @@ export class EventsController {
       },
     },
   })
-
   async uploadFile(@UploadedFile() file) {
     console.log('file', file);
 
@@ -123,9 +122,9 @@ export class EventsController {
       event: rest,
       guestList: event.GuestEvents.length,
       hostUser: HostEvents[0].User.UserDetail,
-      guestUser: GuestEvents.map((item)=>{
-        return item.User.UserDetail
-      })
+      guestUser: GuestEvents.map((item) => {
+        return item.User.UserDetail;
+      }),
     };
   }
 
@@ -142,7 +141,7 @@ export class EventsController {
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     const { userId } = req.user;
-    
+
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
       this.eventsService.join(eventId, userId);
@@ -184,7 +183,10 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Event 북마크 추가' })
-  async addBookmark(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+  async addBookmark(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req: RequestWithUser
+  ) {
     const { userId } = req.user;
     return this.eventsService.addBookmark(eventId, userId, 'bookmarked');
   }
@@ -194,7 +196,10 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Event 북마크 제거' })
-  async removeBookmark(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+  async removeBookmark(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req: RequestWithUser
+  ) {
     const { userId } = req.user;
     return this.eventsService.removeBookmark(eventId, userId, 'unbookmarked');
   }
