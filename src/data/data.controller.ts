@@ -50,7 +50,7 @@ export class DataController {
     return this.dataService.filteredEventByCategory(query);
   }
 
-  @Get('filter/verifiy')
+  @Get('filter/verify')
   @ApiOperation({ summary: '이벤트 필터링(위치인증)' })
   @ApiQuery({ name: 'verify', type: String, required: true })
   filteredEventByVerify(@Query() query: Verify) {
