@@ -92,8 +92,8 @@ export class EventsController {
   @Get()
   @ApiOperation({ summary: 'Event 전체 조회' })
   @ApiOkResponse({ type: EventEntity, isArray: true })
-  async findAll(@Query('lastPage', ParseIntPipe) lastPage:number) {
-    const events = await this.eventsService.findAll(lastPage);
+  async findAll() {
+    const events = await this.eventsService.findAll();
     const event = events.map((item) => {
       const { GuestEvents, HostEvents, ...rest } = item;
       const hostUser = item.HostEvents[0].User.UserDetail;
@@ -141,16 +141,17 @@ export class EventsController {
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     const { userId } = req.user;
+    
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
       this.eventsService.join(eventId, userId);
       this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 로그 생성
-      return {userId, eventId};
+      return `${eventId}번 모임 참석 신청`;
     }
     if (isJoin) {
       this.eventsService.cancelJoin(isJoin.guestEventId);
       this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 로그 생성
-      return {userId, eventId};
+      return `${eventId}번 모임 참석 취소 `;
     }
   }
 
