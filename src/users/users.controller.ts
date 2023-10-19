@@ -35,6 +35,33 @@ export class UsersController {
     return new UserEntity(await this.usersService.create(createUserDto));
   }
 
+  //이메일 중복 검증
+  @Post('checkEmail')
+  @ApiBody({})
+  @ApiOperation({ summary: '이메일 중복 확인' })
+  async checkEmail(@Body() { email }: { email: string }) {
+    const existingUser = await this.usersService.findByEmail({ email });
+    if (existingUser) {
+      return { message: '201' };
+    } else{
+      return { message: '200'};
+    }
+  }
+  
+  //닉네임 중복 검증
+  @Post('checkNickname')
+  @ApiBody({})
+  @ApiOperation({ summary: '닉네임 중복 확인' })
+  async checkNickname(@Body() { nickname }: { nickname: string }) {
+    const existingNickname = await this.usersService.findByNickname({ nickname });
+    if (existingNickname) {
+      return{ message: '201' };
+    } else {
+      //return res.status(200).json({ message: 'Nickname is available.' });
+      return { message: '200' };
+    }
+  }
+
   // 2. 전체 유저 리스트를 조회한다.
   @Get()
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인

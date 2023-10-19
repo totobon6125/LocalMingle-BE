@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -31,9 +35,9 @@ export class EventsService {
   }
 
   // 이벤트 이미지 업로드
-  uploadFile (file: Express.Multer.File) {
-    if (!file) throw new BadRequestException()
-    return file.path
+  uploadFile(file: Express.Multer.File) {
+    if (!file) throw new BadRequestException();
+    return file.path;
   }
 
   // 이벤트 전체 조회

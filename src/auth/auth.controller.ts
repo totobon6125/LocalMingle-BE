@@ -108,6 +108,7 @@ export class AuthController {
 
   //-----------------------카카오 로그인-----------------------------//
   @Get('/login/kakao')
+  @ApiOperation({ summary: '카카오 소셜 로그인' })
   @UseGuards(AuthGuard('kakao'))
   async loginKakao(
     @Req() req: Request & IOAuthUser, //
@@ -116,25 +117,27 @@ export class AuthController {
     this.authService.OAuthLogin({ req, res });
   }
   //-----------------------구글 로그인-----------------------------//
-  // @Get('/login/google') //restAPI만들기. 엔드포인트는 /login/google.
-  // @UseGuards(AuthGuard('google')) //인증과정을 거쳐야하기때문에 UseGuards를 써주고 passport인증으로 AuthGuard를 써준다. 이름은 google로
-  // async loginGoogle(
-  //   @Req() req: Request & IOAuthUser,
-  //   @Res() res: Response, //Nest.js가 express를 기반으로 하기때문에 Request는 express에서 import한다.
-  // ) {
-  //   //프로필을 받아온 다음, 로그인 처리해야하는 곳(auth.service.ts에서 선언해준다)
-  //   this.authService.OAuthLogin({ req, res });
-  // }
+  @Get('/login/google') //restAPI만들기. 엔드포인트는 users/login/google.
+  @ApiOperation({ summary: '구글 소셜 로그인' })
+  @UseGuards(AuthGuard('google')) //인증과정을 거쳐야하기때문에 UseGuards를 써주고 passport인증으로 AuthGuard를 써준다. 이름은 google로
+  async loginGoogle(
+    @Req() req: Request & IOAuthUser,
+    @Res() res: Response //Nest.js가 express를 기반으로 하기때문에 Request는 express에서 import한다.
+  ) {
+    //프로필을 받아온 다음, 로그인 처리해야하는 곳(auth.service.ts에서 선언해준다)
+    this.authService.OAuthLogin({ req, res });
+  }
 
   //-----------------------네이버 로그인-----------------------------//
-  // @Get('/login/naver')
-  // @UseGuards(AuthGuard('naver'))
-  // async loginNaver(
-  //   @Req() req: Request & IOAuthUser, //
-  //   @Res() res: Response,
-  // ) {
-  //   this.authService.OAuthLogin({ req, res });
-  // }
+  @Get('/login/naver')
+  @ApiOperation({ summary: '네이버 소셜 로그인' })
+  @UseGuards(AuthGuard('naver'))
+  async loginNaver(
+    @Req() req: Request & IOAuthUser, //
+    @Res() res: Response
+  ) {
+    this.authService.OAuthLogin({ req, res });
+  }
 
   // @Get('favicon.ico')
   // favicon(
