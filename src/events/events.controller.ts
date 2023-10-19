@@ -13,7 +13,6 @@ import {
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
-  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -53,7 +52,6 @@ export class EventsController {
   @ApiOperation({ summary: '호스트로 Event 생성' })
   @ApiCreatedResponse({ type: EventEntity })
   create(@Req() req: RequestWithUser, @Body() createEventDto: CreateEventDto) {
-    console.log("here", createEventDto)
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
 
     return this.eventsService.create(userId, createEventDto);
@@ -150,7 +148,6 @@ export class EventsController {
 
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
-<<<<<<< HEAD
       this.eventsService.join(+eventId, userId);
       this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 참가 신청 로그 생성
       return `${eventId}번 모임 참석 신청!`;
@@ -159,16 +156,6 @@ export class EventsController {
       this.eventsService.cancelJoin(isJoin.guestEventId);
       this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 참가 취소 로그 생성
       return `${eventId}번 모임 신청 취소!`;
-=======
-      this.eventsService.join(eventId, userId);
-      this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 로그 생성
-      return `${eventId}번 모임 참석 신청`;
-    }
-    if (isJoin) {
-      this.eventsService.cancelJoin(isJoin.guestEventId);
-      this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 로그 생성
-      return `${eventId}번 모임 참석 취소 `;
->>>>>>> 91ef7e642d08985b48033ecbc88dc73bf311dfa8
     }
   }
 

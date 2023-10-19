@@ -135,7 +135,7 @@ export class UsersService {
     }
     else { 
       // nameChanged = true 면 닉네임을 바꿨다는 거니까 닉네임을 포함해서 업데이트
-      // 중복된 닉네임 확인 
+      // 중복된 닉네임 확인
       const existingNickname = await this.prisma.userDetail.findUnique({
         where: { nickname },
       });
