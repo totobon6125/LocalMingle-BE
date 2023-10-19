@@ -143,14 +143,14 @@ export class EventsController {
     const { userId } = req.user;
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
-      this.eventsService.join(+eventId, userId);
+      this.eventsService.join(eventId, userId);
       this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 로그 생성
-      return `${eventId}번 모임 참석 신청!`;
+      return {userId, eventId};
     }
     if (isJoin) {
       this.eventsService.cancelJoin(isJoin.guestEventId);
       this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 로그 생성
-      return `${eventId}번 모임 신청 취소!`;
+      return {userId, eventId};
     }
   }
 
