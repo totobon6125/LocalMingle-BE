@@ -1,18 +1,18 @@
-import { Controller, Get, Injectable } from '@nestjs/common';
+import { Controller, Get, Injectable, Query } from '@nestjs/common';
 import { SearchesService } from './searches.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 @Controller('search')
 @Injectable()
-@ApiTags('Searches')
+@ApiTags('Search')
 export class SearchesController {
-  constructor(private readonly searchService: SearchesService) {}
+  constructor(private readonly searchesService: SearchesService) {}
 
   @Get()
-  @ApiOperation({ summary: '회원 조회' })
+  @ApiOperation({ summary: '이벤트네임 or 콘텐츠 검색' })
   async search(
-    query: string
+    @Query('query') query: string // @Query 데코레이터 추가
   ): Promise<{ eventName: string; content: string }[]> {
-    return this.searchService.searchEvents(query);
+    return this.searchesService.searchEvents(query);
   }
 }
