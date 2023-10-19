@@ -7,7 +7,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 // import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
 
   // 유효성 검사를 위한 ValidationPipe 설정
   app.useGlobalPipes(new ValidationPipe());
@@ -25,14 +25,13 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
   //cors 정책
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // 쿠키를 사용하려면 true로 설정
     exposedHeaders: ['accessToken', 'refreshToken'],
-    allowedHeaders: 'Content-Type, Authorization',
+    //allowedHeaders: 'Content-Type, Authorization',
   });
 
   await app.listen(3000);
