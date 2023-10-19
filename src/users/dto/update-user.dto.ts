@@ -1,6 +1,5 @@
 // src/users/dto/update-user.dto.ts
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
@@ -38,8 +37,14 @@ export class UpdateUserDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'password',
+    description: 'password confirm',
     example: 'abc123456789!',
   })
   confirmPassword: string;
+
+  @ApiProperty({
+    description: 'nickname changed',
+    example: false,
+  })
+  nameChanged: boolean;
 }
