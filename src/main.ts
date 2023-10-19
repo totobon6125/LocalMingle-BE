@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // 유효성 검사를 위한 ValidationPipe 설정
-  app.useGlobalPipes(new ValidationPipe());
+  // app.useGlobalPipes(new ValidationPipe());
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   // 인터셉터를 사용하여 응답 본문에서 비밀번호를 자동으로 제거
