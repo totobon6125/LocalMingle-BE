@@ -133,10 +133,12 @@ export class AuthService {
     res.header(refreshToken);
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);
+    //console.log(typeof user.userId);
 
     // 리다이렉션
-    res.redirect('http://127.0.0.1:5500'); // 메인페이지 url 을 입력해야합니다.
-
+    res.redirect('http://localhost:5173'); // 메인페이지 url 을 입력해야합니다.
+    //http://localhost:5173/
+    //http://127.0.0.1:5500
     return { accessToken, refreshToken, userId: user.userId };
   }
 }
