@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.service.ts
-import { BadRequestException, ConflictException,  Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException,  Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -71,7 +71,9 @@ export class UsersService {
 
   // 2. 전체 유저 리스트를 조회한다.
   async findAll() {
-    return await this.prisma.user.findMany({});
+    return await this.prisma.user.findMany({
+      where : { deletedAt: null },
+    });
   }
   
   // 3. 유저 본인 조회
@@ -84,10 +86,15 @@ export class UsersService {
 
   // 3. userId를 통한 유저 조회
   async findOne(id: number) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { userId: id },
       include: { UserDetail: true, HostEvents: true, GuestEvents: true},
     });
+    
+    if (!user || user.deletedAt !== null) {
+      throw new BadRequestException('삭제된 회원이거나 존재하지 않는 회원입니다.');  
+    }
+    return user;
   }
 
   // 4. 이메일을 통한 유저 찾기
@@ -153,8 +160,9 @@ export class UsersService {
     }
     
     // 패스워드가 일치하면 유저 삭제
-    return await this.prisma.user.delete({
-      where: { userId: userId},
+    return await this.prisma.user.update({
+      where: { userId: userId },
+      data: { deletedAt: new Date() },
     });
   }
 
@@ -167,6 +175,7 @@ export class UsersService {
           select: {
             Event: true,
           },
+          where: { Event: { isDeleted: false } },
         },
       },
     });
@@ -181,10 +190,28 @@ export class UsersService {
           select: {
             Event: true,
           },
+          where: { Event: { isDeleted: false } },
         },
       },
     });
   }
+
+// 10. 사용자가 북마크한 이벤트 리스트를 조회한다. 
+async findBookmarkedEvents(id: number, status: string) {
+  try {
+    const bookmarkedEvents = await this.prisma.eventBookmark.findMany({
+      where: { UserId: id, status: status},
+      include: { Event: true },
+    });
+  
+    if (!bookmarkedEvents.length) {
+      throw new BadRequestException('북마크한 이벤트가 없습니다.');
+    }
+    return bookmarkedEvents
+  } catch (error) {
+    throw new NotFoundException('북마크한 이벤트를 찾을 수 없습니다.');
+  }
+}
 
   // 9. 프로필 이미지를 업데이트 한다.
   async updateProfileImage(id: number, profileImg: string) {
@@ -203,5 +230,5 @@ export class UsersService {
       data: { profileImg: profileImg },
     });
     return updatedProfileImage.profileImg;
-  }
+  }  
 }

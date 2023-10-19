@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -7,6 +7,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
+  // 1. 이벤트 생성
   async create(userId: number, createEventDto: CreateEventDto) {
     const event = await this.prisma.event.create({
       data: createEventDto,
@@ -29,9 +30,12 @@ export class EventsService {
     return event;
   }
 
-  uploadFile(file: Express.Multer.File) {
-    if (!file) throw new BadRequestException();
-    return file.path;
+
+  // 이벤트 이미지 업로드
+  uploadFile (file: Express.Multer.File) {
+    if (!file) throw new BadRequestException()
+    return file.path
+
   }
 
   findAll() {
@@ -125,10 +129,20 @@ export class EventsService {
     });
   }
 
-  /* TODO: 참가 취소하면 guestEvent에서 지우는게 아니라 guestEvent의 isDeleted를 true로 바꾸는 방식으로 변경 */
   async cancelJoin(guestEventId: number) {
     await this.prisma.guestEvent.delete({
       where: { guestEventId },
+    });
+  }
+
+  async createRsvpLog(eventId: number, userId: number, status: string) {
+    await this.prisma.rsvpLog.create({
+      data: {
+        EventId: eventId,
+        UserId: userId,
+        status: status,
+        createdAt: new Date(),
+      },
     });
   }
 
@@ -144,6 +158,42 @@ export class EventsService {
       where: { eventId },
       data: {
         isDeleted: true,
+      },
+    });
+  }
+
+  // 북마크 추가
+  async addBookmark(eventId: number, userId: number, status: string) {
+    return await this.prisma.eventBookmark.create({
+      data: {
+        EventId: eventId,
+        UserId: userId,
+        status: status,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  // 북마크 제거
+  async removeBookmark(eventId: number, userId: number, status: string) {
+    // 먼저 eventBookmarkId를 찾습니다.
+    const eventBookmark = await this.prisma.eventBookmark.findFirst({
+      where: {
+        EventId: eventId,
+        UserId: userId,
+      },
+    });
+
+    if (!eventBookmark) {
+      throw new NotFoundException('해당 북마크를 찾을 수 없습니다.');
+    }
+
+    // 찾은 eventBookmarkId를 통해 deletedAt을 업데이트 합니다.
+    return await this.prisma.eventBookmark.update({
+      where: { eventBookmarkId: eventBookmark.eventBookmarkId },
+      data: {
+        status: status,
+        updatedAt: new Date(),
       },
     });
   }

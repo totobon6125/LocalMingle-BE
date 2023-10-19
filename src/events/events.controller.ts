@@ -13,6 +13,7 @@ import {
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -76,16 +77,17 @@ export class EventsController {
       },
     },
   })
-  async uploadFile(
-    @UploadedFile()
-    file
-  ) {
-    console.log('file', file);
-    const img = this.eventsService.uploadFile(file);
-    console.log(img);
 
-    // const uploadedFile = await this.awsS3Service.uploadEventFile(file) as { Location: string };
-    // return uploadedFile
+  async uploadFile(@UploadedFile() file) {
+    console.log('file', file);
+
+    const uploadedFile = (await this.awsS3Service.uploadEventFile(file)) as {
+      Location: string;
+    };
+    return {
+      message: '이미지가 업로드되었습니다',
+      ImgURL: uploadedFile,
+    };
   }
 
   @Get()
@@ -93,17 +95,14 @@ export class EventsController {
   @ApiOkResponse({ type: EventEntity, isArray: true })
   async findAll() {
     const events = await this.eventsService.findAll();
-
     const event = events.map((item) => {
       const { GuestEvents, HostEvents, ...rest } = item;
       const hostUser = item.HostEvents[0].User.UserDetail;
-      const guestUser = item.GuestEvents[0];
 
       return {
         event: rest,
         guestList: item.GuestEvents.length,
         hostUser: hostUser,
-        guestUser: guestUser,
       };
     });
     return event;
@@ -124,7 +123,9 @@ export class EventsController {
       event: rest,
       guestList: event.GuestEvents.length,
       hostUser: HostEvents[0].User.UserDetail,
-      guestUser: GuestEvents[0]?.User?.UserDetail,
+      guestUser: GuestEvents.map((item)=>{
+        return item.User.UserDetail
+      })
     };
   }
 
@@ -141,14 +142,17 @@ export class EventsController {
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     const { userId } = req.user;
-    const isJoin = await this.eventsService.isJoin(+eventId, userId);
+    
+    const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
-      this.eventsService.join(+eventId, userId);
-      return `${eventId}번 모임 참석 신청!`;
+      this.eventsService.join(eventId, userId);
+      this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 로그 생성
+      return `${eventId}번 모임 참석 신청`;
     }
     if (isJoin) {
       this.eventsService.cancelJoin(isJoin.guestEventId);
-      return `${eventId}번 모임 신청 취소!`;
+      this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 로그 생성
+      return `${eventId}번 모임 참석 취소 `;
     }
   }
 
@@ -173,5 +177,25 @@ export class EventsController {
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     return this.eventsService.remove(eventId);
+  }
+
+  // 북마크 추가
+  @Post(':eventId/bookmark')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Event 북마크 추가' })
+  async addBookmark(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+    const { userId } = req.user;
+    return this.eventsService.addBookmark(eventId, userId, 'bookmarked');
+  }
+
+  // 북마크 제거
+  @Delete(':eventId/bookmark')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Event 북마크 제거' })
+  async removeBookmark(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+    const { userId } = req.user;
+    return this.eventsService.removeBookmark(eventId, userId, 'unbookmarked');
   }
 }
