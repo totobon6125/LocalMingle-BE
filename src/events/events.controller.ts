@@ -13,7 +13,6 @@ import {
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
-  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -46,18 +45,19 @@ export class EventsController {
     private readonly awsS3Service: AwsS3Service
   ) {}
 
+  // 이벤트 생성
   @Post()
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '호스트로 Event 생성' })
   @ApiCreatedResponse({ type: EventEntity })
   create(@Req() req: RequestWithUser, @Body() createEventDto: CreateEventDto) {
-    console.log("here", createEventDto)
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
 
     return this.eventsService.create(userId, createEventDto);
   }
 
+  // 이벤트 이미지 업로드
   @Post('upload')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
@@ -90,6 +90,7 @@ export class EventsController {
     };
   }
 
+  // 이벤트 전체 조회
   @Get()
   @ApiOperation({ summary: 'Event 전체 조회' })
   @ApiOkResponse({ type: EventEntity, isArray: true })
@@ -108,6 +109,7 @@ export class EventsController {
     return event;
   }
 
+  // 이벤트 상세 조회
   @Get(':eventId')
   @ApiOperation({ summary: 'Event 상세 조회' })
   @ApiOkResponse({ type: EventEntity })
@@ -129,6 +131,7 @@ export class EventsController {
     };
   }
 
+  // 이벤트 참가 신청
   @Put(':eventId/join')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
@@ -145,17 +148,18 @@ export class EventsController {
 
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
-      this.eventsService.join(eventId, userId);
-      this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 로그 생성
-      return `${eventId}번 모임 참석 신청`;
+      this.eventsService.join(+eventId, userId);
+      this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 참가 신청 로그 생성
+      return `${eventId}번 모임 참석 신청!`;
     }
     if (isJoin) {
       this.eventsService.cancelJoin(isJoin.guestEventId);
-      this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 로그 생성
-      return `${eventId}번 모임 참석 취소 `;
+      this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 참가 취소 로그 생성
+      return `${eventId}번 모임 신청 취소!`;
     }
   }
 
+  // 이벤트 수정
   @Patch(':eventId')
   @ApiOperation({ summary: 'Host로서 Event 수정' })
   @ApiOkResponse({ type: EventEntity })
@@ -169,6 +173,7 @@ export class EventsController {
     return this.eventsService.update(eventId, updateEventDto);
   }
 
+  // 이벤트 삭제
   @Delete(':eventId')
   @ApiOperation({ summary: 'Host로서 Event 삭제' })
   @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
@@ -179,7 +184,7 @@ export class EventsController {
     return this.eventsService.remove(eventId);
   }
 
-  // 북마크 추가
+  // 관심있는 이벤트 북마크 추가
   @Post(':eventId/bookmark')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -192,7 +197,7 @@ export class EventsController {
     return this.eventsService.addBookmark(eventId, userId, 'bookmarked');
   }
 
-  // 북마크 제거
+  // 관심있는 이벤트 북마크 제거
   @Delete(':eventId/bookmark')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
