@@ -30,10 +30,12 @@ export class EventsService {
     return event;
   }
 
+
   // 이벤트 이미지 업로드
   uploadFile (file: Express.Multer.File) {
     if (!file) throw new BadRequestException()
     return file.path
+
   }
 
   findAll() {

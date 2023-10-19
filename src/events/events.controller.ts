@@ -77,6 +77,7 @@ export class EventsController {
       },
     },
   })
+
   async uploadFile(@UploadedFile() file) {
     console.log('file', file);
 
