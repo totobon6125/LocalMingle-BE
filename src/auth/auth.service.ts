@@ -36,7 +36,7 @@ export class AuthService {
     if (!isAuth)
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
-    //const isdeletedAt =
+    // const isdeletedAt
     // 4. 리프레시 토큰 생성
     const refreshToken = this.setRefreshToken({ user, res });
 
@@ -146,7 +146,7 @@ export class AuthService {
     console.log(user.userId);
 
     // 리다이렉션
-    res.redirect('https://www.totobon6125.store/users/login/kakao'); // 메인페이지 url 을 입력해야합니다.
+    res.redirect('https://www.totobon6125.store'); // 메인페이지 url 을 입력해야합니다.
     //http://localhost:5173/
     //http://127.0.0.1:5500
     return { accessToken, refreshToken, userId: user.userId };
