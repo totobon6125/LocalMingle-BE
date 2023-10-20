@@ -145,7 +145,7 @@ export class AuthService {
     console.log(user.userId);
 
     // 리다이렉션
-    res.redirect('http://localhost:5500'); // 메인페이지 url 을 입력해야합니다.
+    res.redirect('http://localhost:5173'); // 메인페이지 url 을 입력해야합니다.
     //http://localhost:5173/
     //http://127.0.0.1:5500
     return { accessToken, refreshToken, userId: user.userId };
