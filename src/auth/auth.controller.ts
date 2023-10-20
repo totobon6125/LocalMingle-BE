@@ -156,19 +156,17 @@ export class AuthController {
 //   @Req() req: Request & IOAuthUser, //
 //   @Res() res: Response
 // ) {
-//   // AuthGuard('kakao')를 통해 로그인이 성공하면 req.user에 사용자 정보가 포함됩니다.
-//   // const user = req.user;
-//   // 엑세스 토큰와 리프레시 토큰은 일반적으로 user 객체에 있을 것입니다.
-//   const accessToken = this.authService.getAccessToken;
-//   const refreshToken = this.authService.getAccessToken;
-//   // userId는 필요에 따라 추출해서 사용합니다.
-//   const userId = user.userId;
-
+//   const { accessToken, refreshToken, userId } =
+//     await this.authService.OAuthLogin({
+//       req,
+//       res,
+//     });
 //   // 엑세스 토큰과 리프레시 토큰을 응답 헤더에 추가
 //   res.header('accessToken', accessToken);
 //   res.header('refreshToken', refreshToken);
-
-//   // this.authService.OAuthLogin({ req, res });
+//   console.log('컨트롤러엑세스 토큰', accessToken);
+//   console.log('컨트롤러리프레시 토큰', accessToken);
+//   console.log('컨트롤러유저id ', accessToken);
 
 //   // userId 및 다른 정보를 JSON 응답으로 클라이언트에게 반환
 //   res.status(200).json({ userId, accessToken, refreshToken });
