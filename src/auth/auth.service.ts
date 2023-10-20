@@ -65,6 +65,7 @@ export class AuthService {
     );
 
     res.header('accessToken', accessToken); // 클라이언트로 액세스 토큰을 반환
+    //res.header('Authorization', `Bearer ${accessToken}`); // 클라이언트로 액세스토큰을 Authorization 에 Bearer 로 반환
     //console.log('엑세스 토큰 확인용 로그', user);
     return accessToken;
     // return res.header(accessToken);
@@ -98,7 +99,11 @@ export class AuthService {
     return newAccessToken;
   }
 
-  async OAuthLogin({ req, res }) {
+  async OAuthLogin({ req, res }): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    userId: number;
+  }> {
     // 1. 회원조회
     let user = await this.usersService.findByEmail({ email: req.user.email }); // user를 찾아서
 
@@ -134,12 +139,13 @@ export class AuthService {
 
     // res.header(accessToken);
     // res.header(refreshToken);
+    res.header('userId', user.userId);
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);
     console.log(user.userId);
 
     // 리다이렉션
-    res.redirect('http://localhost:5173'); // 메인페이지 url 을 입력해야합니다.
+    res.redirect('http://localhost:5500'); // 메인페이지 url 을 입력해야합니다.
     //http://localhost:5173/
     //http://127.0.0.1:5500
     return { accessToken, refreshToken, userId: user.userId };
