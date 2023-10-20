@@ -216,21 +216,34 @@ export class UsersService {
   }
 
 // 10. 사용자가 북마크한 이벤트 리스트를 조회한다. 
-async findBookmarkedEvents(id: number, status: string) {
-  try {
-    const bookmarkedEvents = await this.prisma.eventBookmark.findMany({
-      where: { UserId: id, status: status},
-      include: { Event: true },
-    });
-  
-    if (!bookmarkedEvents.length) {
-      throw new BadRequestException('북마크한 이벤트가 없습니다.');
-    }
-    return bookmarkedEvents
-  } catch (error) {
-    throw new NotFoundException('북마크한 이벤트를 찾을 수 없습니다.');
+async findBookmarkedEvents(id: number) {
+  const events = await this.prisma.eventBookmark.findMany({
+    where: { UserId: id },
+    include: { Event: true },
+    orderBy: {
+      updatedAt: 'desc', // 가장 최신의 이벤트를 먼저 가져옴
+    },
+  });
+
+  if (!events.length) {
+    throw new NotFoundException('북마크한 이벤트가 없습니다.');
   }
+
+  const latestEventBookmarks = new Map<number, any>(); // Key: EventId, Value: eventBookmark entry
+
+  for (const event of events) {
+    // 이미 본 EventId가 아니면 Map에 추가
+    if (!latestEventBookmarks.has(event.EventId)) {
+      latestEventBookmarks.set(event.EventId, event);
+    }
+  }
+  // status가 "bookmarked"인 것만 필터링
+  const bookmarkedEvents = Array.from(latestEventBookmarks.values()).filter(event => event.status === 'bookmarked');
+
+  // console.log(bookmarkedEvents);
+  return bookmarkedEvents; // 각 EventId 당 가장 최신의 'bookmarked' 상태의 eventBookmark 엔트리 배열 반환
 }
+
 
   // 9. 프로필 이미지를 업데이트 한다.
   async updateProfileImage(id: number, profileImg: string) {
