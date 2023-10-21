@@ -10,7 +10,7 @@ import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
 import { UsersService } from 'src/users/users.service';
 import { JwtKakaoStrategy } from './strategies/jwt-social-kakao.strategy';
 import { JwtGoogleStrategy } from './strategies/jwt-social-google.strategy';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+// import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 export const jwtSecret = process.env.JWT_SECRET;
 @Module({
@@ -21,7 +21,6 @@ export const jwtSecret = process.env.JWT_SECRET;
     AuthService,
     UsersService,
     JwtAccessStrategy,
-    JwtRefreshStrategy,
     JwtKakaoStrategy,
     JwtNaverStrategy,
     JwtGoogleStrategy,
