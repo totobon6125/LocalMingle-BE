@@ -31,6 +31,11 @@ export class AuthService {
     // 2. 일치하는 유저가 없으면 에러
     if (!user) throw new NotFoundException('이메일이 없습니다.');
 
+    // 2-1. 사용자가 삭제되지 않았는지 확인 (deletedAt가 null이어야 함)
+    if (user.deletedAt !== null) {
+      throw new UnauthorizedException('사용자가 삭제되었습니다.');
+    }
+
     // 3. 일치하는 유저는 있지만 비밀번호가 틀렸다면 에러
     const isAuth = await bcrypt.compare(password, user.password);
     if (!isAuth)
@@ -166,8 +171,14 @@ export class AuthService {
 
     // 리다이렉션
     res.redirect(
-      `http://localhost:5500?userId=${encodeURIComponent(user.userId)}`
-    ); // 메인페이지뒤에 ? 해서 userId를 보내야한다.
+      `http://localhost:5500?accessToken=${encodeURIComponent(
+        accessToken
+      )}&refreshToken=${encodeURIComponent(
+        refreshToken
+      )}&userId=${encodeURIComponent(user.userId)}`
+    );
+
+    // 메인페이지뒤에 ? 해서 userId를 보내야한다.
     // `http://localhost:5500?userId=${user.userId}`
     //https://www.totobon6125.store/
     // https://www.totobon6125.store?userId=${user.userId}
