@@ -145,7 +145,7 @@ export class AuthService {
 
     // res.header('accessToken', accessToken);
     // res.header('refreshToken', refreshToken);
-    // res.header('userId', user.userId);
+    res.header('userId', user.userId);
 
     res.cookie('accessToken', accessToken, {
       httpOnly: false, // 배포시에 true
@@ -177,7 +177,6 @@ export class AuthService {
         refreshToken
       )}&userId=${encodeURIComponent(user.userId)}`
     );
-
     // 메인페이지뒤에 ? 해서 userId를 보내야한다.
     // `http://localhost:5500?userId=${user.userId}`
     //https://www.totobon6125.store/
