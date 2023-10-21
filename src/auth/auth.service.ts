@@ -36,6 +36,7 @@ export class AuthService {
     if (!isAuth)
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
+    // const isdeletedAt
     // 4. 리프레시 토큰 생성
     const refreshToken = this.setRefreshToken({ user, res });
 
