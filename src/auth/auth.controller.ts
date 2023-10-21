@@ -147,3 +147,27 @@ export class AuthController {
   //   res.status(204).end();
   // }
 }
+
+// //-----------------------카카오 로그인-----------------------------//
+// @Get('/login/kakao')
+// @ApiOperation({ summary: '카카오 소셜 로그인' })
+// @UseGuards(AuthGuard('kakao'))
+// async loginKakao(
+//   @Req() req: Request & IOAuthUser, //
+//   @Res() res: Response
+// ) {
+//   const { accessToken, refreshToken, userId } =
+//     await this.authService.OAuthLogin({
+//       req,
+//       res,
+//     });
+//   // 엑세스 토큰과 리프레시 토큰을 응답 헤더에 추가
+//   res.header('accessToken', accessToken);
+//   res.header('refreshToken', refreshToken);
+//   console.log('컨트롤러엑세스 토큰', accessToken);
+//   console.log('컨트롤러리프레시 토큰', accessToken);
+//   console.log('컨트롤러유저id ', accessToken);
+
+//   // userId 및 다른 정보를 JSON 응답으로 클라이언트에게 반환
+//   res.status(200).json({ userId, accessToken, refreshToken });
+// }

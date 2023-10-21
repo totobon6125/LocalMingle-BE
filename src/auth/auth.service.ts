@@ -36,6 +36,7 @@ export class AuthService {
     if (!isAuth)
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
+    // const isdeletedAt
     // 4. 리프레시 토큰 생성
     const refreshToken = this.setRefreshToken({ user, res });
 
@@ -63,6 +64,9 @@ export class AuthService {
       { sub: user.userId },
       { secret: process.env.JWT_ACCESS_KEY, expiresIn: '36000s' }
     );
+
+    res.header('accessToken', accessToken); // 클라이언트로 액세스 토큰을 반환
+    //res.header('Authorization', `Bearer ${accessToken}`); // 클라이언트로 액세스토큰을 Authorization 에 Bearer 로 반환
     //console.log('엑세스 토큰 확인용 로그', user);
     return accessToken;
     // return res.header(accessToken);
@@ -74,6 +78,8 @@ export class AuthService {
       { sub: user.userId },
       { secret: process.env.JWT_REFRESH_KEY, expiresIn: '2w' }
     );
+
+    res.header('refreshToken', refreshToken); // 클라이언트로 리프레시 토큰을 반환
     //console.log('리프레시 토큰 확인용 로그', user);
     return refreshToken;
     // return res.header(refreshToken);
@@ -94,7 +100,11 @@ export class AuthService {
     return newAccessToken;
   }
 
-  async OAuthLogin({ req, res }) {
+  async OAuthLogin({ req, res }): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    userId: number;
+  }> {
     // 1. 회원조회
     let user = await this.usersService.findByEmail({ email: req.user.email }); // user를 찾아서
 
@@ -116,7 +126,6 @@ export class AuthService {
     // 3. 회원가입이 되어 있다면? 로그인(AT, RT를 생성해서 브라우저에 전송)한다
     const accessToken = this.getAccessToken({ user, res }); // res를 전달
     const refreshToken = this.setRefreshToken({ user, res }); // res를 전달
-
     // 4. 로그인이 되면 DB에 리프레시 토큰을 저장한다.
     await this.prisma.user.update({
       where: { userId: user.userId },
@@ -126,17 +135,18 @@ export class AuthService {
     });
 
     //Authorization로 보내도록 결정되면 이렇게 수정(피드백 받으면 좋을 내용)
-    // res.header('Authorization', `Bearer ${accessToken}`);
-    // res.header('RefreshToken', refreshToken);
+    //res.header('Authorization', `Bearer ${accessToken}`);
+    //res.header('RefreshToken', refreshToken);
 
-    res.header(accessToken);
-    res.header(refreshToken);
+    // res.header(accessToken);
+    // res.header(refreshToken);
+    res.header('userId', user.userId);
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);
-    //console.log(typeof user.userId);
+    console.log(user.userId);
 
     // 리다이렉션
-    res.redirect('http://localhost:5173'); // 메인페이지 url 을 입력해야합니다.
+    res.redirect('https://www.totobon6125.store'); // 메인페이지 url 을 입력해야합니다.
     //http://localhost:5173/
     //http://127.0.0.1:5500
     return { accessToken, refreshToken, userId: user.userId };
