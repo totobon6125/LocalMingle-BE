@@ -21,7 +21,7 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     console.log('카카오에서 주는 accessToken:' + accessToken);
     console.log('카카오에서 주는 refreshToken:' + refreshToken);
     console.log('카카오 프로필', profile);
-    //console.log(profile._json.kakao_account.email);
+    console.log(profile._json.kakao_account.email);
 
     // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(profile.id.toString(), 10);

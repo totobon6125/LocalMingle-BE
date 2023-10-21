@@ -63,8 +63,8 @@ export class AuthService {
       { sub: user.userId },
       { secret: process.env.JWT_ACCESS_KEY, expiresIn: '36000s' }
     );
-
-    res.header('accessToken', accessToken); // 클라이언트로 액세스 토큰을 반환
+    //res.cookie('accessToken', accessToken);
+    // res.header('accessToken', accessToken); // 클라이언트로 액세스 토큰을 반환
     //res.header('Authorization', `Bearer ${accessToken}`); // 클라이언트로 액세스토큰을 Authorization 에 Bearer 로 반환
     //console.log('엑세스 토큰 확인용 로그', user);
     return accessToken;
@@ -77,8 +77,8 @@ export class AuthService {
       { sub: user.userId },
       { secret: process.env.JWT_REFRESH_KEY, expiresIn: '2w' }
     );
-
-    res.header('refreshToken', refreshToken); // 클라이언트로 리프레시 토큰을 반환
+    //res.cookie('refreshToken', refreshToken);
+    // res.header('refreshToken', refreshToken); // 클라이언트로 리프레시 토큰을 반환
     //console.log('리프레시 토큰 확인용 로그', user);
     return refreshToken;
     // return res.header(refreshToken);
@@ -134,18 +134,42 @@ export class AuthService {
     });
 
     //Authorization로 보내도록 결정되면 이렇게 수정(피드백 받으면 좋을 내용)
-    //res.header('Authorization', `Bearer ${accessToken}`);
-    //res.header('RefreshToken', refreshToken);
+    // res.header('Authorization', `Bearer ${accessToken}`);
+    // res.header('RefreshToken', refreshToken);
 
-    // res.header(accessToken);
-    // res.header(refreshToken);
-    res.header('userId', user.userId);
+    // res.header('accessToken', accessToken);
+    // res.header('refreshToken', refreshToken);
+    // res.header('userId', user.userId);
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: false, // 배포시에 true
+      sameSite: 'none',
+      secure: false, // 배포시에 true
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: false, // 배포시에 true
+      sameSite: 'none',
+      secure: false, // 배포시에 true
+    });
+
+    // res.cookie('accessToken', token, {
+    //   httpOnly: false,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   maxAge: 1000 * 60 * 60,
+    // });
+
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);
     console.log(user.userId);
 
     // 리다이렉션
-    res.redirect('http://localhost:5173'); // 메인페이지 url 을 입력해야합니다.
+    res.redirect(
+      `http://localhost:5500?userId=${encodeURIComponent(user.userId)}`
+    ); // 메인페이지뒤에 ? 해서 userId를 보내야한다.
+    // `http://localhost:5500?userId=${user.userId}`
+    //https://www.totobon6125.store/
+    // https://www.totobon6125.store?userId=${user.userId}
     //http://localhost:5173/
     //http://127.0.0.1:5500
     return { accessToken, refreshToken, userId: user.userId };
