@@ -39,7 +39,6 @@ export class AuthService {
     if (!isAuth)
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
-    // const isdeletedAt
     // 4. 리프레시 토큰 생성
     const refreshToken = this.setRefreshToken({ user, res });
 
@@ -126,19 +125,21 @@ export class AuthService {
       },
     });
 
+    // res.header('accessToken', accessToken);
+    // res.header('refreshToken', refreshToken);
     res.header('userId', user.userId);
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: false, // 배포시에 true
-      sameSite: 'none',
-      secure: false, // 배포시에 true
-    });
+    // res.cookie('accessToken', accessToken, {
+    //   httpOnly: false, // 배포시에 true
+    //   sameSite: 'none',
+    //   secure: false, // 배포시에 true
+    // });
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: false, // 배포시에 true
-      sameSite: 'none',
-      secure: false, // 배포시에 true
-    });
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: false, // 배포시에 true
+    //   sameSite: 'none',
+    //   secure: false, // 배포시에 true
+    // });
 
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);

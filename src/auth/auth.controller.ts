@@ -58,19 +58,9 @@ export class AuthController {
     // 엑세스 토큰을 HTTP 응답 헤더에 추가
     res.header('accessToken', accessToken);
 
-    // 리프레시 토큰을 쿠키로 설정하여 클라이언트에게 전달
-    // httpOnly : javascript 로 쿠키에 접근 할 수 없는 옵션
-    // secure : true 일 시 https 연결에서만 전송된다.
-
-    // 리프레시 토큰을 HTTP 응답 헤더에 추가
     res.header('refreshToken', refreshToken);
 
     res.status(200).json({ userId }); // 클라이언트에게 JSON 응답을 보냄
-
-    //res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false });
-
-    // 액세스 토큰을 클라이언트에게 JSON 응답으로 반환 (Response body 에 전송)
-    //res.status(200).json({ accessToken }); // 클라이언트에게 JSON 응답을 보냄
   }
 
   // 리프레시 토큰을 사용하여 엑세스 토큰 재발급을 위한 엔드포인트 추가

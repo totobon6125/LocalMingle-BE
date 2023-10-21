@@ -68,6 +68,12 @@ export class UsersService {
     return this.prisma.userDetail.findUnique({ where: { nickname } });
   }
 
+   // 사용자 ID로 사용자를 찾는 메서드 추가
+   async findById(userId: number): Promise<User> {
+    return this.prisma.user.findUnique({
+      where: { userId },
+    });
+  }
 
   // 2. 전체 유저 리스트를 조회한다.
   async findAll() {
