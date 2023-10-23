@@ -149,7 +149,7 @@ export class AuthService {
 
     // 리다이렉션
     res.redirect(
-      `http://localhost:5500?accessToken=${encodeURIComponent(
+      `http://localhost:5173?accessToken=${encodeURIComponent(
         accessToken
       )}&refreshToken=${encodeURIComponent(
         refreshToken
