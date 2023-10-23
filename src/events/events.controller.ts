@@ -27,7 +27,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { EventEntity } from './entities/event.entity';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAccessAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AwsS3Service } from 'src/aws/aws.s3';
@@ -47,7 +47,7 @@ export class EventsController {
 
   // 이벤트 생성
   @Post()
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '호스트로 Event 생성' })
   @ApiCreatedResponse({ type: EventEntity })
@@ -59,7 +59,7 @@ export class EventsController {
 
   // 이벤트 이미지 업로드
   @Post('upload')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Event 이미지 업로드' })
   @ApiConsumes('multipart/form-data')
@@ -133,7 +133,7 @@ export class EventsController {
 
   // 이벤트 참가 신청
   @Put(':eventId/join')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Guest로서 Event 참가신청' })
   @ApiCreatedResponse({ description: `모임 참석 신청 / 취소` })
@@ -186,7 +186,7 @@ export class EventsController {
 
   // 관심있는 이벤트 북마크 추가
   @Post(':eventId/bookmark')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Event 북마크 추가' })
   async addBookmark(
@@ -199,7 +199,7 @@ export class EventsController {
 
   // 관심있는 이벤트 북마크 제거
   @Delete(':eventId/bookmark')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Event 북마크 제거' })
   async removeBookmark(
