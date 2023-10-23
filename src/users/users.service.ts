@@ -37,6 +37,19 @@ export class UsersService {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // Default 프로필 이미지 리스트
+  // 순서: 회색, 하늘색, 주황색, 남색, 네온색, 녹색 
+  const profileImgList = 
+  ['https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698025763231',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029706605',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029779728',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029799098',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029815362',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029828369'
+  ]
+  // Default 프로필 이미지 리스트 랜덤으로 하나 선택
+  const randomProfileImg = profileImgList[Math.floor(Math.random() * profileImgList.length)];
+
   // 트랜잭션을 사용하여 user와 UserDetail 생성
   const [user] = await this.prisma.$transaction([
     this.prisma.user.create({
@@ -47,7 +60,7 @@ export class UsersService {
           create: {
             nickname,
             intro,
-            profileImg: '기본 이미지 URL',
+            profileImg: randomProfileImg, // default 프로필 이미지 업로드
           },
         },
       },
@@ -68,6 +81,12 @@ export class UsersService {
     return this.prisma.userDetail.findUnique({ where: { nickname } });
   }
 
+   // 사용자 ID로 사용자를 찾는 메서드 추가
+   async findById(userId: number): Promise<User> {
+    return this.prisma.user.findUnique({
+      where: { userId },
+    });
+  }
 
   // 2. 전체 유저 리스트를 조회한다.
   async findAll() {
