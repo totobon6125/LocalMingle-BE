@@ -111,7 +111,7 @@ export class EventsController {
 
   // 이벤트 상세 조회
   @Get(':eventId')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Event 상세 조회' })
   @ApiOkResponse({ type: EventEntity })
@@ -169,6 +169,8 @@ export class EventsController {
 
   // 이벤트 수정
   @Patch(':eventId')
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Host로서 Event 수정' })
   @ApiOkResponse({ type: EventEntity })
   async update(
@@ -183,6 +185,8 @@ export class EventsController {
 
   // 이벤트 삭제
   @Delete(':eventId')
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Host로서 Event 삭제' })
   @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
   async remove(@Param('eventId', ParseIntPipe) eventId: number) {

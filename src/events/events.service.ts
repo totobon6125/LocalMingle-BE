@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class EventsService {
@@ -17,22 +17,19 @@ export class EventsService {
       data: createEventDto,
     });
 
-    const category = await this.prisma.category.create({
+    await this.prisma.category.create({
       data: {
         EventId: event.eventId,
         name: event.category,
       },
     });
 
-    const hostEvent = await this.prisma.hostEvent.create({
+    await this.prisma.hostEvent.create({
       data: {
         HostId: userId,
         EventId: event.eventId,
       },
     });
-
-    
-
     return event;
   }
 
