@@ -4,6 +4,8 @@
 # .env
 .env
 
+nest_lm copy.yml
+
 # package-lock.json
 package-lock.json
 
