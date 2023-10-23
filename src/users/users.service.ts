@@ -47,7 +47,7 @@ export class UsersService {
           create: {
             nickname,
             intro,
-            profileImg: '기본 이미지 URL',
+            profileImg: 'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698025763231', // default 프로필 이미지 업로드
           },
         },
       },
