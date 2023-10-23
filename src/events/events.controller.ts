@@ -108,9 +108,16 @@ export class EventsController {
   }
 
   @Get(':eventId')
+  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Event 상세 조회' })
   @ApiOkResponse({ type: EventEntity })
-  async findOne(@Param('eventId', ParseIntPipe) eventId: number) {
+  async findOne(@Req() req: RequestWithUser, @Param('eventId', ParseIntPipe) eventId: number) {
+    const {userId} = req.user
+
+    const isJoin = await this.eventsService.isJoin(eventId, userId)
+    const confirmJoin = isJoin ? true : false 
+
     const event = await this.eventsService.findOne(eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
@@ -124,7 +131,8 @@ export class EventsController {
       hostUser: HostEvents[0].User.UserDetail,
       guestUser: GuestEvents.map((item)=>{
         return item.User.UserDetail
-      })
+      }),
+      isJoin : confirmJoin
     };
   }
 
