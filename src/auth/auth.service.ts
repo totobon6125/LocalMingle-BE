@@ -125,10 +125,12 @@ export class AuthService {
       },
     });
 
+    //토큰 요청헤더로 보내는 코드
     // res.header('accessToken', accessToken);
     // res.header('refreshToken', refreshToken);
     res.header('userId', user.userId);
 
+    //토큰 쿠키로 보내는 코드드
     // res.cookie('accessToken', accessToken, {
     //   httpOnly: false, // 배포시에 true
     //   sameSite: 'none',

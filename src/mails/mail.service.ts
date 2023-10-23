@@ -1,5 +1,5 @@
 // mail.service.ts
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import * as nodemailer from 'nodemailer';
 
@@ -44,6 +44,11 @@ export class MailService {
       console.log('메일이 전송되었습니다');
     } catch (error) {
       console.error('메일 전송 중 오류가 발생했습니다:', error);
+      // throw new Error('메일 전송 중 오류가 발생했습니다');
+      throw new HttpException(
+        '메일 전송 중 오류가 발생했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
