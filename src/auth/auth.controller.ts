@@ -58,19 +58,9 @@ export class AuthController {
     // 엑세스 토큰을 HTTP 응답 헤더에 추가
     res.header('accessToken', accessToken);
 
-    // 리프레시 토큰을 쿠키로 설정하여 클라이언트에게 전달
-    // httpOnly : javascript 로 쿠키에 접근 할 수 없는 옵션
-    // secure : true 일 시 https 연결에서만 전송된다.
-
-    // 리프레시 토큰을 HTTP 응답 헤더에 추가
     res.header('refreshToken', refreshToken);
 
     res.status(200).json({ userId }); // 클라이언트에게 JSON 응답을 보냄
-
-    //res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false });
-
-    // 액세스 토큰을 클라이언트에게 JSON 응답으로 반환 (Response body 에 전송)
-    //res.status(200).json({ accessToken }); // 클라이언트에게 JSON 응답을 보냄
   }
 
   // 리프레시 토큰을 사용하여 엑세스 토큰 재발급을 위한 엔드포인트 추가
@@ -108,6 +98,7 @@ export class AuthController {
 
   //-----------------------카카오 로그인-----------------------------//
   @Get('/login/kakao')
+  @ApiOperation({ summary: '카카오 소셜 로그인' })
   @UseGuards(AuthGuard('kakao'))
   async loginKakao(
     @Req() req: Request & IOAuthUser, //
@@ -116,25 +107,27 @@ export class AuthController {
     this.authService.OAuthLogin({ req, res });
   }
   //-----------------------구글 로그인-----------------------------//
-  // @Get('/login/google') //restAPI만들기. 엔드포인트는 /login/google.
-  // @UseGuards(AuthGuard('google')) //인증과정을 거쳐야하기때문에 UseGuards를 써주고 passport인증으로 AuthGuard를 써준다. 이름은 google로
-  // async loginGoogle(
-  //   @Req() req: Request & IOAuthUser,
-  //   @Res() res: Response, //Nest.js가 express를 기반으로 하기때문에 Request는 express에서 import한다.
-  // ) {
-  //   //프로필을 받아온 다음, 로그인 처리해야하는 곳(auth.service.ts에서 선언해준다)
-  //   this.authService.OAuthLogin({ req, res });
-  // }
+  @Get('/login/google') //restAPI만들기. 엔드포인트는 users/login/google.
+  @ApiOperation({ summary: '구글 소셜 로그인' })
+  @UseGuards(AuthGuard('google')) //인증과정을 거쳐야하기때문에 UseGuards를 써주고 passport인증으로 AuthGuard를 써준다. 이름은 google로
+  async loginGoogle(
+    @Req() req: Request & IOAuthUser,
+    @Res() res: Response //Nest.js가 express를 기반으로 하기때문에 Request는 express에서 import한다.
+  ) {
+    //프로필을 받아온 다음, 로그인 처리해야하는 곳(auth.service.ts에서 선언해준다)
+    this.authService.OAuthLogin({ req, res });
+  }
 
   //-----------------------네이버 로그인-----------------------------//
-  // @Get('/login/naver')
-  // @UseGuards(AuthGuard('naver'))
-  // async loginNaver(
-  //   @Req() req: Request & IOAuthUser, //
-  //   @Res() res: Response,
-  // ) {
-  //   this.authService.OAuthLogin({ req, res });
-  // }
+  @Get('/login/naver')
+  @ApiOperation({ summary: '네이버 소셜 로그인' })
+  @UseGuards(AuthGuard('naver'))
+  async loginNaver(
+    @Req() req: Request & IOAuthUser, //
+    @Res() res: Response
+  ) {
+    this.authService.OAuthLogin({ req, res });
+  }
 
   // @Get('favicon.ico')
   // favicon(
@@ -144,3 +137,27 @@ export class AuthController {
   //   res.status(204).end();
   // }
 }
+
+// //-----------------------카카오 로그인-----------------------------//
+// @Get('/login/kakao')
+// @ApiOperation({ summary: '카카오 소셜 로그인' })
+// @UseGuards(AuthGuard('kakao'))
+// async loginKakao(
+//   @Req() req: Request & IOAuthUser, //
+//   @Res() res: Response
+// ) {
+//   const { accessToken, refreshToken, userId } =
+//     await this.authService.OAuthLogin({
+//       req,
+//       res,
+//     });
+//   // 엑세스 토큰과 리프레시 토큰을 응답 헤더에 추가
+//   res.header('accessToken', accessToken);
+//   res.header('refreshToken', refreshToken);
+//   console.log('컨트롤러엑세스 토큰', accessToken);
+//   console.log('컨트롤러리프레시 토큰', accessToken);
+//   console.log('컨트롤러유저id ', accessToken);
+
+//   // userId 및 다른 정보를 JSON 응답으로 클라이언트에게 반환
+//   res.status(200).json({ userId, accessToken, refreshToken });
+// }

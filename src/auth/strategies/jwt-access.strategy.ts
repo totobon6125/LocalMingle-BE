@@ -8,7 +8,7 @@ import { UsersService } from 'src/users/users.service';
 
 //1. 비밀번호 검증
 //2. 만료시간 검증
-export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class JwtAccessStrategy extends PassportStrategy(Strategy, 'access') {
   constructor(private usersService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), //엑세스 토큰

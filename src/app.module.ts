@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mails/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { DataModule } from './data/data.module';
+import { SearchesModule } from './searches/searches.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DataModule } from './data/data.module';
     EventsModule,
     MailModule,
     DataModule,
+    SearchesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

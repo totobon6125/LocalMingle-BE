@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -27,15 +31,18 @@ export class EventsService {
       },
     });
 
+    
+
     return event;
   }
 
   // 이벤트 이미지 업로드
-  uploadFile (file: Express.Multer.File) {
-    if (!file) throw new BadRequestException()
-    return file.path
+  uploadFile(file: Express.Multer.File) {
+    if (!file) throw new BadRequestException();
+    return file.path;
   }
 
+  // 이벤트 전체 조회
   findAll() {
     return this.prisma.event.findMany({
       where: {
@@ -64,6 +71,7 @@ export class EventsService {
     });
   }
 
+  // 이벤트 상세 조회
   async findOne(eventId: number) {
     const event = await this.prisma.event.findUnique({
       where: { eventId, isDeleted: false },
@@ -99,6 +107,7 @@ export class EventsService {
     return event;
   }
 
+  // 이벤트 조회 로그
   async createViewLog(eventId: number) {
     await this.prisma.viewlog.create({
       data: {
@@ -108,6 +117,7 @@ export class EventsService {
     });
   }
 
+  // 이벤트 참가여부 확인
   async isJoin(eventId: number, userId: number) {
     const isJoin = await this.prisma.guestEvent.findFirst({
       where: {
@@ -118,6 +128,7 @@ export class EventsService {
     return isJoin;
   }
 
+  // 이벤트 참가 신청
   async join(eventId: number, userId: number) {
     await this.prisma.guestEvent.create({
       data: {
@@ -127,12 +138,14 @@ export class EventsService {
     });
   }
 
+  // 이벤트 참가 취소
   async cancelJoin(guestEventId: number) {
     await this.prisma.guestEvent.delete({
       where: { guestEventId },
     });
   }
 
+  // 이벤트 신청/취소 로그
   async createRsvpLog(eventId: number, userId: number, status: string) {
     await this.prisma.rsvpLog.create({
       data: {
@@ -144,6 +157,7 @@ export class EventsService {
     });
   }
 
+  // 이벤트 수정
   update(eventId: number, updateEventDto: UpdateEventDto) {
     return this.prisma.event.update({
       where: { eventId },
@@ -151,6 +165,7 @@ export class EventsService {
     });
   }
 
+  // 이벤트 삭제
   remove(eventId: number) {
     return this.prisma.event.update({
       where: { eventId },
@@ -160,39 +175,66 @@ export class EventsService {
     });
   }
 
-  // 북마크 추가
+  // 관심있는 북마크 추가
   async addBookmark(eventId: number, userId: number, status: string) {
-    return await this.prisma.eventBookmark.create({
-      data: {
-        EventId: eventId,
-        UserId: userId,
-        status: status,
-        updatedAt: new Date(),
-      },
-    });
-  }
-
-  // 북마크 제거
-  async removeBookmark(eventId: number, userId: number, status: string) {
-    // 먼저 eventBookmarkId를 찾습니다.
-    const eventBookmark = await this.prisma.eventBookmark.findFirst({
+    const lastEventInTable = await this.prisma.eventBookmark.findFirst({
       where: {
         EventId: eventId,
         UserId: userId,
       },
+      orderBy: {
+        eventBookmarkId: 'desc',
+      },
+    });
+    console.log('addBookmark:', lastEventInTable);
+
+    // 이벤트의 북마크가 존재하지 않거나 가장 최신의 북마크 status가 unbookmarked이면 새로운 로그를 생성한다.
+    if (!lastEventInTable || lastEventInTable.status === 'unbookmarked') {
+      return await this.prisma.eventBookmark.create({
+        data: {
+          EventId: eventId,
+          UserId: userId,
+          status: status,
+          updatedAt: new Date(),
+        },
+      });
+    }
+    // 이미 북마크가 있으면 이미 존재하는 북마크라고 안내를 보낸다.
+    else {
+      throw new BadRequestException('이미 북마크한 이벤트는 다시 북마크 할 수 없습니다.');
+    }
+  }
+
+  // 관심있는 이벤트 북마크 제거
+  async removeBookmark(eventId: number, userId: number, status: string) {
+    const lastEventInTable = await this.prisma.eventBookmark.findFirst({
+      where: {
+        EventId: eventId,
+        UserId: userId,
+      },
+      orderBy: {
+        eventBookmarkId: 'desc',
+      },
     });
 
-    if (!eventBookmark) {
+    console.log('removeBookmark:', lastEventInTable);
+    if (!lastEventInTable) {
       throw new NotFoundException('해당 북마크를 찾을 수 없습니다.');
     }
 
-    // 찾은 eventBookmarkId를 통해 deletedAt을 업데이트 합니다.
-    return await this.prisma.eventBookmark.update({
-      where: { eventBookmarkId: eventBookmark.eventBookmarkId },
-      data: {
-        status: status,
-        updatedAt: new Date(),
-      },
-    });
+    if (lastEventInTable.status === 'bookmarked') {
+      // 마지막 북마크가 bookmarked면 북마크 unbookmarked 로그를 생성한다.
+      return await this.prisma.eventBookmark.create({
+        data: {
+          EventId: eventId,
+          UserId: userId,
+          status: status,
+          updatedAt: new Date(),
+        },
+      });
+    } else {
+      // 마지막 북마크가 unbookmarked면 이미 취소한 북마크라고 안내를 보낸다.
+      throw new BadRequestException('이미 북마크를 취소한 이벤트입니다.');
+    }
   }
 }

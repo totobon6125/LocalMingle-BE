@@ -37,6 +37,19 @@ export class UsersService {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // Default 프로필 이미지 리스트
+  // 순서: 회색, 하늘색, 주황색, 남색, 네온색, 녹색 
+  const profileImgList = 
+  ['https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698025763231',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029706605',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029779728',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029799098',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029815362',
+  'https://s3-image-local-mingle.s3.ap-northeast-2.amazonaws.com/profileImg/1698029828369'
+  ]
+  // Default 프로필 이미지 리스트 랜덤으로 하나 선택
+  const randomProfileImg = profileImgList[Math.floor(Math.random() * profileImgList.length)];
+
   // 트랜잭션을 사용하여 user와 UserDetail 생성
   const [user] = await this.prisma.$transaction([
     this.prisma.user.create({
@@ -47,7 +60,7 @@ export class UsersService {
           create: {
             nickname,
             intro,
-            profileImg: '기본 이미지 URL',
+            profileImg: randomProfileImg, // default 프로필 이미지 업로드
           },
         },
       },
@@ -68,6 +81,12 @@ export class UsersService {
     return this.prisma.userDetail.findUnique({ where: { nickname } });
   }
 
+   // 사용자 ID로 사용자를 찾는 메서드 추가
+   async findById(userId: number): Promise<User> {
+    return this.prisma.user.findUnique({
+      where: { userId },
+    });
+  }
 
   // 2. 전체 유저 리스트를 조회한다.
   async findAll() {
@@ -105,9 +124,8 @@ export class UsersService {
 
   // 5. user 정보 수정한다.
   async update(id: number, updateUserDto: UpdateUserDto) {
-    // console.log('updateUserDto in users.service:', updateUserDto);
-    const { nickname, intro, confirmPassword } = updateUserDto;
-
+    const { nickname, intro, confirmPassword, nameChanged } = updateUserDto;
+    
     const user = await this.prisma.user.findUnique({
       where: { userId: id },
     });
@@ -115,32 +133,52 @@ export class UsersService {
       throw new BadRequestException('유저 정보가 존재하지 않습니다.');
     }
 
-        // 중복된 닉네임 확인 
-        const existingNickname = await this.prisma.userDetail.findUnique({
-          where: { nickname },
-        });
-        if (existingNickname) {
-          throw new ConflictException('이미 존재하는 닉네임입니다.');
-        }
+    
+    if (!nameChanged) {
+      // nameChanged == false 면 닉네임에는 변화가 없다는 것임으로 닉네임을 제외한 나머지 정보만 업데이트
+      // 패스워드, 패스워드 확인 일치 여부 확인
+      const isPasswordMatching = await bcrypt.compare(confirmPassword, user.password);
+      if (!isPasswordMatching) {
+        throw new BadRequestException('패스워드가 일치하지 않습니다.');
+      }
 
-    // 패스워드, 패스워드 확인 일치 여부 확인
-    const isPasswordMatching = await bcrypt.compare(confirmPassword, user.password);
-    if (!isPasswordMatching) {
-      throw new BadRequestException('패스워드가 일치하지 않습니다.');
-    }
-
-
-    // userdetail page 업데이트 
-    const updatedUser = await this.prisma.userDetail.update({
+      // userdetail page 자기소개 업데이트
+      const updatedUser = await this.prisma.userDetail.update({
         where: { userDetailId: user.userId},
+        data: { 
+          intro: intro,
+        },
+        });
+      return updatedUser;
+      
+    }
+    else { 
+      // nameChanged = true 면 닉네임을 바꿨다는 거니까 닉네임을 포함해서 업데이트
+      // 중복된 닉네임 확인
+      const existingNickname = await this.prisma.userDetail.findUnique({
+        where: { nickname },
+      });
+      
+      if (existingNickname) {
+        throw new ConflictException('이미 존재하는 닉네임입니다.');
+      }
+
+      // 패스워드, 패스워드 확인 일치 여부 확인
+      const isPasswordMatching = await bcrypt.compare(confirmPassword, user.password);
+      if (!isPasswordMatching) {
+        throw new BadRequestException('패스워드가 일치하지 않습니다.');
+      }
+
+      // userdetail page 닉네임, 자기소개, 업데이트
+      const updatedUser = await this.prisma.userDetail.update({
+      where: { userDetailId: user.userId},
         data: { 
           intro: intro,
           nickname: nickname
         },
-      });
-
+        });
       return updatedUser;
-      
+    }
   }
 
   // 6. 회원 탈퇴를 한다.
@@ -197,21 +235,34 @@ export class UsersService {
   }
 
 // 10. 사용자가 북마크한 이벤트 리스트를 조회한다. 
-async findBookmarkedEvents(id: number, status: string) {
-  try {
-    const bookmarkedEvents = await this.prisma.eventBookmark.findMany({
-      where: { UserId: id, status: status},
-      include: { Event: true },
-    });
-  
-    if (!bookmarkedEvents.length) {
-      throw new BadRequestException('북마크한 이벤트가 없습니다.');
-    }
-    return bookmarkedEvents
-  } catch (error) {
-    throw new NotFoundException('북마크한 이벤트를 찾을 수 없습니다.');
+async findBookmarkedEvents(id: number) {
+  const events = await this.prisma.eventBookmark.findMany({
+    where: { UserId: id },
+    include: { Event: true },
+    orderBy: {
+      updatedAt: 'desc', // 가장 최신의 이벤트를 먼저 가져옴
+    },
+  });
+
+  if (!events.length) {
+    throw new NotFoundException('북마크한 이벤트가 없습니다.');
   }
+
+  const latestEventBookmarks = new Map<number, any>(); // Key: EventId, Value: eventBookmark entry
+
+  for (const event of events) {
+    // 이미 본 EventId가 아니면 Map에 추가
+    if (!latestEventBookmarks.has(event.EventId)) {
+      latestEventBookmarks.set(event.EventId, event);
+    }
+  }
+  // status가 "bookmarked"인 것만 필터링
+  const bookmarkedEvents = Array.from(latestEventBookmarks.values()).filter(event => event.status === 'bookmarked');
+
+  // console.log(bookmarkedEvents);
+  return bookmarkedEvents; // 각 EventId 당 가장 최신의 'bookmarked' 상태의 eventBookmark 엔트리 배열 반환
 }
+
 
   // 9. 프로필 이미지를 업데이트 한다.
   async updateProfileImage(id: number, profileImg: string) {

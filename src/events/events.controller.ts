@@ -13,7 +13,6 @@ import {
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
-  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -28,7 +27,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { EventEntity } from './entities/event.entity';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAccessAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AwsS3Service } from 'src/aws/aws.s3';
@@ -46,8 +45,9 @@ export class EventsController {
     private readonly awsS3Service: AwsS3Service
   ) {}
 
+  // 이벤트 생성
   @Post()
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '호스트로 Event 생성' })
   @ApiCreatedResponse({ type: EventEntity })
@@ -57,8 +57,9 @@ export class EventsController {
     return this.eventsService.create(userId, createEventDto);
   }
 
+  // 이벤트 이미지 업로드
   @Post('upload')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Event 이미지 업로드' })
   @ApiConsumes('multipart/form-data')
@@ -89,6 +90,7 @@ export class EventsController {
     };
   }
 
+  // 이벤트 전체 조회
   @Get()
   @ApiOperation({ summary: 'Event 전체 조회' })
   @ApiOkResponse({ type: EventEntity, isArray: true })
@@ -107,6 +109,7 @@ export class EventsController {
     return event;
   }
 
+  // 이벤트 상세 조회
   @Get(':eventId')
   @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
@@ -136,8 +139,9 @@ export class EventsController {
     };
   }
 
+  // 이벤트 참가 신청
   @Put(':eventId/join')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Guest로서 Event 참가신청' })
   @ApiCreatedResponse({ description: `모임 참석 신청 / 취소` })
@@ -149,20 +153,21 @@ export class EventsController {
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     const { userId } = req.user;
-    
+
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
-      this.eventsService.join(eventId, userId);
-      this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 로그 생성
-      return `${eventId}번 모임 참석 신청`;
+      this.eventsService.join(+eventId, userId);
+      this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 참가 신청 로그 생성
+      return `${eventId}번 모임 참석 신청!`;
     }
     if (isJoin) {
       this.eventsService.cancelJoin(isJoin.guestEventId);
-      this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 로그 생성
-      return `${eventId}번 모임 참석 취소 `;
+      this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 참가 취소 로그 생성
+      return `${eventId}번 모임 신청 취소!`;
     }
   }
 
+  // 이벤트 수정
   @Patch(':eventId')
   @ApiOperation({ summary: 'Host로서 Event 수정' })
   @ApiOkResponse({ type: EventEntity })
@@ -176,6 +181,7 @@ export class EventsController {
     return this.eventsService.update(eventId, updateEventDto);
   }
 
+  // 이벤트 삭제
   @Delete(':eventId')
   @ApiOperation({ summary: 'Host로서 Event 삭제' })
   @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
@@ -186,22 +192,28 @@ export class EventsController {
     return this.eventsService.remove(eventId);
   }
 
-  // 북마크 추가
+  // 관심있는 이벤트 북마크 추가
   @Post(':eventId/bookmark')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Event 북마크 추가' })
-  async addBookmark(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+  async addBookmark(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req: RequestWithUser
+  ) {
     const { userId } = req.user;
     return this.eventsService.addBookmark(eventId, userId, 'bookmarked');
   }
 
-  // 북마크 제거
+  // 관심있는 이벤트 북마크 제거
   @Delete(':eventId/bookmark')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Event 북마크 제거' })
-  async removeBookmark(@Param('eventId', ParseIntPipe) eventId: number, @Req() req: RequestWithUser) {
+  async removeBookmark(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req: RequestWithUser
+  ) {
     const { userId } = req.user;
     return this.eventsService.removeBookmark(eventId, userId, 'unbookmarked');
   }

@@ -1,13 +1,13 @@
 /* eslint-disable prettier/prettier */
 // src/users/users.controller.ts
-import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards, Res } from '@nestjs/common';
+import { Controller, Req, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes, ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAccessAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
 import { AwsS3Service } from 'src/aws/aws.s3';
 import { UploadedFile, UseInterceptors } from '@nestjs/common';
@@ -51,6 +51,7 @@ export class UsersController {
   //닉네임 중복 검증
   @Post('checkNickname')
   @ApiBody({})
+  @ApiOperation({ summary: '닉네임 중복 확인' })
   async checkNickname(@Body() { nickname }: { nickname: string }) {
     const existingNickname = await this.usersService.findByNickname({ nickname });
     if (existingNickname) {
@@ -63,7 +64,7 @@ export class UsersController {
 
   // 2. 전체 유저 리스트를 조회한다.
   @Get()
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '회원 조회' })
   @ApiOkResponse({ type: UserEntity, isArray: true })
@@ -81,7 +82,7 @@ export class UsersController {
 
   // 유저 자신의 정보를 조회한다.
   @Get('me')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '유저 본인 조회' })
   async findMe(@Req() req: RequestWithUser) {
@@ -95,7 +96,7 @@ export class UsersController {
 
   // 3. userId를 통한 유저 조회
   @Get(':id')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'ID로 회원 조회' })
   @ApiResponse({ status: 200, description: '유저 정보 조회 성공' })
@@ -110,7 +111,7 @@ export class UsersController {
 
   // 5. user 정보 수정한다.
   @Patch(':id')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '회원 정보 수정' })
   @ApiResponse({ status: 200, description: '회원 정보가 수정되었습니다' })
@@ -130,7 +131,7 @@ export class UsersController {
 
   // 6. 회원 탈퇴를 한다.
   @Delete('withdrawal')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '회원 탈퇴' })
   async remove(@Req() req: RequestWithUser, @Body() DeleteUserDto: DeleteUserDto) {
@@ -155,7 +156,7 @@ export class UsersController {
   @Get(':id/joinedEvents')
   @ApiOperation({ summary: '내가 참가한 이벤트 조회' })
   findJoinedEvents(@Param('id') id: string) {
-    console.log('findJoinedEvents in users.controller.ts - id:', id);
+    // console.log('findJoinedEvents in users.controller.ts - id:', id);
     const joinedEvents = this.usersService.findJoinedEvents(+id);
     return joinedEvents;
   }
@@ -164,17 +165,12 @@ export class UsersController {
   @Get(':id/bookmarkedEvents')
   @ApiOperation({ summary: '내가 북마크한 이벤트 조회' })
   async findBookmarkedEvents(@Param('id') id: string) {
-    try {
-      const bookmarkedEvents = await this.usersService.findBookmarkedEvents(+id, 'bookmarked');
-      return bookmarkedEvents;
-    } catch (error) {
-      throw new NotFoundException('북마크한 이벤트를 찾을 수 없습니다.');
-    }
+      return await this.usersService.findBookmarkedEvents(+id);
   }
 
   // 10. 사용자 유저 프로필 이미지를 업로드 한다.
   @Post('upload')
-  @UseGuards(JwtAuthGuard) // passport를 사용하여 인증 확인
+  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '프로필 이미지 업로드' })
   @ApiConsumes('multipart/form-data')  
