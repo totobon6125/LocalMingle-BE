@@ -140,6 +140,6 @@ export class AuthService {
     //&userId=${encodeURIComponent(user.userId)}
     // return res.redirect('http://localhost:5500');
     // return { accessToken, refreshToken };
-    //return { accessToken, refreshToken, userId: user.userId };
+    return { accessToken, refreshToken };
   }
 }
