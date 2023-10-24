@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -22,7 +21,6 @@ export class AuthService {
     // 리팩토링 시 res 빼도 작동하는지 테스트
     accessToken: string;
     refreshToken: string;
-    userId: number; // userId만 반환
   }> {
     // 1. 이메일이 일치하는 유저를 DB에서 찾기
     const user = await this.usersService.findByEmail({ email });
@@ -41,10 +39,14 @@ export class AuthService {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
     // 4. 리프레시 토큰 생성
-    const refreshToken = this.setRefreshToken({ user, res });
+    const refreshToken = this.setRefreshToken({ user });
 
     // 5. 액세스 토큰 및 리프레시 토큰을 반환
-    const accessToken = this.getAccessToken({ user, res });
+    const accessToken = this.getAccessToken({ user });
+
+    res.header('accessToken', accessToken);
+
+    res.header('refreshToken', refreshToken);
 
     // 6. DB에 리프레시 토큰을 저장한다.
     await this.prisma.user.update({
@@ -54,10 +56,10 @@ export class AuthService {
       },
     });
 
-    return { accessToken, refreshToken, userId: user.userId }; //리턴값
+    return { accessToken, refreshToken };
   }
 
-  getAccessToken({ user, res }): string {
+  getAccessToken({ user }): string {
     const accessToken = this.jwtService.sign(
       { sub: user.userId },
       { secret: process.env.JWT_ACCESS_KEY, expiresIn: '36000s' }
@@ -66,7 +68,7 @@ export class AuthService {
     return accessToken;
   }
 
-  setRefreshToken({ user, res }): string {
+  setRefreshToken({ user }): string {
     // 리프레시 토큰을 생성하는 로직을 구현
     const refreshToken = this.jwtService.sign(
       { sub: user.userId },
@@ -87,7 +89,7 @@ export class AuthService {
 
     const newAccessToken = await this.getAccessToken({
       user: { userId }, // 사용자 ID를 전달
-      res: null,
+      // res: null,
     });
 
     return newAccessToken;
@@ -96,7 +98,6 @@ export class AuthService {
   async OAuthLogin({ req, res }): Promise<{
     accessToken: string;
     refreshToken: string;
-    userId: number;
   }> {
     // 1. 회원조회
     let user = await this.usersService.findByEmail({ email: req.user.email }); // user를 찾아서
@@ -113,11 +114,12 @@ export class AuthService {
       };
       // console.log('소셜 로그인 회원가입 : ', createUser); // createUser 정보를 콘솔에 출력
       user = await this.usersService.create(createUser);
+      console.log('소셜로그인 회원가입 정보', createUser);
     }
 
     // 3. 회원가입이 되어 있다면? 로그인(AT, RT를 생성해서 브라우저에 전송)한다
-    const accessToken = this.getAccessToken({ user, res }); // res를 전달
-    const refreshToken = this.setRefreshToken({ user, res }); // res를 전달
+    const accessToken = this.getAccessToken({ user }); // res를 전달
+    const refreshToken = this.setRefreshToken({ user }); // res를 전달
     // 4. 로그인이 되면 DB에 리프레시 토큰을 저장한다.
     await this.prisma.user.update({
       where: { userId: user.userId },
@@ -126,42 +128,18 @@ export class AuthService {
       },
     });
 
-    //토큰 요청헤더로 보내는 코드
-    // res.header('accessToken', accessToken);
-    // res.header('refreshToken', refreshToken);
-    res.header('userId', user.userId);
-
-    //토큰 쿠키로 보내는 코드드
-    // res.cookie('accessToken', accessToken, {
-    //   httpOnly: false, // 배포시에 true
-    //   sameSite: 'none',
-    //   secure: false, // 배포시에 true
-    // });
-
-    // res.cookie('refreshToken', refreshToken, {
-    //   httpOnly: false, // 배포시에 true
-    //   sameSite: 'none',
-    //   secure: false, // 배포시에 true
-    // });
-
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);
-    console.log(user.userId);
 
     // 리다이렉션
     res.redirect(
-      `http://localhost:5500?accessToken=${encodeURIComponent(
+      `http://localhost:5173?accessToken=${encodeURIComponent(
         accessToken
-      )}&refreshToken=${encodeURIComponent(
-        refreshToken
-      )}&userId=${encodeURIComponent(user.userId)}`
+      )}&refreshToken=${encodeURIComponent(refreshToken)}`
     );
-    // 현재 : 파람스로 AT,RT userId전달 // https 로 배포되면 cookie로 바꿔야함
-    // `http://localhost:5500?userId=${user.userId}`
-    //https://www.totobon6125.store/
-    // https://www.totobon6125.store?userId=${user.userId}
-    //http://localhost:5173/
-    //http://127.0.0.1:5500
-    return { accessToken, refreshToken, userId: user.userId };
+    //&userId=${encodeURIComponent(user.userId)}
+    // return res.redirect('http://localhost:5500');
+    // return { accessToken, refreshToken };
+    //return { accessToken, refreshToken, userId: user.userId };
   }
 }

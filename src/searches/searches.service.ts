@@ -24,7 +24,6 @@ export class SearchesService {
         content: true,
       },
     });
-
     return events;
   }
 }

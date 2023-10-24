@@ -18,9 +18,9 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any) {
-    //     console.log('google:', accessToken);
-    //     console.log('google:', refreshToken);
-    //     console.log('google:', profile);
+    console.log('google 엑세스토큰:', accessToken);
+    console.log('google 리프레시 토큰:', refreshToken);
+    console.log('google 프로필:', profile);
 
     // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(profile.id.toString(), 10);
