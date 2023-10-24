@@ -8,8 +8,10 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiBody, ApiConsumes, ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { JwtAccessAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+// import { JwtAccessAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '@prisma/client';
 import { AwsS3Service } from 'src/aws/aws.s3';
+// import { AwsS3Service } from '../aws/aws.s3';
 import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -118,7 +120,6 @@ export class UsersController {
   @ApiResponse({ status: 400, description: '중복된 닉네임입니다' })
   @ApiResponse({ status: 401, description: '패스워드가 일치하지 않습니다' })
   @ApiResponse({ status: 404, description: '유저 정보가 존재하지 않습니다' })
-  
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const user = await this.usersService.findOne(+id);
     if (!user) {
@@ -197,6 +198,19 @@ export class UsersController {
       throw new NotFoundException('User does not exist');
     }
 
+    // 이미지 파일 Validation 체크
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const SUPPORTED_FILE_TYPES = ["image/jpeg", "image/png", "image/gif"];
+    if (!file) {
+      throw new NotFoundException('이미지 파일을 선택해주세요.');
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      throw new NotFoundException('파일 크기는 5MB를 초과할 수 없습니다.');
+    }
+    if (!SUPPORTED_FILE_TYPES.includes(file.mimetype)) {
+      throw new NotFoundException('지원되는 파일 형식은 JPEG, PNG, GIF 뿐입니다.');
+    }
+    
     // 이미지를 s3에 업로드한다.
     const uploadedFile = await this.awsS3Service.uploadFile(file) as { Location: string };
 
