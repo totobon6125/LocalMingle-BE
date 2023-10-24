@@ -38,7 +38,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usersService: UsersService
   ) {}
-
+  //-----------------------로그인-----------------------------//
   @ApiOperation({ summary: '로그인' })
   @ApiResponse({ status: 200, description: '로그인에 성공하셨습니다.' })
   @ApiResponse({ status: 404, description: '이메일이 없습니다.' })
@@ -49,21 +49,14 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response // Response 객체 주입
   ): Promise<void> {
-    const { accessToken, refreshToken, userId } = await this.authService.login({
+    await this.authService.login({
       email,
       password,
       res,
     });
-
-    // 엑세스 토큰을 HTTP 응답 헤더에 추가
-    res.header('accessToken', accessToken);
-
-    res.header('refreshToken', refreshToken);
-
-    res.status(200).json({ userId }); // 클라이언트에게 JSON 응답을 보냄
   }
 
-  // 리프레시 토큰을 사용하여 엑세스 토큰 재발급을 위한 엔드포인트 추가
+  //-----------------------토큰 재발급-----------------------------//
   @ApiOperation({ summary: '리프레시 토큰을 사용하여 엑세스 토큰 재발급' })
   @ApiResponse({
     status: 200,
@@ -79,15 +72,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<void> {
     try {
-      // 리프레시 토큰을 사용하여 새로운 엑세스 토큰 발급
       const newAccessToken =
         await this.authService.refreshAccessToken(refreshToken);
 
       // 새로운 엑세스 토큰을 HTTP 응답 헤더에 추가
       res.header('access-token', newAccessToken);
-
-      // 액세스 토큰을 클라이언트에게 JSON 응답으로 반환 (Response body 에 전송)
-      //res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
       // 리프레시 토큰이 유효하지 않은 경우 에러 처리
       res
@@ -128,36 +117,4 @@ export class AuthController {
   ) {
     this.authService.OAuthLogin({ req, res });
   }
-
-  // @Get('favicon.ico')
-  // favicon(
-  //   @Req() req: Request & IOAuthUser, //
-  //   @Res() res: Response,
-  // ) {
-  //   res.status(204).end();
-  // }
 }
-
-// //-----------------------카카오 로그인-----------------------------//
-// @Get('/login/kakao')
-// @ApiOperation({ summary: '카카오 소셜 로그인' })
-// @UseGuards(AuthGuard('kakao'))
-// async loginKakao(
-//   @Req() req: Request & IOAuthUser, //
-//   @Res() res: Response
-// ) {
-//   const { accessToken, refreshToken, userId } =
-//     await this.authService.OAuthLogin({
-//       req,
-//       res,
-//     });
-//   // 엑세스 토큰과 리프레시 토큰을 응답 헤더에 추가
-//   res.header('accessToken', accessToken);
-//   res.header('refreshToken', refreshToken);
-//   console.log('컨트롤러엑세스 토큰', accessToken);
-//   console.log('컨트롤러리프레시 토큰', accessToken);
-//   console.log('컨트롤러유저id ', accessToken);
-
-//   // userId 및 다른 정보를 JSON 응답으로 클라이언트에게 반환
-//   res.status(200).json({ userId, accessToken, refreshToken });
-// }
