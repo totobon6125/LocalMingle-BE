@@ -36,8 +36,6 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       confirmPassword: hashedPassword,
       nickname: nickname,
       profileImg: '기본이미지 url',
-      accessToken: profile._json.kakao_account.access,
-      refreshToken: profile._json.kakao_account.refresh,
     };
   }
 
@@ -56,9 +54,7 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
 
       const anonymousName = `${anonymousPrefix}${randomString}`;
 
-      //return anonymousName; // 밑의 로직이 작동안하면 임시적으로 사용
-
-      // // 프리즈마를 사용하여 중복 확인
+      // 프리즈마를 사용하여 중복 확인
       const existingUser = await this.prisma.userDetail.findUnique({
         where: { nickname: anonymousName },
       });
