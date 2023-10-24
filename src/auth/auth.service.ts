@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -22,7 +21,6 @@ export class AuthService {
     // 리팩토링 시 res 빼도 작동하는지 테스트
     accessToken: string;
     refreshToken: string;
-    userId: number;
   }> {
     // 1. 이메일이 일치하는 유저를 DB에서 찾기
     const user = await this.usersService.findByEmail({ email });
@@ -58,7 +56,7 @@ export class AuthService {
       },
     });
 
-    return { accessToken, refreshToken, userId: user.userId };
+    return { accessToken, refreshToken };
   }
 
   getAccessToken({ user }): string {
@@ -100,7 +98,6 @@ export class AuthService {
   async OAuthLogin({ req, res }): Promise<{
     accessToken: string;
     refreshToken: string;
-    // userId: number;
   }> {
     // 1. 회원조회
     let user = await this.usersService.findByEmail({ email: req.user.email }); // user를 찾아서
@@ -133,7 +130,6 @@ export class AuthService {
 
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);
-    console.log(user.userId);
 
     // 리다이렉션
     res.redirect(
