@@ -49,11 +49,14 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response // Response 객체 주입
   ): Promise<void> {
-    await this.authService.login({
+    const { accessToken, refreshToken, userId } = await this.authService.login({
       email,
       password,
       res,
     });
+    res.header('accessToken', accessToken);
+    res.header('refreshToken', refreshToken);
+    res.status(200).json({ userId });
   }
 
   //-----------------------토큰 재발급-----------------------------//
