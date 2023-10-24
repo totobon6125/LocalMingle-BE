@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class EventsService {
@@ -17,29 +17,20 @@ export class EventsService {
       data: createEventDto,
     });
 
-    const category = await this.prisma.category.create({
+    await this.prisma.category.create({
       data: {
         EventId: event.eventId,
         name: event.category,
       },
     });
 
-    const hostEvent = await this.prisma.hostEvent.create({
+    await this.prisma.hostEvent.create({
       data: {
         HostId: userId,
         EventId: event.eventId,
       },
     });
-
-    
-
     return event;
-  }
-
-  // 이벤트 이미지 업로드
-  uploadFile(file: Express.Multer.File) {
-    if (!file) throw new BadRequestException();
-    return file.path;
   }
 
   // 이벤트 전체 조회
@@ -163,6 +154,15 @@ export class EventsService {
       where: { eventId },
       data: updateEventDto,
     });
+  }
+
+  // 이벤트 이미지 수정
+  async updateImg(eventId: number, updatedImg:string) {
+    const ImgUrl = await this.prisma.event.update({
+      where: {eventId},
+      data: {eventImg: updatedImg}
+    })
+    return ImgUrl
   }
 
   // 이벤트 삭제

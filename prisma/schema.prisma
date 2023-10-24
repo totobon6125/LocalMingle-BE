@@ -58,7 +58,7 @@ model Event {
   eventLocation   String
   content         String
   category        String
-  isVerified      String   @default("no")
+  isVerified      String?
   isDeleted       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

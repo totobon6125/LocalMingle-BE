@@ -29,10 +29,10 @@ export class EventEntity implements Event {
   @ApiProperty()
   category: string;
 
-  @ApiProperty({ required: false, default: "no" })
+  @ApiProperty({ required: false, default: '🙋‍♀️아무나' })
   isVerified: string;
 
-  @ApiProperty({ required: false})
+  @ApiProperty({ required: false, default: null})
   eventImg: string;
 
   @ApiProperty({ default: false })
