@@ -33,12 +33,6 @@ export class EventsService {
     return event;
   }
 
-  // 이벤트 이미지 업로드
-  uploadFile(file: Express.Multer.File) {
-    if (!file) throw new BadRequestException();
-    return file.path;
-  }
-
   // 이벤트 전체 조회
   findAll() {
     return this.prisma.event.findMany({
@@ -160,6 +154,15 @@ export class EventsService {
       where: { eventId },
       data: updateEventDto,
     });
+  }
+
+  // 이벤트 이미지 수정
+  async updateImg(eventId: number, updatedImg:string) {
+    const ImgUrl = await this.prisma.event.update({
+      where: {eventId},
+      data: {eventImg: updatedImg}
+    })
+    return ImgUrl
   }
 
   // 이벤트 삭제

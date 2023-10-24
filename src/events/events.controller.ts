@@ -13,6 +13,7 @@ import {
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -50,23 +51,28 @@ export class EventsController {
   @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: '호스트로 Event 생성' })
+  @UseInterceptors(FileInterceptor('file'))
   @ApiCreatedResponse({ type: EventEntity })
-  create(@Req() req: RequestWithUser, @Body() createEventDto: CreateEventDto) {
+
+  async create(
+    @Req() req: RequestWithUser,
+    @Body() createEventDto: CreateEventDto,
+  ) {
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
 
-    return this.eventsService.create(userId, createEventDto);
+    return this.eventsService.create(userId, createEventDto)
   }
 
-  // 이벤트 이미지 업로드
-  @Post('upload')
+  // 이벤트 이미지 업데이트
+  @Put(':eventId/upload')
   @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
-  @ApiOperation({ summary: 'Event 이미지 업로드' })
+  @ApiOperation({ summary: 'Event 이미지 업데이트' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   @ApiBody({
     description: 'event image',
-    type: 'multipart/form-data',
+    type: 'multipart/form-data', 
     required: true,
     schema: {
       type: 'object',
@@ -78,15 +84,17 @@ export class EventsController {
       },
     },
   })
-  async uploadFile(@UploadedFile() file) {
-    console.log('file', file);
 
-    const uploadedFile = (await this.awsS3Service.uploadEventFile(file)) as {
+  async uploadFile(@UploadedFile() file, @Param('eventId', ParseIntPipe) eventId:number) {
+
+    const updatedImg = (await this.awsS3Service.uploadEventFile(file)) as {
       Location: string;
     };
+
+    await this.eventsService.updateImg(eventId, updatedImg.Location)
     return {
       message: '이미지가 업로드되었습니다',
-      ImgURL: uploadedFile,
+      ImgURL: updatedImg,
     };
   }
 
@@ -115,11 +123,14 @@ export class EventsController {
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Event 상세 조회' })
   @ApiOkResponse({ type: EventEntity })
-  async findOne(@Req() req: RequestWithUser, @Param('eventId', ParseIntPipe) eventId: number) {
-    const {userId} = req.user
+  async findOne(
+    @Req() req: RequestWithUser,
+    @Param('eventId', ParseIntPipe) eventId: number
+  ) {
+    const { userId } = req.user;
 
-    const isJoin = await this.eventsService.isJoin(eventId, userId)
-    const confirmJoin = isJoin ? true : false 
+    const isJoin = await this.eventsService.isJoin(eventId, userId);
+    const confirmJoin = isJoin ? true : false;
 
     const event = await this.eventsService.findOne(eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
@@ -132,10 +143,10 @@ export class EventsController {
       event: rest,
       guestList: event.GuestEvents.length,
       hostUser: HostEvents[0].User.UserDetail,
-      guestUser: GuestEvents.map((item)=>{
-        return item.User.UserDetail
+      guestUser: GuestEvents.map((item) => {
+        return item.User.UserDetail;
       }),
-      isJoin : confirmJoin
+      isJoin: confirmJoin,
     };
   }
 
@@ -175,10 +186,15 @@ export class EventsController {
   @ApiOkResponse({ type: EventEntity })
   async update(
     @Param('eventId', ParseIntPipe) eventId: number,
-    @Body() updateEventDto: UpdateEventDto
+    @Body() updateEventDto: UpdateEventDto,
+    @Req() req: RequestWithUser
   ) {
+    const { userId } = req.user;
     const event = await this.eventsService.findOne(eventId);
+
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
+    if (userId !== event.HostEvents[0].HostId)
+      throw new UnauthorizedException(`수정 권한이 없습니다`);
 
     return this.eventsService.update(eventId, updateEventDto);
   }
@@ -189,9 +205,15 @@ export class EventsController {
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Host로서 Event 삭제' })
   @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
-  async remove(@Param('eventId', ParseIntPipe) eventId: number) {
+  async remove(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req: RequestWithUser
+  ) {
+    const { userId } = req.user;
     const event = await this.eventsService.findOne(eventId);
     if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
+    if (userId !== event.HostEvents[0].HostId)
+      throw new UnauthorizedException(`삭제 권한이 없습니다`);
 
     return this.eventsService.remove(eventId);
   }

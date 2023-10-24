@@ -2,7 +2,6 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { DataService } from './data.service';
 import { City } from 'src/data/interface/city';
-import { Category } from 'src/data/interface/category';
 import { Verify, toss } from './interface/verify';
 
 @Controller('data')
@@ -41,13 +40,6 @@ export class DataController {
   @ApiQuery({ name: 'doName', type: String, required: true })
   filteredEventByCity(@Query() query: City) {
     return this.dataService.filteredEventByCity(query);
-  }
-
-  @Get('filter/category')
-  @ApiOperation({ summary: '이벤트 필터링(카테고리)' })
-  @ApiQuery({ name: 'category', type: String, required: true })
-  filteredEventByCategory(@Query() query: Category) {
-    return this.dataService.filteredEventByCategory(query);
   }
 
   @Get('filter/verify')
