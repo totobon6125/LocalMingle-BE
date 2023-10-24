@@ -35,7 +35,7 @@ export class CreateEventDto {
   signupEndDate: Date;
 
   @ApiProperty({
-    example: "서울특별시"
+    example: '서울특별시',
   })
   @IsString()
   eventLocation: string;
@@ -46,7 +46,7 @@ export class CreateEventDto {
   content: string;
 
   @ApiProperty({
-    example: "산책"
+    example: '산책',
   })
   @IsString()
   category: string;
@@ -60,8 +60,8 @@ export class CreateEventDto {
   @IsString()
   isVerified?: string;
 
-  @ApiProperty({required: false, default: null})
+  @ApiProperty({ required: false, default: null })
   @IsOptional()
   @IsString()
-  eventImg: string
+  eventImg: string;
 }
