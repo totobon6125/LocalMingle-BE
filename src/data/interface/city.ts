@@ -1,7 +1,7 @@
 export const city = [
   {
     lang: 'ko',
-    itmes: [
+    items: [
       { doName: '서울특별시' },
       { doName: '부산광역시' },
       { doName: '대구광역시' },
