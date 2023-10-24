@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { User, UserDetail } from '@prisma/client';
 import { IUsersServiceFindByEmail, IUsersServiceFindByNickname } from './interfaces/users-service.interface';
+// import { PrismaService } from '../prisma/prisma.service';
 
 
 

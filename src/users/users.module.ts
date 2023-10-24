@@ -3,8 +3,11 @@ import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
+// import { PrismaModule } from '../prisma/prisma.module';
 import { AwsModule } from 'src/aws/aws.module';
 import { AwsS3Service } from 'src/aws/aws.s3';
+// import { AwsModule } from '../aws/aws.module';
+// import { AwsS3Service } from '../aws/aws.s3';
 
 @Module({
   controllers: [UsersController],
