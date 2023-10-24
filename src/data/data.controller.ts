@@ -1,8 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { DataService } from './data.service';
-import { City } from 'src/data/interface/city';
 import { Verify, toss } from './interface/verify';
+import { city } from './interface/city';
 
 @Controller('data')
 @ApiTags('Data')
@@ -11,20 +11,19 @@ export class DataController {
 
   @Get('city')
   @ApiOperation({ summary: '시/도 데이터목록' })
-  async cityData() {
-    const region = await this.dataService.cityData();
-
-    const city = region.filter((item, index) => {
-      return region.findIndex((x) => x.doName === item.doName) === index;
+  @ApiQuery({ name: 'lang', type: String, required: true })
+  async cityData(@Query() query) {
+    const langByCity = city.find((item) => {
+      return item.lang == query.lang
     });
 
-    return city;
+    return langByCity;
   }
 
   @Get('gu_name')
   @ApiOperation({ summary: '구/군 데이터 목록' })
   @ApiQuery({ name: 'doName', type: String, required: true })
-  async guNameData(@Query() query: City) {
+  async guNameData(@Query() query) {
     return await this.dataService.guNameData(query);
   }
 
@@ -32,13 +31,13 @@ export class DataController {
   @ApiOperation({ summary: '카테고리, 위치인증 여부 목록' })
   categoryData() {
     const data = toss;
-    return data
+    return data;
   }
 
   @Get('filter/city')
   @ApiOperation({ summary: '이벤트 필터링(시/도)' })
   @ApiQuery({ name: 'doName', type: String, required: true })
-  filteredEventByCity(@Query() query: City) {
+  filteredEventByCity(@Query() query) {
     return this.dataService.filteredEventByCity(query);
   }
 
