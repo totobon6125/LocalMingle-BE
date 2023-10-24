@@ -132,7 +132,7 @@ export class AuthService {
     console.log('로컬 리프레시 토큰', refreshToken);
 
     // 리다이렉션
-    return res.redirect(
+    res.redirect(
       `http://localhost:5500?accessToken=${encodeURIComponent(
         accessToken
       )}&refreshToken=${encodeURIComponent(refreshToken)}`
@@ -140,6 +140,6 @@ export class AuthService {
     //&userId=${encodeURIComponent(user.userId)}
     // return res.redirect('http://localhost:5500');
     // return { accessToken, refreshToken };
-    //return { accessToken, refreshToken, userId: user.userId };
+    return { accessToken, refreshToken };
   }
 }
