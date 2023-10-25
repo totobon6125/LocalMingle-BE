@@ -17,6 +17,7 @@ export class EventsService {
       data: createEventDto,
     });
 
+    // 카테고리 테이블 생성
     await this.prisma.category.create({
       data: {
         EventId: event.eventId,
@@ -24,6 +25,7 @@ export class EventsService {
       },
     });
 
+    // 호스트 이벤트 테이블(호스트유저와 이벤트를 맵핑해주는 테이블) 생성
     await this.prisma.hostEvent.create({
       data: {
         HostId: userId,
@@ -94,6 +96,9 @@ export class EventsService {
         },
       },
     });
+    if (!event) {
+      throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
+    }
 
     return event;
   }
@@ -150,19 +155,19 @@ export class EventsService {
 
   // 이벤트 수정
   update(eventId: number, updateEventDto: UpdateEventDto) {
-    return this.prisma.event.update({
+    this.prisma.event.update({
       where: { eventId },
       data: updateEventDto,
     });
   }
 
   // 이벤트 이미지 수정
-  async updateImg(eventId: number, updatedImg:string) {
+  async updateImg(eventId: number, updatedImg: string) {
     const ImgUrl = await this.prisma.event.update({
-      where: {eventId},
-      data: {eventImg: updatedImg}
-    })
-    return ImgUrl
+      where: { eventId },
+      data: { eventImg: updatedImg },
+    });
+    return ImgUrl;
   }
 
   // 이벤트 삭제
@@ -201,7 +206,9 @@ export class EventsService {
     }
     // 이미 북마크가 있으면 이미 존재하는 북마크라고 안내를 보낸다.
     else {
-      throw new BadRequestException('이미 북마크한 이벤트는 다시 북마크 할 수 없습니다.');
+      throw new BadRequestException(
+        '이미 북마크한 이벤트는 다시 북마크 할 수 없습니다.'
+      );
     }
   }
 

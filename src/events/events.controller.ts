@@ -14,8 +14,6 @@ import {
   UploadedFile,
   UseInterceptors,
   UnauthorizedException,
-  UsePipes,
-  BadRequestException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -31,14 +29,11 @@ import {
 } from '@nestjs/swagger';
 import { EventEntity } from './entities/event.entity';
 import { JwtAccessAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AwsS3Service } from 'src/aws/aws.s3';
+import { RequestWithUser } from './interface/event-controller.interface';
 
 // request에 user 객체를 추가하기 위한 인터페이스
-interface RequestWithUser extends Request {
-  user: User;
-}
 
 @Controller('events')
 @ApiTags('Events')
@@ -48,7 +43,6 @@ export class EventsController {
     private readonly awsS3Service: AwsS3Service
   ) {}
 
-  // 이벤트 생성
   @Post()
   @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
@@ -59,15 +53,14 @@ export class EventsController {
     @Req() req: RequestWithUser,
     @Body() createEventDto: CreateEventDto
   ) {
-    const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
+    const { userId } = req.user;
 
     return this.eventsService.create(userId, createEventDto);
   }
 
-  // 이벤트 이미지 업데이트
   @Put(':eventId/upload')
-  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
-  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
+  @UseGuards(JwtAccessAuthGuard) 
+  @ApiBearerAuth() 
   @ApiOperation({ summary: 'Event 이미지 업데이트' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
@@ -89,10 +82,12 @@ export class EventsController {
     @UploadedFile() file,
     @Param('eventId', ParseIntPipe) eventId: number
   ) {
-    const updatedImg = (await this.awsS3Service.uploadEventFile(file)) as {
+    // 이미지 파일 aws s3 서버에 저장
+    const updatedImg = await this.awsS3Service.uploadEventFile(file) as {
       Location: string;
     };
 
+    // 이미지 파일 DB에 URL 형태로 저장
     await this.eventsService.updateImg(eventId, updatedImg.Location);
     return {
       message: '이미지가 업로드되었습니다',
@@ -100,12 +95,13 @@ export class EventsController {
     };
   }
 
-  // 이벤트 전체 조회
   @Get()
   @ApiOperation({ summary: 'Event 전체 조회' })
   @ApiOkResponse({ type: EventEntity, isArray: true })
   async findAll() {
     const events = await this.eventsService.findAll();
+
+    // 전체 조회 시 이벤트 호스트와 참가자 수 반환
     const event = events.map((item) => {
       const { GuestEvents, HostEvents, ...rest } = item;
       const hostUser = item.HostEvents[0].User.UserDetail;
@@ -119,10 +115,9 @@ export class EventsController {
     return event;
   }
 
-  // 이벤트 상세 조회
   @Get(':eventId')
-  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
-  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
+  @UseGuards(JwtAccessAuthGuard) 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Event 상세 조회' })
   @ApiOkResponse({ type: EventEntity })
   async findOne(
@@ -131,11 +126,11 @@ export class EventsController {
   ) {
     const { userId } = req.user;
 
+    // 로그인한 유저가 상세조회한 이벤트에 참가여부 확인
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     const confirmJoin = isJoin ? true : false;
 
     const event = await this.eventsService.findOne(eventId);
-    if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
 
     await this.eventsService.createViewLog(eventId);
 
@@ -152,21 +147,17 @@ export class EventsController {
     };
   }
 
-  // 이벤트 참가 신청
   @Put(':eventId/join')
-  @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
-  @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
+  @UseGuards(JwtAccessAuthGuard) 
+  @ApiBearerAuth() 
   @ApiOperation({ summary: 'Guest로서 Event 참가신청' })
-  @ApiCreatedResponse({ description: `모임 참석 신청 / 취소` })
+  @ApiCreatedResponse({ description: `API를 홀수번 호출하면 참석신청 짝수번 신청하면 참석취소` })
   async join(
     @Param('eventId', ParseIntPipe) eventId: number,
     @Req() req: RequestWithUser
   ) {
     const { userId } = req.user;
     const event = await this.eventsService.findOne(eventId);
-    // console.log(event)
-    if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
-    console.log(event.maxSize, event.GuestEvents);
 
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
@@ -197,12 +188,12 @@ export class EventsController {
   ) {
     const { userId } = req.user;
     const event = await this.eventsService.findOne(eventId);
+    if (userId !== event.HostEvents[0].HostId) {
+      throw new UnauthorizedException(`작성자만 수정할 수 있습니다`)
+    }
 
-    if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
-    if (userId !== event.HostEvents[0].HostId)
-      throw new UnauthorizedException(`수정 권한이 없습니다`);
-
-    return this.eventsService.update(eventId, updateEventDto);
+    this.eventsService.update(eventId, updateEventDto);
+    return {message: '수정이 완료되었습니다'}
   }
 
   // 이벤트 삭제
@@ -210,16 +201,15 @@ export class EventsController {
   @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
   @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
   @ApiOperation({ summary: 'Host로서 Event 삭제' })
-  @ApiOkResponse({ description: 'isDeleted: true / soft Delete' })
+  @ApiOkResponse({ description: 'soft Delete로 isDelete 필드를 true 바꿔 체킹만 해둔다. 조회는 되지 않음' })
   async remove(
     @Param('eventId', ParseIntPipe) eventId: number,
     @Req() req: RequestWithUser
   ) {
     const { userId } = req.user;
     const event = await this.eventsService.findOne(eventId);
-    if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
     if (userId !== event.HostEvents[0].HostId)
-      throw new UnauthorizedException(`삭제 권한이 없습니다`);
+      throw new UnauthorizedException(`작성자만 삭제할 수 있습니다`);
 
     return this.eventsService.remove(eventId);
   }

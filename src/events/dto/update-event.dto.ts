@@ -2,56 +2,59 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsInt,
-  IsDate,
   IsOptional,
-  IsBoolean,
+  Min,
+  MaxLength,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class UpdateEventDto {
-  @ApiProperty({ required: false })
+  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  eventName?: string;
+  eventName: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty()
+  @IsNotEmpty()
   @IsInt()
-  @IsOptional()
-  maxSize?: number;
+  @Min(1)
+  maxSize: number;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  eventDate?: Date;
+  @ApiProperty()
+  @IsNotEmpty()
+  eventDate: Date;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  signupStartDate?: Date;
+  @ApiProperty()
+  @IsNotEmpty()
+  signupStartDate: Date;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  signupEndDate?: Date;
+  @ApiProperty()
+  @IsNotEmpty()
+  signupEndDate: Date;
 
-  @ApiProperty({ required: false, example: '경기도' })
+  @ApiProperty({ example: '경기도' })
+  @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  eventLocation?: string;
+  eventLocation: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  content?: string;
+  @MaxLength(200)
+  content: string;
 
-  @ApiProperty({ required: false, example: '산책' })
+  @ApiProperty({ example: '산책' })
+  @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  category?: string;
+  category: string;
 
-  @ApiProperty({ required: false, default: '🙋‍♀️아무나' })
-  @IsOptional()
+  @ApiProperty({ default: '🙋‍♀️아무나' })
+  @IsNotEmpty()
   @IsString()
-  isVerified?: string;
+  isVerified: string;
 
   @ApiProperty()
   @IsOptional()
   @IsString()
-  eventImg?: string;
+  eventImg: string;
 }
