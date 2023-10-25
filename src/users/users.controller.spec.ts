@@ -2,62 +2,55 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-// import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import { UsersModule } from './users.module';
 import { PrismaService } from '../prisma/prisma.service';
+import { AwsS3Service } from '../aws/aws.s3';
 
 describe('UsersController unit test', () => {
-  // let app: INestApplication;
   let controller: UsersController;
+  let service: UsersService;
 
-  // const userServiceTest = { findAll: () => ['test1', 'test2'] };
-  // console.log('userServiceTest:', userServiceTest);
+  const mockPrismaService = {
+    // 여기에 필요한 메서드를 mock 구현
+  };
 
-  let requestMock = {};
-  let responseMock = {};
+  const mockUsersService = {
+    findOne: jest.fn((id: number) => {
+      return { userId: id, email: 'test@test.com' };
+    }),
+  };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       imports: [UsersModule],
-      providers: [UsersService],
-    })
-      // .overrideProvider(UsersService)
-      // .useValue(userServiceTest)
-      .compile();
+      providers: [
+        { provide: UsersService, useValue: mockUsersService },
+        { provide: PrismaService, useValue: mockPrismaService },
+        AwsS3Service,
+      ],
+    }).compile();
 
     controller = module.get<UsersController>(UsersController);
-    // app = module.createNestApplication();
-    // await app.init();
+    service = module.get<UsersService>(UsersService);
   });
 
   // jest test
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+  // it('should be defined', () => {
+  //   expect(controller).toBeDefined();
+  // });
 
   describe('Unit Tests', () => {
-
-    // 3. userId를 통한 유저 조회
-  // @Get(':id')
-  // @UseGuards(JwtAccessAuthGuard) // passport를 사용하여 인증 확인
-  // @ApiBearerAuth() // Swagger 문서에 Bearer 토큰 인증 추가
-  // @ApiOperation({ summary: 'ID로 회원 조회' })
-  // @ApiResponse({ status: 200, description: '유저 정보 조회 성공' })
-  // async findOne(@Param('id') id: string) {
-  //   const user = this.usersService.findOne(+id);
-  //   if (!user) {
-  //     throw new NotFoundException('User does not exist');
-  //   }
-  //   return user;
-  // }
-    it('should return a status of 200', () => {
-      controller.findOne('1');
-      expect(controller.findOne('1')).toBe('1');
+    // TC01: findOne(id: number) 테스트
+    it('TC01: findOne should return a user object', async () => {
+      const id = '1';
+      expect(await controller.findOne(id)).toEqual({
+        userId: 1,
+        email: 'test@test.com',
+      });
+      expect(service.findOne).toHaveBeenCalledWith(id);
     });
   });
-
 });
 
 /* 

@@ -72,6 +72,14 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   @ApiProperty({
+    description: 'userLocation',
+    example: '서울시 강남구 ',
+  })
+  userLocation?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
     description: 'refreshToken',
     example: 'refreshToken',
   })
