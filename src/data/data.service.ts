@@ -23,6 +23,7 @@ export class DataService {
   filteredEventByCity(query) {
     return this.prisma.event.findMany({
       where: { eventLocation: query.doName },
+      select: {isDeleted: false}
     });
   }
 
