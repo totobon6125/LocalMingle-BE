@@ -3,6 +3,7 @@
 import { BadRequestException, ConflictException,  Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPasswordDto } from './dto/update-userPassword.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { User, UserDetail } from '@prisma/client';
@@ -98,10 +99,11 @@ export class UsersService {
   
   // 3. 유저 본인 조회
   async findMe(userId: number) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { userId },
       include: { UserDetail: true },
-      });
+    });
+    return user;
   }
 
   // 3. userId를 통한 유저 조회
@@ -117,15 +119,10 @@ export class UsersService {
     return user;
   }
 
-  // 4. 이메일을 통한 유저 찾기
-  // findByEmail({ email }: IUsersServiceFindByEmail): Promise<User> {
-  //   // 이코드는 여러번 재사용 될 수 있기 떄문에 따로 빼줌
-  //   return this.prisma.user.findUnique({ where: { email } });
-  // }
 
   // 5. user 정보 수정한다.
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const { nickname, intro, confirmPassword, nameChanged } = updateUserDto;
+    const { nickname, intro, confirmPassword, nameChanged, userLocation } = updateUserDto;
     
     const user = await this.prisma.user.findUnique({
       where: { userId: id },
@@ -133,9 +130,9 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('유저 정보가 존재하지 않습니다.');
     }
-
     
     if (!nameChanged) {
+      // 자기소개, 유저주소 업데이트
       // nameChanged == false 면 닉네임에는 변화가 없다는 것임으로 닉네임을 제외한 나머지 정보만 업데이트
       // 패스워드, 패스워드 확인 일치 여부 확인
       const isPasswordMatching = await bcrypt.compare(confirmPassword, user.password);
@@ -148,13 +145,16 @@ export class UsersService {
         where: { userDetailId: user.userId},
         data: { 
           intro: intro,
+          userLocation: userLocation,
         },
         });
       return updatedUser;
       
     }
     else { 
+      // 닉네임, 자기소개 업데이트
       // nameChanged = true 면 닉네임을 바꿨다는 거니까 닉네임을 포함해서 업데이트
+      
       // 중복된 닉네임 확인
       const existingNickname = await this.prisma.userDetail.findUnique({
         where: { nickname },
@@ -175,11 +175,35 @@ export class UsersService {
       where: { userDetailId: user.userId},
         data: { 
           intro: intro,
-          nickname: nickname
+          nickname: nickname,
+          userLocation: userLocation,
         },
         });
       return updatedUser;
     }
+  }
+
+  // 5.1 update 유저 정보 수정 - 패스워드 변경
+  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto) {
+    const newPassword = updateUserPasswordDto.password;
+    
+    // 패스워드 암호화
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    
+    // 유저 존재 여부 확인
+    const user = await this.prisma.user.findUnique({
+      where: { userId: id },
+    });
+    if (!user) {
+      throw new BadRequestException('유저 정보가 존재하지 않습니다.');
+    }
+
+    // password 업데이트
+    const updatedUserPassword = await this.prisma.user.update({
+      where: { userId: id },
+      data: { password: hashedNewPassword },
+    });
+    return updatedUserPassword;    
   }
 
   // 6. 회원 탈퇴를 한다.

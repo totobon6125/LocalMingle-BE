@@ -2,39 +2,56 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-// import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import { UsersModule } from './users.module';
 import { PrismaService } from '../prisma/prisma.service';
+import { AwsS3Service } from '../aws/aws.s3';
 
 describe('UsersController unit test', () => {
   // let app: INestApplication;
   let controller: UsersController;
+  let service: UsersService;
 
-  // const userServiceTest = { findAll: () => ['test1', 'test2'] };
-  // console.log('userServiceTest:', userServiceTest);
 
-  let requestMock = {};
-  let responseMock = {};
+  const mockPrismaService = {
+    // 여기에 필요한 메서드를 mock 구현
+  };
+
+  const mockUsersService = {
+    findOne: jest.fn((id: number) => {
+      return { userId: id, email: 'test@test.com' };
+    }),
+  };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       imports: [UsersModule],
-      providers: [UsersService],
-    })
-      // .overrideProvider(UsersService)
-      // .useValue(userServiceTest)
-      .compile();
+      providers: [
+        { provide: UsersService, useValue: mockUsersService },
+        { provide: PrismaService, useValue: mockPrismaService },
+        AwsS3Service,
+      ],
+    }).compile();
 
     controller = module.get<UsersController>(UsersController);
-    // app = module.createNestApplication();
-    // await app.init();
+    service = module.get<UsersService>(UsersService);
   });
 
   // jest test
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  // it('should be defined', () => {
+  //   expect(controller).toBeDefined();
+  // });
+
+  describe('Unit Tests', () => {
+    // TC01: findOne(id: number) 테스트
+    it('TC01: findOne should return a user object', async () => {
+      const id = '1';
+      expect(await controller.findOne(id)).toEqual({
+        userId: 1,
+        email: 'test@test.com',
+      });
+      expect(service.findOne).toHaveBeenCalledWith(id);
+    });
   });
 
   describe('Unit Tests', () => {

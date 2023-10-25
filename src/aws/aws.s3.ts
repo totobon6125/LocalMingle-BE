@@ -1,6 +1,10 @@
 // src/aws/aws.s3.ts
 import * as AWS from 'aws-sdk';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 @Injectable()
 export class AwsS3Service {
@@ -15,8 +19,19 @@ export class AwsS3Service {
 
   // S3 프로필 이미지 업로드 로직
   async uploadFile(file) {
+    // 이미지 파일 Validation 체크
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const SUPPORTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
     if (!file) {
-      throw new BadRequestException('No file uploaded');
+      throw new NotFoundException('이미지 파일을 선택해주세요.');
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      throw new BadRequestException('파일 크기는 5MB를 초과할 수 없습니다.');
+    }
+    if (!SUPPORTED_FILE_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException(
+        '지원되는 파일 형식은 JPEG, PNG, GIF 뿐입니다.'
+      );
     }
 
     const params = {
