@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class SearchesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async searchEvents(
+  async searchByNameOrContent(
     query: string
   ): Promise<{ eventName: string; content: string }[]> {
     // 최소 2글자 이상의 검색어 확인
@@ -14,16 +14,31 @@ export class SearchesService {
     }
     const events = await this.prisma.event.findMany({
       where: {
+        isDeleted: false,
         OR: [
           { eventName: { contains: query } },
           { content: { contains: query } },
         ],
       },
-      select: {
-        eventName: true,
-        content: true,
-      },
     });
     return events;
+  }
+
+  searchByLocation(query: any) {
+    return this.prisma.event.findMany({
+      where: { eventLocation: query.doName, isDeleted: false },
+    });
+  }
+
+  searchByCategory(query: string) {
+    return this.prisma.event.findMany({
+      where: { category: query, isDeleted: false },
+    });
+  }
+
+  searchtByVerify(query: string) {
+    return this.prisma.event.findMany({
+      where: { isVerified: query, isDeleted: false },
+    });
   }
 }

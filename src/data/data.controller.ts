@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { DataService } from './data.service';
-import { Verify, toss } from './interface/verify';
+import { toss } from './interface/verify';
 import { city } from './interface/city';
 
 @Controller('data')
@@ -19,7 +19,7 @@ export class DataController {
     if (query.lang !== 'ko' && query.lang !== 'jp' && query.lang !== 'en') {
       return { message: '[ko, en, jp] 중 하나를 입력하세요' };
     }
-    
+
     const langByCity = city.find((item) => {
       return item.lang == query.lang;
     });
@@ -38,19 +38,5 @@ export class DataController {
   categoryData() {
     const data = toss;
     return data;
-  }
-
-  @Get('filter/city')
-  @ApiOperation({ summary: '이벤트 필터링(시/도)' })
-  @ApiQuery({ name: 'doName', type: String, required: true })
-  filteredEventByCity(@Query() query) {
-    return this.dataService.filteredEventByCity(query);
-  }
-
-  @Get('filter/verify')
-  @ApiOperation({ summary: '이벤트 필터링(위치인증)' })
-  @ApiQuery({ name: 'verify', type: String, required: true })
-  filteredEventByVerify(@Query() query: Verify) {
-    return this.dataService.filteredEventByVerify(query);
   }
 }

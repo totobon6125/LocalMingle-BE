@@ -7,7 +7,6 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
   Put,
   UseGuards,
   ParseIntPipe,
