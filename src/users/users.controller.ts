@@ -166,6 +166,7 @@ export class UsersController {
   ) {
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
     const user = await this.usersService.findOne(userId);
+
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
@@ -243,6 +244,7 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException('User does not exist');
     }
+
     // 이미지를 s3에 업로드한다.
     const uploadedFile = (await this.awsS3Service.uploadFile(file)) as {
       Location: string;

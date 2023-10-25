@@ -30,7 +30,7 @@ export class UpdateEventDto {
   @IsOptional()
   signupEndDate?: Date;
 
-  @ApiProperty({ required: false, example: "경기도" })
+  @ApiProperty({ required: false, example: '경기도' })
   @IsString()
   @IsOptional()
   eventLocation?: string;
@@ -40,12 +40,12 @@ export class UpdateEventDto {
   @IsOptional()
   content?: string;
 
-  @ApiProperty({ required: false, example: "산책" })
+  @ApiProperty({ required: false, example: '산책' })
   @IsString()
   @IsOptional()
   category?: string;
 
-  @ApiProperty({ required: false, default: "no" })
+  @ApiProperty({ required: false, default: '🙋‍♀️아무나' })
   @IsOptional()
   @IsString()
   isVerified?: string;
@@ -53,5 +53,5 @@ export class UpdateEventDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  eventImg?: string
+  eventImg?: string;
 }
