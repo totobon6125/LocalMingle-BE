@@ -14,6 +14,8 @@ import {
   UploadedFile,
   UseInterceptors,
   UnauthorizedException,
+  UsePipes,
+  BadRequestException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -53,14 +55,13 @@ export class EventsController {
   @ApiOperation({ summary: '호스트로 Event 생성' })
   @UseInterceptors(FileInterceptor('file'))
   @ApiCreatedResponse({ type: EventEntity })
-
   async create(
     @Req() req: RequestWithUser,
-    @Body() createEventDto: CreateEventDto,
+    @Body() createEventDto: CreateEventDto
   ) {
     const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
 
-    return this.eventsService.create(userId, createEventDto)
+    return this.eventsService.create(userId, createEventDto);
   }
 
   // 이벤트 이미지 업데이트
@@ -72,7 +73,7 @@ export class EventsController {
   @UseInterceptors(FileInterceptor('file'))
   @ApiBody({
     description: 'event image',
-    type: 'multipart/form-data', 
+    type: 'multipart/form-data',
     required: true,
     schema: {
       type: 'object',
@@ -84,14 +85,15 @@ export class EventsController {
       },
     },
   })
-
-  async uploadFile(@UploadedFile() file, @Param('eventId', ParseIntPipe) eventId:number) {
-
+  async uploadFile(
+    @UploadedFile() file,
+    @Param('eventId', ParseIntPipe) eventId: number
+  ) {
     const updatedImg = (await this.awsS3Service.uploadEventFile(file)) as {
       Location: string;
     };
 
-    await this.eventsService.updateImg(eventId, updatedImg.Location)
+    await this.eventsService.updateImg(eventId, updatedImg.Location);
     return {
       message: '이미지가 업로드되었습니다',
       ImgURL: updatedImg,
@@ -160,13 +162,17 @@ export class EventsController {
     @Param('eventId', ParseIntPipe) eventId: number,
     @Req() req: RequestWithUser
   ) {
-    const event = await this.eventsService.findOne(eventId);
-    if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
-
     const { userId } = req.user;
+    const event = await this.eventsService.findOne(eventId);
+    // console.log(event)
+    if (!event) throw new NotFoundException(`${eventId}번 이벤트가 없습니다`);
+    console.log(event.maxSize, event.GuestEvents);
 
     const isJoin = await this.eventsService.isJoin(eventId, userId);
     if (!isJoin) {
+      if (event.maxSize <= event.GuestEvents.length) {
+        return { message: `참가인원은 최대${event.maxSize}명 입니다 빠꾸입니다` };
+      }
       this.eventsService.join(+eventId, userId);
       this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 참가 신청 로그 생성
       return `${eventId}번 모임 참석 신청!`;

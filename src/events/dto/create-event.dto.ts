@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsNotEmpty,
   MaxLength,
+  Min,
 } from 'class-validator';
 
 export class CreateEventDto {
@@ -23,24 +24,32 @@ export class CreateEventDto {
   })
   @IsNotEmpty()
   @IsInt()
+  @Min(1)
   maxSize: number;
 
   @ApiProperty()
+  @IsNotEmpty()
   eventDate: Date;
 
   @ApiProperty()
+  @IsNotEmpty()
   signupStartDate: Date;
 
   @ApiProperty()
+  @IsNotEmpty()
   signupEndDate: Date;
 
   @ApiProperty({
     example: '서울특별시',
   })
   @IsString()
+  @IsNotEmpty()
   eventLocation: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '재밌게 놀아요',
+  })
+  @IsNotEmpty()
   @IsString()
   @MaxLength(200)
   content: string;
@@ -48,6 +57,7 @@ export class CreateEventDto {
   @ApiProperty({
     example: '산책',
   })
+  @IsNotEmpty()
   @IsString()
   category: string;
 
