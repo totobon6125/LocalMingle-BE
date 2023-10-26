@@ -67,6 +67,7 @@ export class UsersController {
 
   // 1-2 닉네임 중복 검증
   // FIXME: HeeDragon - ApiBody 추가, message 개선  @Post('checkNickname')
+  @Post('checkNickname')
   @ApiOperation({ summary: '닉네임 중복 확인' })
   @ApiBody({})
   async checkNickname(@Body() { nickname }: { nickname: string }) {
