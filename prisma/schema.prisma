@@ -56,7 +56,8 @@ model Event {
   signupStartDate DateTime
   signupEndDate   DateTime
   eventImg        String?
-  eventLocation   String
+  location_City   String
+  location_District String
   content         String
   category        String
   isVerified      String?
