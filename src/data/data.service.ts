@@ -19,16 +19,4 @@ export class DataService {
     });
     return data;
   }
-
-  filteredEventByCity(query) {
-    return this.prisma.event.findMany({
-      where: { eventLocation: query.doName },
-    });
-  }
-
-  filteredEventByVerify(query: Verify) {
-    return this.prisma.event.findMany({
-      where: { isVerified: query.verify },
-    });
-  }
 }
