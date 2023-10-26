@@ -12,4 +12,3 @@ import { SearchesController } from './searches.controller';
 })
 export class SearchesModule {}
 
-// /search?query=특정 단어 와 같은 URL로 접근
