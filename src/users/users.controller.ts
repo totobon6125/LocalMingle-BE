@@ -134,13 +134,17 @@ export class UsersController {
   @ApiOperation({ summary: '비밀번호 변경' })
   @ApiResponse({ status: 200, description: '비밀번호가 변경되었습니다' })
   @ApiResponse({ status: 404, description: '유저 정보가 존재하지 않습니다' })
+  @ApiResponse({
+    status: 400,
+    description: '동일한 비밀번호를 입력하였습니다',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @ApiBearerAuth()
   async updatePassword(
     @Req() req: RequestWithUser,
     @Body() updateUserPasswordDto: UpdateUserPasswordDto
   ) {
-    const { userId } = req.user; // request에 user 객체가 추가되었고 userId에 값 할당
+    const { userId } = req.user;
     await this.usersService.updatePassword(userId, updateUserPasswordDto);
     return { message: '비밀번호가 변경되었습니다' };
   }

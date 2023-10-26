@@ -193,7 +193,13 @@ export class UsersService {
       where: { userId },
     });
     if (!user) {
-      throw new BadRequestException('유저 정보가 존재하지 않습니다.');
+      throw new BadRequestException('유저 정보가 존재하지 않습니다');
+    }
+
+    // 기존 현재 패스워드와 변경하려는 새로운 패스워드가 같은지 확인 후 같은 경우 에러
+    const isPasswordMatching = await bcrypt.compare(newPassword, user.password);
+    if (isPasswordMatching) {
+      throw new BadRequestException('동일한 비밀번호를 입력하였습니다');
     }
 
     // password 업데이트
