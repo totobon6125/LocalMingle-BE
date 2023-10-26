@@ -38,28 +38,6 @@ export class UpdateUserDto {
   })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(15)
-  @IsOptional()
-  //알파벳 포함 , 숫자 포함 , 특수문자 포함
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
-  @ApiProperty({
-    description: 'password',
-    example: 'abc123456789!',
-  })
-  password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsOptional()
-  @ApiProperty({
-    description: 'password confirm',
-    example: 'abc123456789!',
-  })
-  confirmPassword: string;
-
   @ApiProperty({
     description: 'nickname changed',
     example: false,

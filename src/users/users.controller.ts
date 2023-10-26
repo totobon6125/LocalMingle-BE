@@ -137,7 +137,6 @@ export class UsersController {
   @ApiOperation({ summary: '회원 정보 수정' })
   @ApiResponse({ status: 200, description: '회원 정보가 수정되었습니다' })
   @ApiResponse({ status: 400, description: '중복된 닉네임입니다' })
-  @ApiResponse({ status: 401, description: '패스워드가 일치하지 않습니다' })
   @ApiResponse({ status: 404, description: '유저 정보가 존재하지 않습니다' })
   async update(
     @Req() req: RequestWithUser,
