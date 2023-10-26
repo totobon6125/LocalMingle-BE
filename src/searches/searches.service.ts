@@ -26,7 +26,7 @@ export class SearchesService {
 
   searchByLocation(query: any) {
     return this.prisma.event.findMany({
-      where: { eventLocation: query.doName, isDeleted: false },
+      where: { location_City: query.doName, isDeleted: false },
     });
   }
 

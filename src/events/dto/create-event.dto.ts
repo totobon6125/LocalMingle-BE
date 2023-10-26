@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Event } from '@prisma/client';
 import {
   IsString,
   IsInt,
@@ -9,7 +10,7 @@ import {
   Min,
 } from 'class-validator';
 
-export class CreateEventDto {
+export class CreateEventDto  {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -43,7 +44,14 @@ export class CreateEventDto {
   @ApiProperty({
     example: '서울특별시',
   })
-  eventLocation: string;
+  location_City: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: '종로구',
+  })
+  location_District: string;
 
   @IsString()
   @IsNotEmpty()
