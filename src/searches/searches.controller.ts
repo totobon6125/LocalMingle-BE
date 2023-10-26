@@ -11,7 +11,7 @@ export class SearchesController {
   @Get()
   @ApiOperation({ summary: '이벤트네임 or 콘텐츠 검색' })
   async searchByNameOrContent(
-    @Query('query') query: string // @Query 데코레이터 추가
+    @Query('query') query: string
   ): Promise<{ eventName: string; content: string }[]> {
     return this.searchesService.searchByNameOrContent(query);
   }
@@ -19,21 +19,19 @@ export class SearchesController {
   @Get('byLocation')
   @ApiOperation({ summary: '이벤트 장소별 검색' })
   @ApiQuery({ name: 'doName', type: String, required: true })
-  searchByLocation(@Query() query:any) {
+  searchByLocation(@Query() query) {
     return this.searchesService.searchByLocation(query);
   }
 
   @Get('byCategory')
   @ApiOperation({ summary: '카테고리별 검색' })
   searchByCategory(@Query('query') query: string) {
-    console.log(query)
     return this.searchesService.searchByCategory(query);
   }
 
   @Get('byVerify')
   @ApiOperation({ summary: '동네만 or 아무나 검색' })
   searchByVerify(@Query('query') query: string) {
-    console.log(query)
     return this.searchesService.searchByVerify(query);
   }
 }

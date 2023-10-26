@@ -10,67 +10,67 @@ import {
 } from 'class-validator';
 
 export class CreateEventDto {
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: '같이 산책하실분',
   })
-  @IsNotEmpty()
-  @IsString()
   @MaxLength(50)
   eventName: string;
 
+  @IsInt()
+  @IsNotEmpty()
+  @Min(1)
   @ApiProperty({
     example: 10,
   })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
   maxSize: number;
 
-  @ApiProperty()
   @IsNotEmpty()
+  @ApiProperty()
   eventDate: Date;
 
-  @ApiProperty()
   @IsNotEmpty()
+  @ApiProperty()
   signupStartDate: Date;
 
-  @ApiProperty()
   @IsNotEmpty()
+  @ApiProperty()
   signupEndDate: Date;
 
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: '서울특별시',
   })
-  @IsString()
-  @IsNotEmpty()
   eventLocation: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(200)
   @ApiProperty({
     example: '재밌게 놀아요',
   })
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(200)
   content: string;
 
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: '산책',
   })
-  @IsNotEmpty()
-  @IsString()
   category: string;
 
-  @ApiProperty({ required: false, default: false })
   @IsBoolean()
+  @ApiProperty({ required: false, default: false })
   isDeleted: boolean = false;
 
-  @ApiProperty({ required: false, default: '🙋‍♀️아무나' })
-  @IsOptional()
   @IsString()
+  @IsOptional()
+  @ApiProperty({ required: false, default: '🙋‍♀️아무나' })
   isVerified?: string;
 
-  @ApiProperty({ required: false, default: null })
-  @IsOptional()
   @IsString()
-  eventImg: string;
+  @IsOptional()
+  @ApiProperty({ required: false, default: null })
+  eventImg?: string;
 }
