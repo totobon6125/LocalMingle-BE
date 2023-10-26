@@ -34,8 +34,17 @@ export class UpdateEventDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: '경기도' })
-  eventLocation: string;
+  @ApiProperty({
+    example: '서울특별시',
+  })
+  location_City: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: '마포구',
+  })
+  location_District: string;
 
   @IsString()
   @IsNotEmpty()
