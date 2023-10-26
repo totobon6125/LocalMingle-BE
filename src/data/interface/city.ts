@@ -18,7 +18,7 @@ export const city = [
       { doName: '전라남도' },
       { doName: '경상북도' },
       { doName: '경상남도' },
-      { doName: '제주특별자치시' },
+      { doName: '제주특별자치도' },
     ],
   },
   {
