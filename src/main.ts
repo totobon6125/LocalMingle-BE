@@ -27,7 +27,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   //cors 정책
   app.enableCors({
-    origin: ['http://localhost:5173','https://d2r603zvpf912o.cloudfront.net/'],
+    origin: ['http://localhost:5173','https://d2r603zvpf912o.cloudfront.net','https://totobon.store'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // 쿠키를 사용하려면 true로 설정
     exposedHeaders: ['accessToken', 'refreshToken'],

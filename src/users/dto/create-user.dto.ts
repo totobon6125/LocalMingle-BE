@@ -25,7 +25,7 @@ export class CreateUserDto {
   @MinLength(8)
   @MaxLength(15)
   //알파벳 포함 , 숫자 포함 , 특수문자 포함
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
+  @Matches(/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).*$/)
   @ApiProperty({
     description: 'password',
     example: 'abc123456789!',
@@ -68,6 +68,14 @@ export class CreateUserDto {
     example: '프로필이미지 url',
   })
   profileImg?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    description: 'userLocation',
+    example: '서울시 강남구 ',
+  })
+  userLocation?: string;
 
   @IsString()
   @IsOptional()

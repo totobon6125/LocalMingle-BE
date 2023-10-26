@@ -35,6 +35,7 @@ model UserDetail {
   nickname     String  @unique
   intro        String?
   profileImg   String?
+  userLocation String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
