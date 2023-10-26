@@ -1,3 +1,5 @@
+import { User } from '@prisma/client';
+
 export interface IUsersServiceCreate {
   email: string;
   password: string;
@@ -12,4 +14,9 @@ export interface IUsersServiceFindByEmail {
 
 export interface IUsersServiceFindByNickname {
   nickname: string;
+}
+
+// request에 user 객체를 추가하기 위한 인터페이스
+export interface RequestWithUser extends Request {
+  user: User;
 }
