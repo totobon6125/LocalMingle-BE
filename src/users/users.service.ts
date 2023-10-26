@@ -133,7 +133,7 @@ export class UsersService {
   // 3. user 정보 수정
   async update(userId: number, updateUserDto: UpdateUserDto) {
     const { nickname, intro, nameChanged, userLocation } = updateUserDto;
-
+    console.log("닉네임 들어오나?",nickname)
     const user = await this.prisma.user.findUnique({
       where: { userId },
     });
