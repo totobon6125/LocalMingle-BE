@@ -25,15 +25,15 @@ export class SearchesController {
 
   @Get('byCategory')
   @ApiOperation({ summary: '카테고리별 검색' })
-  searchtByCategory(@Query('query') query: string) {
+  searchByCategory(@Query('query') query: string) {
     console.log(query)
     return this.searchesService.searchByCategory(query);
   }
 
   @Get('byVerify')
   @ApiOperation({ summary: '동네만 or 아무나 검색' })
-  searchtByVerify(@Query('query') query: string) {
+  searchByVerify(@Query('query') query: string) {
     console.log(query)
-    return this.searchesService.searchtByVerify(query);
+    return this.searchesService.searchByVerify(query);
   }
 }

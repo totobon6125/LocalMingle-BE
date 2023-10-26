@@ -36,7 +36,7 @@ export class SearchesService {
     });
   }
 
-  searchtByVerify(query: string) {
+  searchByVerify(query: string) {
     return this.prisma.event.findMany({
       where: { isVerified: query, isDeleted: false },
     });
