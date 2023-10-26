@@ -4,10 +4,11 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma/prisma.service'; // 프리즈마 서비스 파일 경로를 사용하는 경로로 수정해야 합니다.
 import { Inject } from '@nestjs/common';
 
+// @Injectable()
 export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(PrismaService) private readonly prismaService: PrismaService // 추가
+    @Inject(PrismaService) private readonly prismaService: PrismaService
   ) {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID,
@@ -18,16 +19,15 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any) {
-    console.log('google 엑세스토큰:', accessToken);
-    console.log('google 리프레시 토큰:', refreshToken);
-    console.log('google 프로필:', profile);
+    // console.log('google 엑세스토큰:', accessToken);
+    // console.log('google 리프레시 토큰:', refreshToken);
+    // console.log('google 프로필:', profile);
 
     // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(profile.id.toString(), 10);
 
     // 고유한 익명 nickname 생성
     const nickname = await this.generateUniqueAnonymousName();
-    //console.log('닉네임 확인', nickname);
     return {
       name: profile.displayName,
       email: profile.emails[0].value,
@@ -52,8 +52,6 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
       }
 
       const anonymousName = `${anonymousPrefix}${randomString}`;
-
-      //return anonymousName; // 밑의 로직이 작동안하면 임시적으로 사용
 
       // 프리즈마를 사용하여 중복 확인
       const existingUser = await this.prisma.userDetail.findUnique({

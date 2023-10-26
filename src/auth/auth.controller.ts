@@ -7,22 +7,20 @@ import {
   UseGuards,
   Res,
   Req,
-} from '@nestjs/common'; // Headers 추가
-import { AuthService } from './auth.service';
+} from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
-import { Request, Response } from 'express';
-import { AuthEntity } from './entity/auth.entity';
-import { UsersService } from 'src/users/users.service';
 import { AuthGuard } from '@nestjs/passport';
+import { LoginDto } from './dto/login.dto';
+import { AuthEntity } from './entity/auth.entity';
+import { AuthService } from './auth.service';
+import { Request, Response } from 'express';
 
 interface IOAuthUser {
-  //interface 설정
   user: {
     name: string;
     email: string;
@@ -34,10 +32,7 @@ interface IOAuthUser {
 @ApiTags('Auth')
 @ApiOkResponse({ type: AuthEntity })
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly authService: AuthService) {}
   //-----------------------로그인-----------------------------//
   @ApiOperation({ summary: '로그인' })
   @ApiResponse({ status: 200, description: '로그인에 성공하셨습니다.' })
@@ -46,8 +41,7 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() { email, password }: LoginDto,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response // Response 객체 주입
+    @Res({ passthrough: true }) res: Response
   ): Promise<void> {
     const { accessToken, refreshToken, userId } = await this.authService.login({
       email,
@@ -60,6 +54,7 @@ export class AuthController {
   }
 
   //-----------------------토큰 재발급-----------------------------//
+  @Post('refresh')
   @ApiOperation({ summary: '리프레시 토큰을 사용하여 엑세스 토큰 재발급' })
   @ApiResponse({
     status: 200,
@@ -69,7 +64,6 @@ export class AuthController {
     status: 401,
     description: '리프레시 토큰이 유효하지 않습니다.',
   })
-  @Post('refresh')
   async refreshAccessToken(
     @Headers('refreshToken') refreshToken: string, // 요청 헤더에서 refresh-token 값을 추출
     @Res({ passthrough: true }) res: Response

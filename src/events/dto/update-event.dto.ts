@@ -9,52 +9,52 @@ import {
 } from 'class-validator';
 
 export class UpdateEventDto {
-  @ApiProperty()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
   eventName: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
   @IsInt()
+  @IsNotEmpty()
+  @ApiProperty()
   @Min(1)
   maxSize: number;
 
-  @ApiProperty()
   @IsNotEmpty()
+  @ApiProperty()
   eventDate: Date;
 
-  @ApiProperty()
   @IsNotEmpty()
+  @ApiProperty()
   signupStartDate: Date;
 
-  @ApiProperty()
   @IsNotEmpty()
+  @ApiProperty()
   signupEndDate: Date;
 
-  @ApiProperty({ example: '경기도' })
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: '경기도' })
   eventLocation: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(200)
+  @ApiProperty()
   content: string;
 
-  @ApiProperty({ example: '산책' })
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: '산책' })
   category: string;
 
-  @ApiProperty({ default: '🙋‍♀️아무나' })
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ default: '🙋‍♀️아무나' })
   isVerified: string;
 
-  @ApiProperty()
-  @IsOptional()
   @IsString()
+  @IsOptional()
+  @ApiProperty()
   eventImg: string;
 }

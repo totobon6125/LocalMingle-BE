@@ -18,10 +18,10 @@ export class JwtNaverStrategy extends PassportStrategy(Strategy, 'naver') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    console.log('네이버에서 주는 accessToken:' + accessToken);
-    console.log('네이버에서 주는 refreshToken:' + refreshToken);
-    console.log(profile);
-    console.log(profile.email);
+    // console.log('네이버에서 주는 accessToken:' + accessToken);
+    // console.log('네이버에서 주는 refreshToken:' + refreshToken);
+    // console.log(profile);
+    // console.log(profile.email);
 
     // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(profile.id.toString(), 10);
