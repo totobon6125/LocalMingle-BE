@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -133,17 +132,18 @@ export class AuthService {
 
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);
-    console.log(user.userId);
-
+    //console.log(user.userId);
     // 리다이렉션
-    return res.redirect(
-      `http://localhost:5500?accessToken=${encodeURIComponent(
+    res.redirect(
+      `http://localhost:5173?accessToken=${encodeURIComponent(
         accessToken
-      )}&refreshToken=${encodeURIComponent(refreshToken)}`
+      )}&refreshToken=${encodeURIComponent(
+        refreshToken
+      )}&userId=${encodeURIComponent(user.userId)}`
     );
     //&userId=${encodeURIComponent(user.userId)}
     // return res.redirect('http://localhost:5500');
     // return { accessToken, refreshToken };
-    //return { accessToken, refreshToken, userId: user.userId };
+    return { accessToken, refreshToken };
   }
 }
