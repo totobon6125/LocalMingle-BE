@@ -66,6 +66,9 @@ jobs:
     runs-on: ubuntu-latest 
 
     steps:
+      - name: checkout commit
+        uses: actions/checkout@v3
+        
       # .env 파일 생성 및 환경 변수 설정
       - name: Create .env file
         run: |
