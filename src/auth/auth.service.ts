@@ -6,7 +6,6 @@ import {
 import { PrismaService } from './../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-//import { IAuthServiceLogin } from './interface/auth-service.interface';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -25,7 +24,7 @@ export class AuthService {
   }> {
     // 1. 이메일이 일치하는 유저를 DB에서 찾기
     const user = await this.usersService.findByEmail({ email });
-    console.log(user);
+
     // 2. 일치하는 유저가 없으면 에러
     if (!user) throw new NotFoundException('이메일이 없습니다.');
 
@@ -41,12 +40,10 @@ export class AuthService {
 
     // 4. 리프레시 토큰 생성
     const refreshToken = this.setRefreshToken({ user });
-
-    // 5. 액세스 토큰 및 리프레시 토큰을 반환
     const accessToken = this.getAccessToken({ user });
 
+    // 5. 액세스 토큰 및 리프레시 토큰을 반환
     res.header('accessToken', accessToken);
-
     res.header('refreshToken', refreshToken);
 
     // 6. DB에 리프레시 토큰을 저장한다.
@@ -75,7 +72,6 @@ export class AuthService {
       { sub: user.userId },
       { secret: process.env.JWT_REFRESH_KEY, expiresIn: '2w' }
     );
-
     return refreshToken;
   }
 
@@ -92,14 +88,12 @@ export class AuthService {
       user: { userId }, // 사용자 ID를 전달
       // res: null,
     });
-
     return newAccessToken;
   }
 
   async OAuthLogin({ req, res }): Promise<{
     accessToken: string;
     refreshToken: string;
-    // userId: number;
   }> {
     // 1. 회원조회
     let user = await this.usersService.findByEmail({ email: req.user.email }); // user를 찾아서
@@ -114,9 +108,7 @@ export class AuthService {
         intro: req.user.intro,
         profileImg: req.user.profileImg,
       };
-      // console.log('소셜 로그인 회원가입 : ', createUser); // createUser 정보를 콘솔에 출력
       user = await this.usersService.create(createUser);
-      console.log('소셜로그인 회원가입 정보', createUser);
     }
 
     // 2-1. 사용자가 삭제되지 않았는지 확인 (deletedAt가 null이어야 함)
@@ -137,17 +129,19 @@ export class AuthService {
 
     console.log('로컬 엑세스 토큰', accessToken);
     console.log('로컬 리프레시 토큰', refreshToken);
-    console.log(user.userId);
-
     // 리다이렉션
-    return res.redirect(
-      `http://localhost:5500?accessToken=${encodeURIComponent(
+    res.redirect(
+      `http://localhost:5173?accessToken=${encodeURIComponent(
+    res.redirect(
+      `http://localhost:5173?accessToken=${encodeURIComponent(
         accessToken
-      )}&refreshToken=${encodeURIComponent(refreshToken)}`
+      )}&refreshToken=${encodeURIComponent(
+        refreshToken
+      )}&userId=${encodeURIComponent(user.userId)}`
+      )}&refreshToken=${encodeURIComponent(
+        refreshToken
+      )}&userId=${encodeURIComponent(user.userId)}`
     );
-    //&userId=${encodeURIComponent(user.userId)}
-    // return res.redirect('http://localhost:5500');
-    // return { accessToken, refreshToken };
-    //return { accessToken, refreshToken, userId: user.userId };
+    return { accessToken, refreshToken };
   }
 }
