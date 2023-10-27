@@ -114,6 +114,7 @@ export class AuthService {
 
     // 2-1. 사용자가 삭제되지 않았는지 확인 (deletedAt가 null이어야 함)
     if (user.deletedAt !== null) {
+      // res.redirect('http://localhost:5000/');
       throw new UnauthorizedException('사용자가 삭제되었습니다.');
     }
 
