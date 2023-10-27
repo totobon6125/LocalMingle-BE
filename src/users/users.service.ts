@@ -27,7 +27,6 @@ export class UsersService {
   if (existingUser) {
     throw new ConflictException('이미 등록된 이메일입니다.');
   }
-
   // 닉네임 중복 체크
   const existingNickname = await this.prisma.userDetail.findUnique({
     where: { nickname },

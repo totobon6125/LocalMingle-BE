@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -118,6 +117,11 @@ export class AuthService {
       // console.log('소셜 로그인 회원가입 : ', createUser); // createUser 정보를 콘솔에 출력
       user = await this.usersService.create(createUser);
       console.log('소셜로그인 회원가입 정보', createUser);
+    }
+
+    // 2-1. 사용자가 삭제되지 않았는지 확인 (deletedAt가 null이어야 함)
+    if (user.deletedAt !== null) {
+      throw new UnauthorizedException('사용자가 삭제되었습니다.');
     }
 
     // 3. 회원가입이 되어 있다면? 로그인(AT, RT를 생성해서 브라우저에 전송)한다
