@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Event } from '@prisma/client';
 import {
   IsString,
   IsInt,

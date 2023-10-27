@@ -5,12 +5,9 @@ import { PrismaService } from '../prisma/prisma.service';
 export class SearchesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async searchByNameOrContent(
-    query: string
-  ): Promise<{ eventName: string; content: string }[]> {
-    // 최소 2글자 이상의 검색어 확인
+  async searchByNameOrContent(query: string) {
     if (query.length < 2) {
-      throw new BadRequestException('검색어는 최소 2글자 이상이어야 합니다.');
+      throw new BadRequestException('검색어를 2글자 이상 입력해주세요')
     }
     const events = await this.prisma.event.findMany({
       where: {
@@ -20,6 +17,26 @@ export class SearchesService {
           { content: { contains: query } },
         ],
       },
+      include: {
+        HostEvents: {
+          select: {
+            User: {
+              select: {
+                UserDetail: true,
+              },
+            },
+          },
+        },
+        GuestEvents: true,
+        _count: {
+          select: {
+            Viewlogs: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
     return events;
   }
@@ -27,18 +44,78 @@ export class SearchesService {
   searchByLocation(query: any) {
     return this.prisma.event.findMany({
       where: { location_City: query.doName, isDeleted: false },
+      include: {
+        HostEvents: {
+          select: {
+            User: {
+              select: {
+                UserDetail: true,
+              },
+            },
+          },
+        },
+        GuestEvents: true,
+        _count: {
+          select: {
+            Viewlogs: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
   }
 
-  searchByCategory(query: string) {
+  searchByCategory(query:string) {
     return this.prisma.event.findMany({
       where: { category: query, isDeleted: false },
+      include: {
+        HostEvents: {
+          select: {
+            User: {
+              select: {
+                UserDetail: true,
+              },
+            },
+          },
+        },
+        GuestEvents: true,
+        _count: {
+          select: {
+            Viewlogs: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
   }
 
-  searchByVerify(query: string) {
+  searchByVerify(query:string) {
     return this.prisma.event.findMany({
       where: { isVerified: query, isDeleted: false },
+      include: {
+        HostEvents: {
+          select: {
+            User: {
+              select: {
+                UserDetail: true,
+              },
+            },
+          },
+        },
+        GuestEvents: true,
+        _count: {
+          select: {
+            Viewlogs: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
   }
 }
