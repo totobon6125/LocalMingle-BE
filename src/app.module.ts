@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
@@ -9,6 +7,8 @@ import { MailModule } from './mails/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { DataModule } from './data/data.module';
 import { SearchesModule } from './searches/searches.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [

@@ -35,6 +35,7 @@ model UserDetail {
   nickname     String  @unique
   intro        String?
   profileImg   String?
+  userLocation String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -55,7 +56,8 @@ model Event {
   signupStartDate DateTime
   signupEndDate   DateTime
   eventImg        String?
-  eventLocation   String
+  location_City   String
+  location_District String
   content         String
   category        String
   isVerified      String?

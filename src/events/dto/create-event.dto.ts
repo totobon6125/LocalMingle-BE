@@ -1,67 +1,84 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Event } from '@prisma/client';
 import {
   IsString,
   IsInt,
-  IsDate,
   IsOptional,
   IsBoolean,
   IsNotEmpty,
   MaxLength,
+  Min,
 } from 'class-validator';
 
-export class CreateEventDto {
+export class CreateEventDto  {
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: '같이 산책하실분',
   })
-  @IsNotEmpty()
-  @IsString()
   @MaxLength(50)
   eventName: string;
 
+  @IsInt()
+  @IsNotEmpty()
+  @Min(1)
   @ApiProperty({
     example: 10,
   })
-  @IsNotEmpty()
-  @IsInt()
   maxSize: number;
 
+  @IsNotEmpty()
   @ApiProperty()
   eventDate: Date;
 
+  @IsNotEmpty()
   @ApiProperty()
   signupStartDate: Date;
 
+  @IsNotEmpty()
   @ApiProperty()
   signupEndDate: Date;
 
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
-    example: "서울특별시"
+    example: '서울특별시',
   })
-  @IsString()
-  eventLocation: string;
+  location_City: string;
 
-  @ApiProperty()
   @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: '종로구',
+  })
+  location_District: string;
+
+  @IsString()
+  @IsNotEmpty()
   @MaxLength(200)
+  @ApiProperty({
+    example: '재밌게 놀아요',
+  })
   content: string;
 
-  @ApiProperty({
-    example: "산책"
-  })
   @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: '산책',
+  })
   category: string;
 
-  @ApiProperty({ required: false, default: false })
   @IsBoolean()
+  @ApiProperty({ required: false, default: false })
   isDeleted: boolean = false;
 
-  @ApiProperty({ required: false, default: '🙋‍♀️아무나' })
-  @IsOptional()
   @IsString()
+  @IsOptional()
+  @ApiProperty({ required: false, default: '🙋‍♀️아무나' })
   isVerified?: string;
 
-  @ApiProperty({required: false, default: null})
-  @IsOptional()
   @IsString()
-  eventImg: string
+  @IsOptional()
+  @ApiProperty({ required: false, default: null })
+  eventImg?: string;
 }

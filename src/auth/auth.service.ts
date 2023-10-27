@@ -115,7 +115,6 @@ export class AuthService {
     if (user.deletedAt !== null) {
       throw new UnauthorizedException('사용자가 삭제되었습니다.');
     }
-
     // 3. 회원가입이 되어 있다면? 로그인(AT, RT를 생성해서 브라우저에 전송)한다
     const accessToken = this.getAccessToken({ user }); // res를 전달
     const refreshToken = this.setRefreshToken({ user }); // res를 전달
