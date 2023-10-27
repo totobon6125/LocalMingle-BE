@@ -5,6 +5,7 @@
 .env
 
 nest_lm copy.yml
+nest_lm copy 2.yml
 
 # package-lock.json
 package-lock.json
