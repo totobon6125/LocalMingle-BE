@@ -98,6 +98,7 @@ export class AuthService {
     // 1. 회원조회
     let user = await this.usersService.findByEmail({ email: req.user.email }); // user를 찾아서
 
+    //2. 사용자가 없으면 회원가입
     if (!user) {
       // 아이디 생성 관련 코드 추가
       const createUser = {
@@ -115,6 +116,7 @@ export class AuthService {
     if (user.deletedAt !== null) {
       throw new UnauthorizedException('사용자가 삭제되었습니다.');
     }
+
     // 3. 회원가입이 되어 있다면? 로그인(AT, RT를 생성해서 브라우저에 전송)한다
     const accessToken = this.getAccessToken({ user }); // res를 전달
     const refreshToken = this.setRefreshToken({ user }); // res를 전달
@@ -130,13 +132,8 @@ export class AuthService {
     console.log('로컬 리프레시 토큰', refreshToken);
     // 리다이렉션
     res.redirect(
-      `http://localhost:5173?accessToken=${encodeURIComponent(
-    res.redirect(
-      `http://localhost:5173?accessToken=${encodeURIComponent(
+      `http://localhost:5500?accessToken=${encodeURIComponent(
         accessToken
-      )}&refreshToken=${encodeURIComponent(
-        refreshToken
-      )}&userId=${encodeURIComponent(user.userId)}`
       )}&refreshToken=${encodeURIComponent(
         refreshToken
       )}&userId=${encodeURIComponent(user.userId)}`

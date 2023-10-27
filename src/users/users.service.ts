@@ -29,18 +29,19 @@ export class UsersService {
         '비밀번호와 비밀번호 확인이 일치하지 않습니다.'
       );
     }
-  // 이메일 중복 체크
-  const existingUser = await this.findByEmail({ email });
-  if (existingUser) {
-    throw new ConflictException('이미 등록된 이메일입니다.');
-  }
-  // 닉네임 중복 체크
-  const existingNickname = await this.prisma.userDetail.findUnique({
-    where: { nickname },
-  });
-  if (existingNickname) {
-    throw new ConflictException('이미 사용 중인 닉네임입니다.');
-  }
+    // 이메일 중복 체크
+    const existingUser = await this.findByEmail({ email });
+    if (existingUser) {
+      throw new ConflictException('이미 등록된 이메일입니다.');
+    }
+
+    // 닉네임 중복 체크
+    const existingNickname = await this.prisma.userDetail.findUnique({
+      where: { nickname },
+    });
+    if (existingNickname) {
+      throw new ConflictException('이미 사용 중인 닉네임입니다.');
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
