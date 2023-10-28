@@ -46,7 +46,7 @@ export class SearchesController {
 
   @Get('byCategory')
   @ApiOperation({ summary: '카테고리별 검색' })
-  @ApiQuery({ name: 'query', type: String, example:'☕맛집/커피, 🏃‍♂️운동/건강,🐾애완동, 📕공부/교육' })
+  @ApiQuery({ name: 'query', type: String, example:'☕맛집/커피, 🏃‍♂️운동/건강,🐾애완동물, 📕공부/교육' })
   async searchByCategory(@Query('query') query: string) {
     const events = await this.searchesService.searchByCategory(query);
 
