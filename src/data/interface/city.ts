@@ -65,7 +65,7 @@ export const city = [
       { doName: 'Jeollanam-do' },
       { doName: 'Gyeongsangbuk-do' },
       { doName: 'Gyeongsangnam-do' },
-      { doName: 'Jeju-si' },
+      { doName: 'Jeju-do' },
     ],
   },
 ];
