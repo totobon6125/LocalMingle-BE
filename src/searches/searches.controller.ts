@@ -10,9 +10,9 @@ export class SearchesController {
   constructor(private readonly searchesService: SearchesService) {}
 
   @Get()
-  @ApiOperation({ summary: '이벤트네임 or 콘텐츠 검색' })
+  @ApiOperation({ summary: '키워드 검색, 카테고리, 지역, 위치인증 필터링' })
   async searchByLocation(@Query() searchesDto: SearchesDto) {
-    console.log(searchesDto.keyWord)
+
     const events = await this.searchesService.search(searchesDto);
 
     const event = events.map((item) => {
@@ -26,4 +26,5 @@ export class SearchesController {
       };
     });
     return event;
-  } }
+  } 
+}

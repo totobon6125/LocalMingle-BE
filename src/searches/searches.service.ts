@@ -18,31 +18,19 @@ export class SearchesService {
                   { content: { contains: searchesDto.keyWord } },
                 ],
               }
-            : null,
-          {
-            isVerified:
-              searchesDto.verify == ''
-                ? { not: null }
-                : { contains: searchesDto.verify },
-          },
-          {
-            location_City:
-              searchesDto.city == ''
-                ? { not: null }
-                : { contains: searchesDto.city },
-          },
-          {
-            location_District:
-              searchesDto.guName == ''
-                ? { not: null }
-                : { contains: searchesDto.guName },
-          },
-          {
-            category:
-              searchesDto.category == ''
-                ? { not: null }
-                : { contains: searchesDto.category },
-          },
+            : {},
+          searchesDto.verify
+            ? { isVerified: { contains: searchesDto.verify } }
+            : {},
+          searchesDto.city
+            ? { location_City: { contains: searchesDto.city } }
+            : {},
+          searchesDto.guName
+            ? { location_District: { contains: searchesDto.guName } }
+            : {},
+          searchesDto.category
+            ? { category: { contains: searchesDto.category } }
+            : {},
         ],
       },
       include: {
