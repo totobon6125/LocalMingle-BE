@@ -22,6 +22,7 @@ import { Model } from 'mongoose';
       'http://localhost:5173',
       'https://d2r603zvpf912o.cloudfront.net',
       'https://totobon.store',
+      'https://local-mingle-fe.vercel.app',
     ],
     methods: ['GET', 'POST'],
     credentials: true,
