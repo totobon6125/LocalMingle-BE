@@ -12,7 +12,6 @@ export class SearchesController {
   @Get()
   @ApiOperation({ summary: '키워드 검색, 카테고리, 지역, 위치인증 필터링' })
   async searchByLocation(@Query() searchesDto: SearchesDto) {
-
     const events = await this.searchesService.search(searchesDto);
 
     const event = events.map((item) => {
@@ -26,5 +25,5 @@ export class SearchesController {
       };
     });
     return event;
-  } 
+  }
 }
