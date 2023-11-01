@@ -108,12 +108,9 @@ export class EventsController {
     };
   }
 
-  // 4. 이벤트 참가
-  @Put(':eventId/join')
+  // 4. 이벤트 참가 신청
+  @Post(':eventId/join')
   @ApiOperation({ summary: 'Guest로서 Event 참가신청' })
-  @ApiCreatedResponse({
-    description: `API를 홀수번 호출하면 참석신청 짝수번 신청하면 참석취소`,
-  })
   @UseGuards(JwtAccessAuthGuard)
   @ApiBearerAuth()
   async join(
@@ -129,15 +126,44 @@ export class EventsController {
         return {
           message: `참가인원은 최대${event.maxSize}명 입니다`,
         };
-      }
+      } 
+      
       this.eventsService.join(eventId, userId);
       this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 참가 신청 로그 생성
-      return `${eventId}번 모임 참석 신청!`;
+      return {
+        message: `${eventId}번 모임 참가 신청`,
+        confirm: true
+      }
+    } else {
+      return {
+        message: '이미 참석한 이벤트입니다'
+      }
     }
+  }
+  // 4-1. 이벤트 참가 취소
+  @Delete(':eventId/join')
+  @ApiOperation({ summary: 'Guest로서 Event 참가 취소' })
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiBearerAuth()
+  async cancelJoin(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req: RequestWithUser
+  ) {
+    const { userId } = req.user;
+    await this.eventsService.findOne(eventId);
+    const isJoin = await this.eventsService.isJoin(eventId, userId);
+
     if (isJoin) {
       this.eventsService.cancelJoin(isJoin.guestEventId);
-      this.eventsService.createRsvpLog(eventId, userId, 'canceled'); // 참가 취소 로그 생성
-      return `${eventId}번 모임 신청 취소!`;
+      this.eventsService.createRsvpLog(eventId, userId, 'canceled');
+    } else {
+      return {
+        message: '참석한 이벤트만 취소할 수 있습니다'
+      }
+    }
+    return {
+      message: `${eventId}번 모임 참가 취소`,
+      confirm: false
     }
   }
 
