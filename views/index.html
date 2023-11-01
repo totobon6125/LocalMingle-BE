@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <title>소셜로그인</title>
+  </head>
+  <body>
+    <h1>소셜로그인</h1>
+    <!-- 1. 소셜 로그인을 담을 섹션을 만들어줘 -->
+
+    <!-- 섹션 테두리 그려줘 -->
+
+    <style>
+      /* 이 구간이 너무 길어 박스처럼 만들어줘 */
+      #social-login {
+        border: 1px solid black;
+        padding: 10px;
+        width: 300px;
+      }
+
+      /* 채팅 섹션도 만들어줘 */
+      #chat {
+        border: 1px solid black;
+        padding: 10px;
+        width: 300px;
+        margin: 10px;
+      }
+    </style>
+
+    <section id="social-login">
+      <a href="http://localhost:3000/users/login/google">구글로그인</a>
+      <a href="http://localhost:3000/users/login/kakao">카카오로그인</a>
+      <a href="http://localhost:3000/users/login/naver">네이버로그인</a>
+    </section>
+    <!-- 여기에 섹션을 생성하고 그 안에서 채팅 기능을 구현할거야 -->
+    <!-- <section id="chat">
+      <h2>채팅</h2>
+      <form action="/chat" method="post">
+        <input type="text" name="message" placeholder="메시지를 입력하세요" />
+        <button type="submit">전송</button>
+      </form>
+      <ul id="messages">
+      </ul>
+    </section> -->
+    
+
+  </body>
+</html>

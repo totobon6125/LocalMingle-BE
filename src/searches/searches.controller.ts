@@ -26,5 +26,7 @@ export class SearchesController {
       };
     });
     return event;
-  } 
+
+  }
+
 }
