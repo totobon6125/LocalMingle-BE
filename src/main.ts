@@ -25,7 +25,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // CORS 정책 test
+  // CORS 정책 test2
   app.enableCors({
     origin: [
       'http://localhost:5173',
