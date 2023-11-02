@@ -133,7 +133,7 @@ export class AuthService {
     console.log('로컬 리프레시 토큰', refreshToken);
     // 리다이렉션
     res.redirect(
-      `http://localhost:5173?accessToken=${encodeURIComponent(
+      `https://localmingle.store?accessToken=${encodeURIComponent(
         accessToken
       )}&refreshToken=${encodeURIComponent(
         refreshToken
