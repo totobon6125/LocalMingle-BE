@@ -1,7 +1,7 @@
 import { Controller, Get, Injectable, Query } from '@nestjs/common';
 import { SearchesService } from './searches.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { SearchesDto } from './searches.dto.ts/searches.dto';
+import { SearchesDto } from './searches.dto/searches.dto';
 
 @Controller('search')
 @Injectable()
