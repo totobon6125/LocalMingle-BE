@@ -98,6 +98,7 @@ export class AuthService {
     // 1. 회원조회
     let user = await this.usersService.findByEmail({ email: req.user.email }); // user를 찾아서
 
+    //2. 사용자가 없으면 회원가입
     if (!user) {
       // 아이디 생성 관련 코드 추가
       const createUser = {
@@ -110,6 +111,13 @@ export class AuthService {
       };
       user = await this.usersService.create(createUser);
     }
+
+    // 2-1. 사용자가 삭제되지 않았는지 확인 (deletedAt가 null이어야 함)
+    if (user.deletedAt !== null) {
+      // res.redirect('http://localhost:5000/');
+      throw new UnauthorizedException('사용자가 삭제되었습니다.');
+    }
+
     // 3. 회원가입이 되어 있다면? 로그인(AT, RT를 생성해서 브라우저에 전송)한다
     const accessToken = this.getAccessToken({ user }); // res를 전달
     const refreshToken = this.setRefreshToken({ user }); // res를 전달

@@ -3,9 +3,11 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // 유효성 검사를 위한 ValidationPipe 설정
   app.useGlobalPipes(new ValidationPipe());
@@ -23,12 +25,15 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // CORS 정책
+  // CORS 정책 test
   app.enableCors({
     origin: [
       'http://localhost:5173',
       'https://d2r603zvpf912o.cloudfront.net',
       'https://totobon.store',
+      'https://local-mingle-fe.vercel.app',
+      'https://d2k8kob2tp4v96.cloudfront.net',
+      'https://localmingle.store',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // 쿠키를 사용하려면 true로 설정
