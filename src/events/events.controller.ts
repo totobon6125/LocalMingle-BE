@@ -64,7 +64,7 @@ export class EventsController {
     // 전체 조회 시 이벤트 호스트와 참가자 수 반환
     const event = events.map((item) => {
       const { GuestEvents, HostEvents, ...rest } = item;
-      const hostUser = HostEvents[0].User.UserDetail;
+      const hostUser = HostEvents[0]?.User?.UserDetail || null
 
       return {
         event: rest,
