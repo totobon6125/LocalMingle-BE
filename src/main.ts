@@ -32,6 +32,7 @@ async function bootstrap() {
       'https://d2r603zvpf912o.cloudfront.net',
       'https://totobon.store',
       'https://local-mingle-fe.vercel.app',
+      'https://localmingle.store/',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // 쿠키를 사용하려면 true로 설정
