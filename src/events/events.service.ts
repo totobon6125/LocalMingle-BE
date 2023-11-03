@@ -104,11 +104,11 @@ export class EventsService {
   }
 
   // 3-1. 이벤트 조회수 로거
-  async createViewLog(eventId: number) {
+  async createViewLog(eventId: number, userId: number) {
     await this.prisma.viewlog.create({
       data: {
         EventId: eventId,
-        UserId: 1,
+        UserId: userId,
       },
     });
   }

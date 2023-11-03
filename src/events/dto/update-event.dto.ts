@@ -6,6 +6,7 @@ import {
   Min,
   MaxLength,
   IsNotEmpty,
+  Max,
 } from 'class-validator';
 
 export class UpdateEventDto {
@@ -18,6 +19,7 @@ export class UpdateEventDto {
   @IsNotEmpty()
   @ApiProperty()
   @Min(1)
+  @Max(50)
   maxSize: number;
 
   @IsNotEmpty()
