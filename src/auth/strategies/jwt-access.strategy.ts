@@ -11,7 +11,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'access') {
   }
 
   validate(payload) {
-    console.log('페이로드 확인', payload); // {sub ; 유저id}
+    // console.log('페이로드 확인', payload); // {sub ; 유저id}
 
     return {
       userId: payload.sub, // id -> userId로 변환 (페이로드에 담긴 유저id를 반환)
