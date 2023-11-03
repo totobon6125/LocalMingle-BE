@@ -83,8 +83,8 @@ export class ChatsGateway
     // 72시간(3일) 이상 지난 채팅 삭제
     const chatScheduler = new Date();
     // chatScheduler.setDate(chatScheduler.getDate() - 3); //3일
-    //chatScheduler.setHours(chatScheduler.getHours() - 72); // 72시간
-    chatScheduler.setMinutes(chatScheduler.getMinutes() - 2); // 4320분(3일) 테스트 2분
+    chatScheduler.setHours(chatScheduler.getHours() - 72); // 72시간
+    // chatScheduler.setMinutes(chatScheduler.getMinutes() - 2); // 4320분(3일) 테스트 2분
     await this.chattingModel.deleteMany({ created: { $lt: chatScheduler } });
   }
 
