@@ -10,7 +10,7 @@ import { SearchesModule } from './searches/searches.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ChatsModule } from './chats/room.chats.module';
+import { ChatsModule } from './chats/chats.module';
 
 @Module({
   imports: [

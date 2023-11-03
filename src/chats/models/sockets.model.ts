@@ -1,22 +1,32 @@
-import { IsNotEmpty, IsString } from 'class-validator';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, SchemaOptions, Types } from 'mongoose'; // Types 추가
+import { IsNotEmpty, IsString } from 'class-validator';
+import { SchemaOptions, Types, Document } from 'mongoose';
 
 const options: SchemaOptions = {
   id: false,
-  collection: 'sockets',
+  collection: 'sockets', // 데이터 베이스 이름
   timestamps: true,
 };
 
 @Schema(options)
 export class Socket extends Document {
   @Prop({
-    unique: true,
     required: true,
   })
   @IsNotEmpty()
   @IsString()
-  id: string;
+  clientId: string; //소켓을 연결했을때 생기는 Id
+
+  @Prop({ type: Types.ObjectId, ref: 'Event' }) // roomId 추가
+  @IsNotEmpty()
+  roomId: number; // EventId를 roomId로 참조하여 사용
+
+  @Prop({
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsString()
+  userId: string; //사용자 Id
 
   @Prop({
     required: true,
@@ -25,14 +35,8 @@ export class Socket extends Document {
   @IsString()
   nickname: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Event' }) // roomId 추가
-  roomId: number; // 이벤트 ID를 저장
-
   @Prop()
   profileImg: string; // profileImg 필드 추가
-
-  @Prop()
-  time: Date; // 타임 필드 추가
 }
 
 export const SocketSchema = SchemaFactory.createForClass(Socket);
