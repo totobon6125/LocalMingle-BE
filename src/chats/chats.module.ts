@@ -1,9 +1,9 @@
+import { SocketSchema, Socket as SocketModel } from './models/sockets.model';
 import { Module } from '@nestjs/common';
 import { ChatsGateway } from './chats.gateway';
-import { ChatsService } from './chats.service';
-import { Chatting, ChattingSchema } from './models/chattings.model';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SocketSchema, Socket as SocketModel } from './models/sockets.model';
+import { Chatting, ChattingSchema } from './models/chattings.model';
+import { RoomChatsService } from './chats.service';
 
 @Module({
   imports: [
@@ -12,6 +12,6 @@ import { SocketSchema, Socket as SocketModel } from './models/sockets.model';
       { name: SocketModel.name, schema: SocketSchema },
     ]),
   ],
-  providers: [ChatsGateway, ChatsService],
+  providers: [ChatsGateway, RoomChatsService],
 })
 export class ChatsModule {}
