@@ -19,6 +19,7 @@ import { Chatting } from './models/chattings.model';
 
 @WebSocketGateway({
   namespace: 'chattings',
+  //WebSocket 서버가 모든 원격 호스트로부터의 연결을 허용
   cors: true,
   allowEIO3: true,
 })
