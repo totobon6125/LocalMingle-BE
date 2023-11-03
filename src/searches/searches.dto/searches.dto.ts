@@ -39,6 +39,5 @@ export class SearchesDto {
     })
     @IsOptional()
     @IsString()
-    @MinLength(2)
     keyWord: string
 }
