@@ -64,7 +64,7 @@ export class EventsController {
     // 전체 조회 시 이벤트 호스트와 참가자 수 반환
     const event = events.map((item) => {
       const { GuestEvents, HostEvents, ...rest } = item;
-      const hostUser = HostEvents[0]?.User?.UserDetail || null
+      const hostUser = HostEvents[0].User.UserDetail;
 
       return {
         event: rest,
@@ -95,7 +95,7 @@ export class EventsController {
     const { GuestEvents, HostEvents, ...rest } = event;
 
     // 조회수 로그 생성
-    await this.eventsService.createViewLog(eventId);
+    await this.eventsService.createViewLog(eventId, userId);
 
     return {
       event: rest,
@@ -126,18 +126,18 @@ export class EventsController {
         return {
           message: `참가인원은 최대${event.maxSize}명 입니다`,
         };
-      } 
-      
+      }
+
       this.eventsService.join(eventId, userId);
       this.eventsService.createRsvpLog(eventId, userId, 'applied'); // 참가 신청 로그 생성
       return {
         message: `${eventId}번 모임 참가 신청`,
-        confirm: true
-      }
+        confirm: true,
+      };
     } else {
       return {
-        message: '이미 참석한 이벤트입니다'
-      }
+        message: '이미 참석한 이벤트입니다',
+      };
     }
   }
   // 4-1. 이벤트 참가 취소
@@ -158,13 +158,13 @@ export class EventsController {
       this.eventsService.createRsvpLog(eventId, userId, 'canceled');
     } else {
       return {
-        message: '참석한 이벤트만 취소할 수 있습니다'
-      }
+        message: '참석한 이벤트만 취소할 수 있습니다',
+      };
     }
     return {
       message: `${eventId}번 모임 참가 취소`,
-      confirm: false
-    }
+      confirm: false,
+    };
   }
 
   // 5. 이벤트 수정
