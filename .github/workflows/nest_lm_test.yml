@@ -90,6 +90,7 @@ jobs:
           echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
           echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
           echo "NAVER_CALLBACK_URL=${{ secrets.NAVER_CALLBACK_URL }}" >> .env
+          echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env     
         working-directory: ./
 
       # 압축 파일 생성 - 이 부분과 s3 업로드 부분은 같은 job 에 있어야 됨 없으면 업로드 할 .zip 을 못 찾음
