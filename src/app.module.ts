@@ -11,6 +11,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ChatsModule } from './chats/chats.module';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 @Module({
   imports: [
@@ -24,6 +25,14 @@ import { ChatsModule } from './chats/chats.module';
     MailModule,
     DataModule,
     SearchesModule,
+    RedisModule.forRoot({
+      readyLog: true,
+      config: {
+        host: process.env.REDID_HOST,
+        port: 6379,
+        password: process.env.REDIS_PASS
+      }
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,10 +6,15 @@ import {
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @InjectRedis() private readonly redis: Redis,
+    private prisma: PrismaService
+  ) {}
 
   // 1. 이벤트 생성
   async create(userId: number, createEventDto: CreateEventDto) {
@@ -36,32 +41,40 @@ export class EventsService {
   }
 
   // 2. 이벤트 전체 조회
-  findAll() {
-    return this.prisma.event.findMany({
-      where: {
-        isDeleted: false,
-      },
-      include: {
-        HostEvents: {
-          select: {
-            User: {
-              select: {
-                UserDetail: true,
+  async findAll() {
+    const redisEvents = await this.redis.get('events');
+    const cachedEvents = redisEvents ? JSON.parse(redisEvents) : null;
+    if (cachedEvents) {
+      return cachedEvents;
+    } else {
+      const events = await this.prisma.event.findMany({
+        where: {
+          isDeleted: false,
+        },
+        include: {
+          HostEvents: {
+            select: {
+              User: {
+                select: {
+                  UserDetail: true,
+                },
               },
             },
           },
-        },
-        GuestEvents: true,
-        _count: {
-          select: {
-            Viewlogs: true,
+          GuestEvents: true,
+          _count: {
+            select: {
+              Viewlogs: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      await this.redis.set('events', JSON.stringify(events));
+      return events;
+    }
   }
 
   // 3. 이벤트 상세 조회
