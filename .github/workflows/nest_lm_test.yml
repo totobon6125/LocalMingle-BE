@@ -77,7 +77,7 @@ jobs:
           echo "JWT_REFRESH_KEY=${{ secrets.JWT_REFRESH_KEY }}" >> .env
           echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
           echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> .env
-          echo "KAKAO_CALLBACK_URL=${{ secrets.KAKAO_CALLBACK_URL_DEV }}" >> .env
+          echo "KAKAO_CALLBACK_URL=${{ secrets.KAKAO_CALLBACK_URL }}" >> .env
           echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
           echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
           echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
@@ -91,6 +91,8 @@ jobs:
           echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
           echo "NAVER_CALLBACK_URL=${{ secrets.NAVER_CALLBACK_URL }}" >> .env
           echo "CLIENT_URL=${{ secrets.CLIENT_URL_DEV }}" >> .env
+          echo "REDID_HOST=${{ secrets.REDID_HOST }}" >> .env
+          echo "REDID_PASS=${{ secrets.REDID_PASS }}" >> .env     
           echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env     
         working-directory: ./
 
