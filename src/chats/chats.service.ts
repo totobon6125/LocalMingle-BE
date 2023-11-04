@@ -17,12 +17,15 @@ export class ChatsService {
   ) {
     this.logger.log('constructor');
   }
+
   //소켓연결 해제
   async disconnectClient(client: Socket, server: Server) {
     // 클라이언트 ID를 기반으로 사용자 정보 조회
     const user = await this.socketModel.findOne({ clientId: client.id });
     if (!user) {
-      return server.to(client.id).emit('NotFound_user', NotFoundException);
+      return server
+        .to(client.id)
+        .emit('NotFound_user', new NotFoundException());
     }
     const roomId = user.roomId;
     // 클라이언트 ID에 해당하는 사용자를 삭제
@@ -30,7 +33,9 @@ export class ChatsService {
     // 방 정보 조회
     const room = await this.ChattingModel.findOne({ roomId });
     if (!room) {
-      return server.to(client.id).emit('NotFound_room', NotFoundException);
+      return server
+        .to(client.id)
+        .emit('NotFound_room', new NotFoundException());
     }
     // 유저리스트에서 클라이언트 ID 제거
     const nickname = room.userList[client.id]?.nickname;
@@ -139,7 +144,9 @@ export class ChatsService {
 
     // 채팅방이 존재하지 않으면 클라이언트에게 'NotFoundException' 에러 메시지를 전송합니다.
     if (!data) {
-      return server.to(client.id).emit('NotFound_data', NotFoundException);
+      return server
+        .to(client.id)
+        .emit('NotFound_data', new NotFoundException());
     }
 
     // 채팅방에 있는 사용자 목록을 가져옵니다.
@@ -159,7 +166,9 @@ export class ChatsService {
 
     // 만약 채팅방이 존재하지 않는다면, 클라이언트에게 'NotFoundException' 에러를 전송합니다.
     if (!data) {
-      return server.to(client.id).emit('NotFound_data', NotFoundException);
+      return server
+        .to(client.id)
+        .emit('NotFound_data', new NotFoundException());
     }
 
     // 채팅방이 존재하면 삭제 작업을 수행합니다.
@@ -177,7 +186,9 @@ export class ChatsService {
     const room = await this.ChattingModel.findOne({ roomId });
     // 채팅방이 존재하지 않으면 클라이언트에게 'NotFoundException' 에러 메시지를 전송합니다.
     if (!room) {
-      return server.to(client.id).emit('NotFound_room', NotFoundException);
+      return server
+        .to(client.id)
+        .emit('NotFound_room', new NotFoundException());
     }
     const userId = room.userList[client.id];
     const nickname = room.userList[client.id]?.nickname;
@@ -187,7 +198,9 @@ export class ChatsService {
       delete room.userList[client.id];
     } else {
       // 사용자 ID가 존재하지 않으면 클라이언트에게 'NotFoundException' 에러 메시지를 전송합니다.
-      return server.to(client.id).emit('NotFound_userId', NotFoundException);
+      return server
+        .to(client.id)
+        .emit('NotFound_userId', new NotFoundException());
     }
     // 채팅방 업데이트: 사용자 목록 업데이트
     await this.ChattingModel.findOneAndUpdate(
