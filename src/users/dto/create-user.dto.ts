@@ -44,6 +44,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(2)
   @MaxLength(8)
+  // @Matches(/[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]/) //영어 또는 한글이 포함
   @Matches(/^(?=.*[A-Za-z가-힣]).*[A-Za-z가-힣0-9]*$/) //영어 또는 한글이 포함
   @ApiProperty({
     description: 'nickname',

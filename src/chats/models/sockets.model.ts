@@ -4,7 +4,7 @@ import { Document, SchemaOptions, Types } from 'mongoose'; // Types 추가
 
 const options: SchemaOptions = {
   id: false,
-  collection: 'sockets',
+  collection: 'sockets', // 데이터 베이스 이름
   timestamps: true,
 };
 
@@ -32,7 +32,7 @@ export class Socket extends Document {
   profileImg: string; // profileImg 필드 추가
 
   @Prop()
-  time: Date; // 타임 필드 추가
+  time: Date; // profileImg 필드 추가
 }
 
 export const SocketSchema = SchemaFactory.createForClass(Socket);

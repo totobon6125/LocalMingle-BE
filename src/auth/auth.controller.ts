@@ -32,7 +32,7 @@ interface IOAuthUser {
 @ApiTags('Auth')
 @ApiOkResponse({ type: AuthEntity })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
   //-----------------------로그인-----------------------------//
   @ApiOperation({ summary: '로그인' })
   @ApiResponse({ status: 200, description: '로그인에 성공하셨습니다.' })
