@@ -6,8 +6,8 @@ import { SearchesDto } from './searches.dto/searches.dto';
 export class SearchesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  search(searchesDto: SearchesDto) {
-    return this.prisma.event.findMany({
+  async search(searchesDto: SearchesDto) {
+    const searchedEvents = await this.prisma.event.findMany({
       where: {
         isDeleted: false,
         AND: [
@@ -54,5 +54,6 @@ export class SearchesService {
         createdAt: 'desc',
       },
     });
+    return searchedEvents;
   }
 }

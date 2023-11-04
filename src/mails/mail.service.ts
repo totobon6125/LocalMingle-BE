@@ -29,10 +29,10 @@ export class MailService {
   async sendMail(to: string, subject: string, req: Request) {
     try {
       const email = req.body.to;
-      console.log('이메일 확인 샌드 메일:', email);
+      // console.log('이메일 확인 샌드 메일:', email);
 
       const verificationCode = this.generateRandomNumber(10000, 99999); // 5자리 랜덤 인증 번호 생성
-      console.log('인증 번호 확인 샌드 메일:', verificationCode);
+      // console.log('인증 번호 확인 샌드 메일:', verificationCode);
 
       // 인증 번호와 유효 기간을 저장
       const expires = Date.now() + 5 * 60 * 1000; // 5분 후 만료
@@ -54,10 +54,7 @@ export class MailService {
         인증 번호: ${verificationCode} 
         만료기간: ${new Date(expires)}`,
       });
-
-      console.log('메일이 전송되었습니다');
     } catch (error) {
-      console.error('메일 전송 중 오류가 발생했습니다:', error);
       throw new HttpException(
         '메일 전송 중 오류가 발생했습니다',
         HttpStatus.INTERNAL_SERVER_ERROR

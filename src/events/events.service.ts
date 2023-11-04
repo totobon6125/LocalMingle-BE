@@ -9,7 +9,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService
+  ) {}
 
   // 1. 이벤트 생성
   async create(userId: number, createEventDto: CreateEventDto) {
@@ -36,8 +38,8 @@ export class EventsService {
   }
 
   // 2. 이벤트 전체 조회
-  findAll() {
-    return this.prisma.event.findMany({
+  async findAll() {
+    const events = await this.prisma.event.findMany({
       where: {
         isDeleted: false,
       },
@@ -62,6 +64,7 @@ export class EventsService {
         createdAt: 'desc',
       },
     });
+    return events;
   }
 
   // 3. 이벤트 상세 조회
@@ -223,7 +226,7 @@ export class EventsService {
       },
     });
 
-    console.log('removeBookmark:', lastEventInTable);
+    // console.log('removeBookmark:', lastEventInTable);
     if (!lastEventInTable) {
       throw new NotFoundException('해당 북마크를 찾을 수 없습니다.');
     }
