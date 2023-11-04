@@ -90,6 +90,7 @@ jobs:
           echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
           echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
           echo "NAVER_CALLBACK_URL=${{ secrets.NAVER_CALLBACK_URL }}" >> .env
+          echo "CLIENT_URL=${{ secrets.CLIENT_URL_DEV }}" >> .env
           echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env     
         working-directory: ./
 

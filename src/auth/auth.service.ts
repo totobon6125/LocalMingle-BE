@@ -14,7 +14,7 @@ export class AuthService {
     private usersService: UsersService,
     private prisma: PrismaService,
     private jwtService: JwtService
-  ) {}
+  ) { }
 
   async login({ email, password, res }): Promise<{
     // 리팩토링 시 res 빼도 작동하는지 테스트
@@ -133,7 +133,7 @@ export class AuthService {
     // console.log('로컬 리프레시 토큰', refreshToken);
     // 리다이렉션
     res.redirect(
-      `https://localmingle.store?accessToken=${encodeURIComponent(
+      `${process.env.CLIENT_URL}?accessToken=${encodeURIComponent(
         accessToken
       )}&refreshToken=${encodeURIComponent(
         refreshToken
