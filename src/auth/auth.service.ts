@@ -14,7 +14,7 @@ export class AuthService {
     private usersService: UsersService,
     private prisma: PrismaService,
     private jwtService: JwtService
-  ) { }
+  ) {}
 
   async login({ email, password, res }): Promise<{
     // 리팩토링 시 res 빼도 작동하는지 테스트
