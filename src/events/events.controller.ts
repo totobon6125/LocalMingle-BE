@@ -54,13 +54,6 @@ export class EventsController {
     return this.eventsService.create(userId, createEventDto);
   }
 
-  @Get('test')
-  @ApiOperation({ summary: 'dev서버 test' })
-  async test() {
-    return 'test'
-  }
-    
-
   // 2. 이벤트 전체 조회
   @Get()
   @ApiOperation({ summary: 'Event 전체 조회' })
