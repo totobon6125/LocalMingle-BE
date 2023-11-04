@@ -9,9 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class EventsService {
-  constructor(
-    private prisma: PrismaService
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   // 1. 이벤트 생성
   async create(userId: number, createEventDto: CreateEventDto) {
