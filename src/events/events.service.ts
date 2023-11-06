@@ -1,15 +1,19 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class EventsService {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private prisma: PrismaService
   ) {}
 
@@ -39,32 +43,39 @@ export class EventsService {
 
   // 2. 이벤트 전체 조회
   async findAll() {
-    const events = await this.prisma.event.findMany({
-      where: {
-        isDeleted: false,
-      },
-      include: {
-        HostEvents: {
-          select: {
-            User: {
-              select: {
-                UserDetail: true,
+    const cachedEvents:any = await this.cacheManager.get('events');
+    const cachedData = cachedEvents ? JSON.parse(cachedEvents) : null;
+    if (cachedData) {
+      return cachedData;
+    } else {
+      const events = await this.prisma.event.findMany({
+        where: {
+          isDeleted: false,
+        },
+        include: {
+          HostEvents: {
+            select: {
+              User: {
+                select: {
+                  UserDetail: true,
+                },
               },
             },
           },
-        },
-        GuestEvents: true,
-        _count: {
-          select: {
-            Viewlogs: true,
+          GuestEvents: true,
+          _count: {
+            select: {
+              Viewlogs: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-    return events;
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      await this.cacheManager.set('events', JSON.stringify(events));
+      return events;
+    }
   }
 
   // 3. 이벤트 상세 조회
