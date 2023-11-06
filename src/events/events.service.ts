@@ -237,7 +237,7 @@ export class EventsService {
       },
     });
 
-    console.log('removeBookmark:', lastEventInTable);
+    // console.log('removeBookmark:', lastEventInTable);
     if (!lastEventInTable) {
       throw new NotFoundException('해당 북마크를 찾을 수 없습니다.');
     }
