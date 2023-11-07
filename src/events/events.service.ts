@@ -43,7 +43,7 @@ export class EventsService {
 
   // 2. 이벤트 전체 조회
   async findAll() {
-    const cachedEvents:any = await this.cacheManager.get('events');
+    const cachedEvents: any = await this.cacheManager.get('events');
     const cachedData = cachedEvents ? JSON.parse(cachedEvents) : null;
     if (cachedData) {
       return cachedData;
