@@ -89,7 +89,7 @@ export class ChatsGateway
   }
 
   // 유저가 방에 참석할때
-  @SubscribeMessage('join_room')
+  @SubscribeMessage('join_room') // 조인룸으로 태현님이 보내면 받는 on
   async handleJoinRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() { nickname, roomId, profileImg, userId }: IRoomRequest

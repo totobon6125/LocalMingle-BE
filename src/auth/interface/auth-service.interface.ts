@@ -7,14 +7,15 @@ export interface IUsersServiceFindByEmail {
 export interface IAuthServiceLogin {
   email: string;
   password: string;
+  res: any;
 }
 
 export interface IAuthServiceGetAccessToken {
   user: User;
-  res: any;
+  // res: any;
 }
 
 export interface IAuthServiceGetRefereshToken {
   user: User;
-  res: any;
+  // res: any;
 }
