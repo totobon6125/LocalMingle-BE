@@ -42,13 +42,16 @@ export class EventsService {
   }
 
   // 2. 이벤트 전체 조회
-  async findAll() {
+  async findAll(lastPage: number) {
     const cachedEvents:any = await this.cacheManager.get('events');
     const cachedData = cachedEvents ? JSON.parse(cachedEvents) : null;
     if (cachedData) {
       return cachedData;
     } else {
       const events = await this.prisma.event.findMany({
+        take: 4,
+        skip: lastPage ? 1 : 0,
+        ...(lastPage && {cursor: {eventId: lastPage}}),
         where: {
           isDeleted: false,
         },
