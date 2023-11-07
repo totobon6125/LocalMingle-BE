@@ -1,23 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SearchesDto } from './searches.dto/searches.dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 
 @Injectable()
 export class SearchesService {
   constructor(
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly prisma: PrismaService
   ) {}
 
   async search(searchesDto: SearchesDto) {
-    const searchedEvents: any = await this.cacheManager.get('searchedEvents');
-    const cachedData = searchedEvents ? searchedEvents : null;
-    if (cachedData) {
-      return cachedData;
-    } else {
-      const events = await this.prisma.event.findMany({
+      return await this.prisma.event.findMany({
         where: {
           isDeleted: false,
           AND: [
@@ -64,8 +56,5 @@ export class SearchesService {
           createdAt: 'desc',
         },
       });
-      await this.cacheManager.set('searchedEvents', events);
-      return events;
     }
   }
-}
