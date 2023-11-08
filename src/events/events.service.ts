@@ -51,7 +51,6 @@ export class EventsService {
       const events = await this.prisma.event.findMany({
         take: 4,
         skip: page, 
-        // ...(lastPage && { cursor: { eventId: lastPage } }),
         where: {
           isDeleted: false,
         },
