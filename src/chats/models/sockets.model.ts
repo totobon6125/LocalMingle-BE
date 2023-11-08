@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { SchemaOptions, Types, Document } from 'mongoose';
+import { SchemaOptions, Document } from 'mongoose';
 
 const options: SchemaOptions = {
   id: false,
@@ -11,13 +11,14 @@ const options: SchemaOptions = {
 @Schema(options)
 export class Socket extends Document {
   @Prop({
+    unique: true,
     required: true,
   })
   @IsNotEmpty()
   @IsString()
-  clientId: string; //소켓을 연결했을때 생기는 Id
+  socketId: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Event' }) // roomId 추가
+  @Prop({ type: Number, ref: 'Event' }) // roomId 추가
   @IsNotEmpty()
   roomId: number; // EventId를 roomId로 참조하여 사용
 
