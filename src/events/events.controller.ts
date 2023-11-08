@@ -59,8 +59,8 @@ export class EventsController {
   @Get()
   @ApiOperation({ summary: 'Event 전체 조회' })
   @ApiOkResponse({ type: EventEntity, isArray: true })
-  async findAll(@Query('lastPage', ParseIntPipe) lastPage: number) {
-    const events = await this.eventsService.findAll(lastPage);
+  async findAll(@Query('page', ParseIntPipe) page: number) {
+    const events = await this.eventsService.findAll(page);
 
     // 전체 조회 시 이벤트 호스트와 참가자 수 반환
     const event = events.map((item) => {
