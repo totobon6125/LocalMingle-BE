@@ -10,17 +10,25 @@ const options: SchemaOptions = {
 
 @Schema(options)
 export class Chatting extends Document {
-  // @Prop({
-  //   type: {
-  //     _id: { type: Types.ObjectId, required: true, ref: 'sockets' },
-  //     userId: { type: Number },
-  //     nickname: { type: String, required: true },
-  //     profileImg: { type: String }, // 추가: 프로필 이미지
-  //     roomId: { type: Number }, // 추가: 방 ID 또는 방 식별자
-  //   },
-  // })
-  // @IsNotEmpty()
-  // user: SocketModel; // 이코드는 필요없을 수도 있습니다. 기존코드때문에 임시로 넣음
+  @Prop({
+    type: [
+      {
+        userId: { type: Number, required: true },
+        nickname: { type: String, required: true },
+        profileImg: { type: String, required: true },
+        socketId: { type: String, required: false },
+        roomId: { type: Number, required: false },
+      },
+    ],
+  })
+  @IsNotEmpty()
+  userList: Array<{
+    socketId: string;
+    userId?: number;
+    nickname: string;
+    profileImg?: string;
+    roomId?: number;
+  }>;
 
   //모임방 id값 EventId를 roomId로 변환하여 쓰고 있음
   @Prop({
@@ -31,10 +39,16 @@ export class Chatting extends Document {
   @IsString()
   roomId: number;
 
-  @Prop({ type: Object, required: true })
+  // @Prop({ type: Object, required: true })
+  // @IsNotEmpty()
+  // userList: object; // 유저 리스트에는 nickname , profileImg , userId 가
+
+  @Prop({
+    required: true,
+  })
   @IsNotEmpty()
-  @IsString() // userList의 타입을 명시적으로 지정
-  userList: object; // 유저 리스트에는 nickname , profileImg , userId 가
+  @IsString()
+  message: string;
 }
 
 export const ChattingSchema = SchemaFactory.createForClass(Chatting);
