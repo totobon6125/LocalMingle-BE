@@ -4,7 +4,7 @@ import { Socket as SocketModel } from './models/sockets.model';
 import { Chatting, Chatting as ChattingModel } from './models/chattings.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IRoomRequest } from './interfaces/chats.interface';
+import { IuserInfo } from './interfaces/chats.interface';
 
 @Injectable()
 export class ChatsService {
@@ -18,209 +18,215 @@ export class ChatsService {
     this.logger.log('constructor');
   }
 
-  //소켓연결 해제
-  async disconnectClient(client: Socket, server: Server) {
-    // 클라이언트 ID를 기반으로 사용자 정보 조회
-    const user = await this.socketModel.findOne({ clientId: client.id });
-    if (!user) {
-      return server
-        .to(client.id)
-        .emit('NotFound_user', new NotFoundException());
-    }
-    const roomId = user.roomId;
-    // 클라이언트 ID에 해당하는 사용자를 삭제
-    await this.socketModel.findOneAndDelete({ clientId: client.id }).exec();
-    // 방 정보 조회
-    const room = await this.ChattingModel.findOne({ roomId });
-    if (!room) {
-      return server
-        .to(client.id)
-        .emit('NotFound_room', new NotFoundException());
-    }
-    // 유저리스트에서 클라이언트 ID 제거
-    const nickname = room.userList[client.id]?.nickname;
-    delete room.userList[client.id];
-    // 업데이트된 데이터를 저장
-    await this.ChattingModel.findOneAndUpdate(
-      { roomId },
-      { $set: { userList: room.userList } }
-    );
-
-    //await this.leaveRoomRequestToApiServer(roomId);
-    // server
-    //   .to(String(roomId))
-    //   .emit('disconnect_user', `${nickname}의 연결이 종료되었습니다.`);
-    this.emitEventForUserList(client, server, roomId, nickname, 'leave_user');
-    this.logger.log(`disconnected: ${client.id}`);
-  }
-
-  // async leaveRoomRequestToApiServer(uuid: string): Promise<void> {
-  //   const headers = {
-  //     'socket-secret-key': process.env.SOCKET_SECRET_KEY ?? '',
-  //   };
-  //   await axios.post(`${baseURL}/room/socket/leave/${uuid}`, undefined, {
-  //     headers,
-  //   });
-  // }
-
   //유저가 방에 참여
-  async joinRoom(client: Socket, server: Server, iRoomRequest: IRoomRequest) {
-    const { roomId, nickname, userId } = iRoomRequest;
-    //유저를 socketModel 에서 찾습니다.
-    const isExist = await this.socketModel.findOne({ userId: userId });
-    //만약 유저가 존재하면 클라이언트에게 에러메세지
-    if (isExist) {
-      //유저가 있으면 방을 나가는 로직
-      //await this.leaveRoomRequestToApiServer(roomId);
-      return client.emit('joinRoom_Error', '이미 방에 접속한 사용자 입니다.');
-    }
-    client.leave(client.id);
-    client.join(String(roomId));
+  async joinRoom(socket: Socket, server: Server, iuserInfo: IuserInfo) {
+    const { roomId, nickname } = iuserInfo;
+
+    // 해당 방 정보를 조회
     const roomData = await this.ChattingModel.findOne({ roomId });
     if (!roomData) {
-      await this.createRoom(client, iRoomRequest);
+      // 방 정보가 없으면 새로운 방을 만들고 사용자 정보를 추가
+      await this.createRoom(socket, iuserInfo);
     } else {
-      await this.updateRoom(client, roomData, iRoomRequest);
+      // 방 정보가 이미 있는 경우 사용자 정보 업데이트
+      await this.updateRoom(socket, roomData, iuserInfo);
     }
+
+    // 사용자 목록을 클라이언트에게 전송하고 새로운 유저가 방에 참가했음을 알림
+    this.sendUserListToClient(server, roomId);
     server
       .to(String(roomId))
       .emit('new-user', `${nickname} 유저가 채팅방에 참가하였습니다.`);
-    this.emitEventForUserList(client, server, roomId, nickname, 'new-user');
   }
+
+  // 방에 속한 유저 목록을 클라이언트에게 전송하는 메서드 ( 객체를 배열로 변환하여 프론트로 반환하는 코드)
+  async sendUserListToClient(server: Server, roomId: number) {
+    // 해당 방의 정보를 조회
+    const room = await this.ChattingModel.findOne({ roomId });
+    // 방 정보가 존재하면 유저 목록을 배열로 변환하여 클라이언트에게 전달
+    if (room) {
+      const userList = Object.values(room.userList); // userList는 객체이므로 배열로 변환
+      server.to(String(roomId)).emit('user_list', userList);
+    }
+  }
+
+  // 방에 속한 유저 목록을 클라이언트에게 전송하는 메서드(객체 그대로 프론트로 반환하는 코드)
+  // async sendUserListToClient(server: Server, roomId: number) {
+  //   // 해당 방의 정보를 조회
+  //   const room = await this.ChattingModel.findOne({ roomId });
+  //   // 방 정보가 존재하면 유저 목록을 객체 그대로 클라이언트에게 전달
+  //   if (room) {
+  //     server.to(String(roomId)).emit('user_list', room.userList);
+  //   }
+  // }
 
   //채팅방을 만듬
   async createRoom(
-    client: Socket,
-    { nickname, roomId, profileImg, userId }: IRoomRequest
+    socket: Socket,
+    { nickname, roomId, profileImg, userId }: IuserInfo
   ) {
-    const newRoom = { roomId: roomId, user: client.id, userList: {} };
-    newRoom.userList = { [client.id]: { nickname, profileImg } };
+    const newRoom = {
+      roomId: roomId,
+      userList: [
+        {
+          socketId: socket.id,
+          userId: userId,
+          nickname: nickname,
+          profileImg: profileImg,
+        },
+      ],
+    };
     await this.ChattingModel.create(newRoom);
-    const newUser = {
-      clientId: client.id,
+    const newuser = {
+      socketId: socket.id,
       roomId: roomId,
       nickname: nickname,
       userId: userId,
     };
-    await this.socketModel.create(newUser);
+    await this.socketModel.create(newuser);
   }
 
   //채팅방을 참여하는 사용자 정보 업데이트
   async updateRoom(
-    client: Socket,
+    socket: Socket,
     roomData: any,
-    { roomId, nickname, profileImg, userId }: IRoomRequest
+    { roomId, nickname, profileImg, userId }: IuserInfo
   ) {
-    // 새로운 사용자 정보를 준비합니다.
-    const newUser = {
-      clientId: client.id,
+    const newuser = {
+      socketId: socket.id,
       roomId,
       nickname,
       userId,
     };
-    //newUser를 socketModel을 사용하여 db에 저장
-    await this.socketModel.create(newUser);
-    const findEventRoom = roomData;
-    //클라이언트 키를 사용해서 nickname, profileImg를 업데이트
-    findEventRoom.userList[client.id] = { nickname, profileImg };
-    //findOneAndUpdate 몽고디비에서 roomId와 일치하는 채팅방을 찾아서 유저리스트를 업데이트하여 저장
+    await this.socketModel.create(newuser);
+    const chatRoom = roomData;
+    chatRoom.userList.push({
+      socketId: socket.id,
+      userId: userId,
+      nickname: nickname,
+      profileImg: profileImg,
+    });
     await this.ChattingModel.findOneAndUpdate(
       { roomId },
-      // $set 연산자로 userList 를 업데이트
-      { $set: { userList: findEventRoom.userList } }
+      { $set: { userList: chatRoom.userList } }
     );
   }
 
-  // 사용자 목록 업데이트 이벤트 전송
-  async emitEventForUserList(
-    client: Socket,
-    server: Server,
-    roomId: number, // 채팅방의 고유 식별자
-    nickname: string, // 사용자의 닉네임
-    userEvent: string // 전송할 이벤트의 이름 (예: 'new-user' 또는 'leave-user')
-  ) {
-    // 주어진 roomId로 채팅방 정보 조회
-    const data = await this.ChattingModel.findOne({ roomId });
+  async removeRoom(socket: Socket, server: Server, roomId: number) {
+    const findChattingRoom = await this.ChattingModel.findOne({
+      roomId,
+    }).exec();
 
-    // 채팅방이 존재하지 않으면 클라이언트에게 'NotFoundException' 에러 메시지를 전송합니다.
-    if (!data) {
+    if (!findChattingRoom) {
       return server
-        .to(client.id)
-        .emit('NotFound_data', new NotFoundException());
+        .to(socket.id)
+        .emit('NotFound-ChattingRoom', new NotFoundException());
     }
 
-    // 채팅방에 있는 사용자 목록을 가져옵니다.
-    const userListObj = data['userList'];
-
-    // 사용자 목록을 배열 형태로 변환합니다.
-    const userListArr = Object.values(userListObj);
-
-    // 채팅방에 속한 모든 클라이언트에게 사용자 목록 업데이트 이벤트를 전송합니다.
-    server.to(String(roomId)).emit(userEvent, { nickname, userListArr });
+    await this.deleteRoom(roomId);
   }
 
-  //채팅방을 삭제 (클라이언트가 모임을 삭제 할때 이 매서드를 호출하면 채팅창을 삭제합니다.)
-  async removeRoom(client: Socket, server: Server, roomId: number) {
-    // 주어진 roomId 채팅방을 찾습니다.
-    const data = await this.ChattingModel.findOne({ roomId }).exec();
+  async deleteRoom(roomId: number): Promise<Chatting> {
+    const deleteChattingRoom = await this.ChattingModel.findOneAndDelete({
+      roomId,
+    }).exec();
+    return deleteChattingRoom;
+  }
 
-    // 만약 채팅방이 존재하지 않는다면, 클라이언트에게 'NotFoundException' 에러를 전송합니다.
-    if (!data) {
+  async leaveRoom(socket: Socket, server: Server) {
+    // 클라이언트 ID를 기반으로 사용자 정보 조회
+    const user = await this.socketModel.findOne({ socketId: socket.id });
+    if (!user) {
       return server
-        .to(client.id)
-        .emit('NotFound_data', new NotFoundException());
+        .to(socket.id)
+        .emit('NotFound_user', new NotFoundException());
     }
+    const roomId = user.roomId;
+    const nickname = user.nickname;
 
-    // 채팅방이 존재하면 삭제 작업을 수행합니다.
-    await this.deleteByRoomId(roomId);
-  }
+    // 사용자 정보 삭제
+    await this.socketModel.findOneAndDelete({ socketId: socket.id }).exec();
 
-  async deleteByRoomId(roomId: number): Promise<Chatting> {
-    const result = await this.ChattingModel.findOneAndDelete({ roomId }).exec();
-    return result;
-  }
-
-  //방을 떠날때
-  async leaveRoom(client: Socket, server: Server, roomId: number) {
-    // 주어진 roomId로 채팅방 정보 조회
+    // 방 정보 조회
     const room = await this.ChattingModel.findOne({ roomId });
-    // 채팅방이 존재하지 않으면 클라이언트에게 'NotFoundException' 에러 메시지를 전송합니다.
     if (!room) {
       return server
-        .to(client.id)
+        .to(socket.id)
         .emit('NotFound_room', new NotFoundException());
     }
-    const userId = room.userList[client.id];
-    const nickname = room.userList[client.id]?.nickname;
 
-    // 사용자 ID가 존재하면 사용자를 채팅방에서 제거
-    if (userId) {
-      delete room.userList[client.id];
-    } else {
-      // 사용자 ID가 존재하지 않으면 클라이언트에게 'NotFoundException' 에러 메시지를 전송합니다.
-      return server
-        .to(client.id)
-        .emit('NotFound_userId', new NotFoundException());
+    // 사용자를 방에서 삭제하고 유저 리스트 업데이트
+    const userIndex = room.userList.findIndex((u) => u.socketId === socket.id);
+    if (userIndex !== -1) {
+      room.userList.splice(userIndex, 1);
+      await this.ChattingModel.findOneAndUpdate(
+        { roomId },
+        { $set: { userList: room.userList } }
+      );
+
+      // 방에서 나간 사용자에게 메시지 보내기
+      server
+        .to(String(roomId))
+        .emit('left_user', `${nickname} 유저가 채팅방을 떠났습니다.`);
     }
-    // 채팅방 업데이트: 사용자 목록 업데이트
-    await this.ChattingModel.findOneAndUpdate(
-      { roomId },
-      { $set: { userList: room.userList } }
-    );
-    // 사용자 데이터 삭제
-    await this.socketModel.deleteOne({ clientId: client.id });
-
-    // 나간 사용자에게 나간 것을 알리기 위한 메시지를 전송합니다.
-    server
-      .to(String(roomId))
-      .emit('left_user', `${nickname} 유저가 채팅방을 떠났습니다.`);
-    // 유저리스트 보내주기
-    this.emitEventForUserList(client, server, roomId, nickname, 'leave-user');
   }
 
-  // roomId에 해당하는 이전 채팅 내용을 데이터베이스에서 불러옵니다.
   async getChatHistory(roomId: number) {
     const chatHistory = await this.ChattingModel.find({ roomId }).exec();
     return chatHistory;
   }
 }
+
+//소켓연결 해제
+// async disconnectClient(socket: Socket, server: Server) {
+//   // 클라이언트 ID를 기반으로 사용자 정보 조회
+//   const user = await this.socketModel.findOne({ socketId: socket.id });
+//   if (!user) {
+//     return server
+//       .to(socket.id)
+//       .emit('NotFound_user', new NotFoundException());
+//   }
+//   const roomId = user.roomId;
+//   // 클라이언트 ID에 해당하는 사용자를 삭제
+//   await this.socketModel.findOneAndDelete({ socketId: socket.id }).exec();
+//   // 방 정보 조회
+//   const room = await this.ChattingModel.findOne({ roomId });
+//   if (!room) {
+//     return server
+//       .to(socket.id)
+//       .emit('NotFound_room', new NotFoundException());
+//   }
+//   // 업데이트된 데이터를 저장
+//   await this.ChattingModel.findOneAndUpdate(
+//     { roomId },
+//     { $set: { userList: room.userList } }
+//   );
+//   // this.emitEventForUserList(socket, server, roomId, nickname, 'leave_user');
+//   this.logger.log(`disconnected: ${socket.id}`);
+// }
+
+// async leaveRoom(socket: Socket, server: Server, roomId: number) {
+//   const room = await this.ChattingModel.findOne({ roomId });
+//   if (!room) {
+//     return server
+//       .to(socket.id)
+//       .emit('NotFound_room', new NotFoundException());
+//   }
+//   const userId = room.userList[socket.id];
+//   const nickname = room.userList[socket.id].nickname;
+
+//   if (userId) {
+//     delete room.userList[socket.id];
+//   } else {
+//     return server
+//       .to(socket.id)
+//       .emit('NotFound_userId', new NotFoundException());
+//   }
+//   await this.ChattingModel.findOneAndUpdate(
+//     { roomId },
+//     { $set: { userList: room.userList } }
+//   );
+//   server
+//     .to(String(roomId))
+//     .emit('left_user', `${nickname} 유저가 채팅방을 떠났습니다.`);
+// }
