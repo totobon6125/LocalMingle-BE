@@ -42,7 +42,7 @@ export class EventsService {
   }
 
   // 2. 이벤트 전체 조회
-  async findAll(lastPage: number) {
+  async findAll(page: number) {
     const cachedEvents: any = await this.cacheManager.get('events');
     const cachedData = cachedEvents ? JSON.parse(cachedEvents) : null;
     if (cachedData) {
@@ -50,8 +50,8 @@ export class EventsService {
     } else {
       const events = await this.prisma.event.findMany({
         take: 4,
-        skip: 0,
-        ...(lastPage && { cursor: { eventId: lastPage } }),
+        skip: page, 
+        // ...(lastPage && { cursor: { eventId: lastPage } }),
         where: {
           isDeleted: false,
         },
@@ -77,7 +77,6 @@ export class EventsService {
         },
       });
       await this.cacheManager.set('events', JSON.stringify(events));
-      console.log('events', events);
       return events;
     }
   }
