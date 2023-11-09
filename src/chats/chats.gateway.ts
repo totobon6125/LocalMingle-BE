@@ -13,6 +13,7 @@ import { Socket, Server } from 'socket.io';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Chatting } from './models/chattings.model';
+import { Socket as SocketModel } from './models/sockets.model'; // 소켓 모델 추가
 
 @WebSocketGateway({
   namespace: 'chattings',
@@ -45,8 +46,8 @@ export class ChatsGateway
 
   constructor(
     @InjectModel(Chatting.name) private readonly chattingModel: Model<Chatting>,
-    @InjectModel(Socket.name)
-    private readonly socketModel: Model<Socket>
+    @InjectModel(SocketModel.name) // 변경된 모델
+    private readonly socketModel: Model<SocketModel> // 변경된 모델
   ) {
     this.logger.log('constructor');
   }
@@ -57,17 +58,20 @@ export class ChatsGateway
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
-    const user = await this.socketModel.findOne({ id: socket.id });
+    const user = await this.socketModel.findOne({ socketId: socket.id });
+    console.log('연결해제 유저 확인', user);
+    console.log('연결해제 소켓 아이디', socket.id);
     if (user) {
       socket.broadcast.emit('disconnect_user', user);
       await user.deleteOne();
-
-      this.userList = this.userList.filter(
-        (u) => u.userId !== user.data.userId
-      );
+      // 유저 리스트에서 해당 유저 삭제
+      this.userList = this.userList.filter((u) => u.userId !== user.userId); // 수정된 부분
+      console.log('연결 해제 유저리스트 ', this.userList);
       socket.broadcast.emit('userList', this.userList);
     }
-    this.logger.log(`disconnected : ${socket.id} ${socket.nsp.name}`);
+    this.logger.log(
+      `disconnected : ${socket.id} ${socket.nsp.name} 연결히 해제되었습빈다.`
+    );
   }
 
   // 클라이언트가 연결되면 해당 클라이언트의 ID와 네임스페이스 정보를 로그에 출력
@@ -95,6 +99,15 @@ export class ChatsGateway
       this.logger.log(
         `Joined room: ${payload.roomId}, Nickname: ${payload.nickname}`
       );
+
+      // MongoDB의 socketModel에 사용자 정보 저장
+      await this.socketModel.create({
+        socketId: socket.id,
+        nickname: payload.nickname,
+        roomId: payload.roomId,
+        profileImg: payload.profileImg,
+        userId: payload.userId,
+      });
 
       // 이전 채팅 내용을 불러옵니다.
       const chatHistory = await this.getChatHistory(payload.roomId);

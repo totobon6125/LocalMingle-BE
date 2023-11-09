@@ -11,7 +11,7 @@ const options: SchemaOptions = {
 @Schema(options)
 export class Socket extends Document {
   @Prop({
-    unique: true,
+    unique: false,
     required: true,
   })
   @IsNotEmpty()
