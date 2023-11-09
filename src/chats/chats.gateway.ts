@@ -106,8 +106,8 @@ export class ChatsGateway
     // 이전 채팅 내용과 함께 사용자 정보를 클라이언트에게 전송합니다.
     socket.emit('chat_history', chatHistory);
     // 방에 있는 모든 사용자에게 userList 전송
+    this.server.to(String(payload.roomId)).emit('user_connected', payload);
     this.server.to(String(payload.roomId)).emit('userList', this.userList);
-    //this.server.to(String(payload.roomId)).emit('user_connected', payload);
   }
 
   // 방에서 적었던 채팅 내용을 불러오는 매서드

@@ -37,11 +37,7 @@ export class Chatting extends Document {
     required: true,
   })
   userList: Record<string, any>[];
-  //   @Prop()
-  //   @IsNotEmpty()
-  //   @IsString()
-  //   message: string;
-  // }
+
   @Prop({
     required: true,
   })
