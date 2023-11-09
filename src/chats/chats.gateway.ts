@@ -14,6 +14,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Chatting } from './models/chattings.model';
 import { Socket as SocketModel } from './models/sockets.model'; // 소켓 모델 추가
+import * as Cron from 'node-cron'; // cron 패키지로부터 임포트
 
 @WebSocketGateway({
   namespace: 'chattings',
@@ -50,6 +51,11 @@ export class ChatsGateway
     private readonly socketModel: Model<SocketModel> // 변경된 모델
   ) {
     this.logger.log('constructor');
+
+    // 스케줄러를 시작합니다.
+    Cron.schedule('0 0 */3 * * *', () => {
+      this.deleteOldChats();
+    });
   }
   // WebSocketGateway가 초기화될 때 실행되는 메소드
   // WebSocketGateway가 초기화되면 로그를 출력합니다.
@@ -70,7 +76,7 @@ export class ChatsGateway
       socket.broadcast.emit('userList', this.userList);
     }
     this.logger.log(
-      `disconnected : ${socket.id} ${socket.nsp.name} 연결히 해제되었습빈다.`
+      `disconnected : ${socket.id} ${socket.nsp.name} 연결히 해제되었습니다.`
     );
   }
 
