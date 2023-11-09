@@ -62,7 +62,6 @@ export class ChatsGateway
       socket.broadcast.emit('disconnect_user', user);
       await user.deleteOne();
 
-      // userList에서 해당 유저 정보 제거
       this.userList = this.userList.filter(
         (u) => u.userId !== user.data.userId
       );
@@ -76,7 +75,6 @@ export class ChatsGateway
     this.logger.log(`connected : ${socket.id} ${socket.nsp.name}`);
     // await this.logger.log(`connected : ${socket.id} ${socket.nsp.name}`);
   }
-  // 클라이언트가 'join_room' 메시지를 보낼 때 실행되는 메소드
   @SubscribeMessage('join_room')
   async handleJoinRoom(
     @MessageBody()
@@ -88,27 +86,33 @@ export class ChatsGateway
     },
     @ConnectedSocket() socket: Socket
   ) {
-    socket.join(String(payload.roomId));
-    this.logger.log(
-      `Joined room: ${payload.roomId}, Nickname: ${payload.nickname}`
+    const isUserAlreadyInList = this.userList.some(
+      (user) => user.userId === payload.userId
     );
 
-    //이전 채팅 내용을 불러옵니다.
-    const chatHistory = await this.getChatHistory(payload.roomId);
+    if (!isUserAlreadyInList) {
+      socket.join(String(payload.roomId));
+      this.logger.log(
+        `Joined room: ${payload.roomId}, Nickname: ${payload.nickname}`
+      );
 
-    // userList에 사용자 정보 추가
-    this.userList.push({
-      nickname: payload.nickname,
-      profileImg: payload.profileImg,
-      userId: payload.userId,
-    });
+      // 이전 채팅 내용을 불러옵니다.
+      const chatHistory = await this.getChatHistory(payload.roomId);
 
-    // 이전 채팅 내용과 함께 사용자 정보를 클라이언트에게 전송합니다.
-    socket.emit('chat_history', chatHistory);
-    // 방에 있는 모든 사용자에게 userList 전송
-    this.server.to(String(payload.roomId)).emit('user_connected', payload);
-    console.log(this.userList);
-    this.server.to(String(payload.roomId)).emit('userList', this.userList);
+      // userList에 사용자 정보 추가
+      this.userList.push({
+        nickname: payload.nickname,
+        profileImg: payload.profileImg,
+        userId: payload.userId,
+      });
+
+      // 이전 채팅 내용과 함께 사용자 정보를 클라이언트에게 전송합니다.
+      socket.emit('chat_history', chatHistory);
+      // 방에 있는 모든 사용자에게 userList 전송
+      this.server.to(String(payload.roomId)).emit('user_connected', payload);
+      console.log('유저리스트 콘솔', this.userList);
+      this.server.to(String(payload.roomId)).emit('userList', this.userList);
+    }
   }
 
   // 방에서 적었던 채팅 내용을 불러오는 매서드
