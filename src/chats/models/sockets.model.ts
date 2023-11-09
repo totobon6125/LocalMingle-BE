@@ -27,17 +27,16 @@ export class Socket extends Document {
   })
   @IsNotEmpty()
   @IsString()
-  userId: string; //사용자 Id
-
-  @Prop({
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsString()
   nickname: string;
 
   @Prop()
   profileImg: string; // profileImg 필드 추가
+
+  @Prop()
+  time: Date; // profileImg 필드 추가
+
+  @Prop()
+  userId: number; // user
 }
 
 export const SocketSchema = SchemaFactory.createForClass(Socket);
