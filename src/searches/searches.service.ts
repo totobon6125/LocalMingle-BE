@@ -6,8 +6,10 @@ import { SearchesDto } from './searches.dto/searches.dto';
 export class SearchesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async search(searchesDto: SearchesDto) {
+  async search(page: number, searchesDto: SearchesDto) {
     return await this.prisma.event.findMany({
+      take: 4,
+      skip: page, 
       where: {
         isDeleted: false,
         AND: [
