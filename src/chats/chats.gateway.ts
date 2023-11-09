@@ -107,6 +107,7 @@ export class ChatsGateway
     socket.emit('chat_history', chatHistory);
     // 방에 있는 모든 사용자에게 userList 전송
     this.server.to(String(payload.roomId)).emit('user_connected', payload);
+    console.log(this.userList);
     this.server.to(String(payload.roomId)).emit('userList', this.userList);
   }
 
