@@ -7,6 +7,7 @@ import { PrismaService } from './../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
+import { IAuthServiceLogin } from './interface/auth-service.interface';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async login({ email, password, res }): Promise<{
+  async login({ email, password, res }: IAuthServiceLogin): Promise<{
     // 리팩토링 시 res 빼도 작동하는지 테스트
     accessToken: string;
     refreshToken: string;
@@ -86,7 +87,6 @@ export class AuthService {
 
     const newAccessToken = await this.getAccessToken({
       user: { userId }, // 사용자 ID를 전달
-      // res: null,
     });
     return newAccessToken;
   }
@@ -133,7 +133,7 @@ export class AuthService {
     // console.log('로컬 리프레시 토큰', refreshToken);
     // 리다이렉션
     res.redirect(
-      `https://localmingle.store?accessToken=${encodeURIComponent(
+      `${process.env.CLIENT_URL}?accessToken=${encodeURIComponent(
         accessToken
       )}&refreshToken=${encodeURIComponent(
         refreshToken

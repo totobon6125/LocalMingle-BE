@@ -1,15 +1,21 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private prisma: PrismaService
+  ) {}
 
   // 1. 이벤트 생성
   async create(userId: number, createEventDto: CreateEventDto) {
@@ -36,32 +42,42 @@ export class EventsService {
   }
 
   // 2. 이벤트 전체 조회
-  findAll() {
-    return this.prisma.event.findMany({
-      where: {
-        isDeleted: false,
-      },
-      include: {
-        HostEvents: {
-          select: {
-            User: {
-              select: {
-                UserDetail: true,
+  async findAll(page: number) {
+    const cachedEvents: any = await this.cacheManager.get('events');
+    const cachedData = cachedEvents ? JSON.parse(cachedEvents) : null;
+    if (cachedData) {
+      return cachedData;
+    } else {
+      const events = await this.prisma.event.findMany({
+        take: 4,
+        skip: page, 
+        where: {
+          isDeleted: false,
+        },
+        include: {
+          HostEvents: {
+            select: {
+              User: {
+                select: {
+                  UserDetail: true,
+                },
               },
             },
           },
-        },
-        GuestEvents: true,
-        _count: {
-          select: {
-            Viewlogs: true,
+          GuestEvents: true,
+          _count: {
+            select: {
+              Viewlogs: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      await this.cacheManager.set('events', JSON.stringify(events));
+      return events;
+    }
   }
 
   // 3. 이벤트 상세 조회
@@ -223,7 +239,7 @@ export class EventsService {
       },
     });
 
-    console.log('removeBookmark:', lastEventInTable);
+    // console.log('removeBookmark:', lastEventInTable);
     if (!lastEventInTable) {
       throw new NotFoundException('해당 북마크를 찾을 수 없습니다.');
     }

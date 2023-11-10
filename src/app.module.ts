@@ -11,6 +11,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ChatsModule } from './chats/chats.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -24,6 +25,11 @@ import { ChatsModule } from './chats/chats.module';
     MailModule,
     DataModule,
     SearchesModule,
+    CacheModule.register({
+      isGlobal:true,
+      til: 60,
+      max: 100
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

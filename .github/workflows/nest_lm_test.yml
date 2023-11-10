@@ -3,19 +3,19 @@
 # 작성에서 가장 중요한 건 줄 간격임!!!! 매우 중요!!!! 이거 안 맞으면 무조건 에러남!!!!
 
 # 워크플로우의 이름 설정
-name: nest_lm CI 
+name: nest_lm_test CI 
 
 on:
   # 코드가 'main' 브랜치로 push 될 때만 워크플로우가 실행됨
   push: 
-    branches: [ "main" ]
+    branches: [ "dev" ]
   
 # workflow 환경변수 설정 
 env:
-  PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
-  BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-  CODE_DEPLOY_APP_NAME: ${{ secrets.CODE_DEPLOY_APP_NAME }}
-  DEPLOYMENT_GROUP_NAME: ${{ secrets.DEPLOYMENT_GROUP_NAME }}
+  PROJECT_NAME: ${{ secrets.PROJECT_DEV_NAME }}
+  BUCKET_NAME: ${{ secrets.BUCKET_DEV_NAME }}
+  CODE_DEPLOY_APP_NAME: ${{ secrets.CODE_DEPLOY_APP_DEV_NAME }}
+  DEPLOYMENT_GROUP_NAME: ${{ secrets.DEPLOYMENT_GROUP_DEV_NAME }}
 
 # jobs 는 job 의 집합 - 깃액션에서 폴더 형식으로 구분되는 것이 job 임
 jobs:
@@ -77,7 +77,7 @@ jobs:
           echo "JWT_REFRESH_KEY=${{ secrets.JWT_REFRESH_KEY }}" >> .env
           echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
           echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> .env
-          echo "KAKAO_CALLBACK_URL=${{ secrets.KAKAO_CALLBACK_URL }}" >> .env
+          echo "KAKAO_CALLBACK_URL=${{ secrets.KAKAO_CALLBACK_URL_DEV }}" >> .env
           echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
           echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
           echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
@@ -90,8 +90,10 @@ jobs:
           echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
           echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
           echo "NAVER_CALLBACK_URL=${{ secrets.NAVER_CALLBACK_URL }}" >> .env
-          echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env          
-          echo "CLIENT_URL=${{ secrets.CLIENT_URL }}" >> .env
+          echo "CLIENT_URL=${{ secrets.CLIENT_URL_DEV }}" >> .env
+          echo "REDID_HOST=${{ secrets.REDID_HOST }}" >> .env
+          echo "REDID_PASS=${{ secrets.REDID_PASS }}" >> .env     
+          echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env     
         working-directory: ./
 
       # 압축 파일 생성 - 이 부분과 s3 업로드 부분은 같은 job 에 있어야 됨 없으면 업로드 할 .zip 을 못 찾음
@@ -111,7 +113,7 @@ jobs:
       - name: Upload to S3
         run: aws s3 cp ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
 
-      # CodeDeploy 배포 요청
+      # CodeDeploy 배포 요청 까지 성공
       - name: Request deploy to CodeDeploy
         run: aws deploy create-deployment 
                 --application-name $CODE_DEPLOY_APP_NAME
