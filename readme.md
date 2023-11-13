@@ -2,6 +2,24 @@
 로컬밍글은 사용자의 접속 위치를 기반으로 일상의 소모임을 만들 수 있는 SNS 형식의 커뮤니티 서비스 입니다.
 이 프로젝트의 시작은 사회가 바빠짐에 따라 이웃에 누가 사는지 모르는 지금의 사회에서 취미나 일상의 공유 등 소모임을 통해 잊쳐져 가는 정을 회복했으면 하는 바람으로 시작된 프로젝트 입니다.
 
+<table>
+  <tr>
+    <th style="width: 100px;">이름</th>
+    <th style="width: 150px;">포지션</th>
+    <th style="width: 250px;">역할</th>
+    <th style="width: 200px;">깃허브</th>
+    <th style="width: 200px;">블로그</th>
+  </tr>
+  <tr>
+    <td>장소영</td>
+    <td>Front-End</td>
+    <td>메인페이지(카드뷰, 게시글 검색, 게시글 샐랙터 필터링, 인피니티 스크롤), 게시글 작성 및 수정, 1차 개발 범위에 대한 전체화면 퍼블리싱, 프론트 gitHub 관리, Figma 관리</td>
+    <td><a href="https://github.com/ddoddiworld">장소영의 GitHub</a></td>
+    <td><a href="https://velog.io/@ddoddiworld">장소영의 블로그</a></td>
+  </tr>
+  <!-- 나머지 행들도 동일한 형식으로 추가 -->
+</table>
+
 ## 참가한 사람
 
 | 이름                      | 포지션                       | 역할      | 깃허브                                 | 블로그                           |
