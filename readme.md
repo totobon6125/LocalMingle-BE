@@ -42,7 +42,7 @@
 <tr>
   <td>에릭킴</td>
   <td>Back-End</td>
-  <td>마이 페이지 CRUD, 내 프로필 조회, 닉네임/한줄 자기소개/비밀번호 수정, 내가 생성한 목록 조회/수정/삭제, 내가 참가한 목록 조회/취소, 회원탈퇴, 테스트 코드 작성</td>
+  <td>마이 페이지 CRUD, 내 프로필 조회, 닉네임/한줄 자기소개/비밀번호 수정<br>내가 생성한 목록 조회/수정/삭제, 내가 참가한 목록 조회/취소, 회원탈퇴, 테스트 코드 작성</td>
   <td><a href="https://github.com/erickimme/">에릭킴의 GitHub</a></td>
   <td><a href="https://everyonehasadream.tistory.com/">에릭킴의 블로그</a></td>
 </tr>
