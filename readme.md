@@ -14,7 +14,7 @@
   <tr>
     <td>장소영</td>
     <td>Front-End</td>
-    <td>메인페이지(카드뷰, 게시글 검색, 게시글 샐랙터 필터링, 인피니티 스크롤),<br>게시글 작성 및 수정, 1차 개발 범위에 대한 전체화면 퍼블리싱,<br>프론트 gitHub 관리, Figma 관리</td>
+    <td>팀 부리더<br>메인페이지(카드뷰, 게시글 검색, 게시글 샐랙터 필터링, 인피니티 스크롤),<br>게시글 작성 및 수정, 1차 개발 범위에 대한 전체화면 퍼블리싱,<br>프론트 gitHub 관리, Figma 관리</td>
     <td><a href="https://github.com/ddoddiworld">장소영의 GitHub</a></td>
     <td><a href="https://velog.io/@ddoddiworld">장소영의 블로그</a></td>
   </tr>
@@ -28,7 +28,7 @@
 <tr>
   <td>김대욱</td>
   <td>Back-End</td>
-  <td>프로젝트 일정 조정, FE/BE 서버 인프라 조성(CloudFront, Route53, ACM, CodeDeploy, Ec2, S3)<br> FE/BE CICD 구현, AWS 사용법 작성, 프로젝트 관련 문서 작업, 총무</td>
+  <td>팀 리더, 총무<br> FE/BE 서버 인프라 조성(CloudFront, Route53, ACM, CodeDeploy, Ec2, S3)<br> FE/BE CICD 구현, AWS 사용법 작성, 프로젝트 관련 문서 작업 </td>
   <td><a href="https://github.com/totobon6125">김대욱의 GitHub</a></td>
   <td><a href="https://blog.naver.com/ackrima">김대욱의 블로그</a></td>
 </tr>
