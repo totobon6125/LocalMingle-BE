@@ -2,12 +2,12 @@
 로컬밍글은 사용자의 접속 위치를 기반으로 일상의 소모임을 만들 수 있는 SNS 형식의 커뮤니티 서비스 입니다.
 이 프로젝트의 시작은 사회가 바빠짐에 따라 이웃에 누가 사는지 모르는 지금의 사회에서 취미나 일상의 공유 등 소모임을 통해 잊쳐져 가는 정을 회복했으면 하는 바람으로 시작된 프로젝트 입니다.
 
-## 참가한 사람들 
+## 참가한 사람들
 <table>
   <tr>
-    <th style="width: 200px;">이름</th>
-    <th style="width: 150px;">포지션</th>
-    <th style="width: 100px;">역할</th>
+    <th style="width: 250px;">이름</th>
+    <th style="width: 250px;">포지션</th>
+    <th style="width: 50px;">역할</th>
     <th style="width: 200px;">깃허브</th>
     <th style="width: 200px;">블로그</th>
   </tr>
