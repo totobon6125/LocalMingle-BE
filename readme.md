@@ -14,7 +14,8 @@
   <tr>
     <td>장소영</td>
     <td>Front-End</td>
-    <td>메인페이지(카드뷰, 게시글 검색, 게시글 샐랙터 필터링, 인피니티 스크롤), 게시글 작성 및 수정, 1차 개발 범위에 대한 전체화면 퍼블리싱, 프론트 gitHub 관리, Figma 관리</td>
+    <td>메인페이지(카드뷰, 게시글 검색, 게시글 샐랙터 필터링, 인피니티 스크롤),
+      게시글 작성 및 수정, 1차 개발 범위에 대한 전체화면 퍼블리싱, 프론트 gitHub 관리, Figma 관리</td>
     <td><a href="https://github.com/ddoddiworld">장소영의 GitHub</a></td>
     <td><a href="https://velog.io/@ddoddiworld">장소영의 블로그</a></td>
   </tr>
