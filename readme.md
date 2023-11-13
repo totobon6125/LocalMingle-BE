@@ -62,12 +62,14 @@
   <td><a href="https://www.behance.net/289871a1">박상현의<br>블로그</a></td>
 </tr>
 </table>
-
+<br>
+<br>
 
 ## 기술 아키텍처
 
 ![아키텍처 ver8](https://github.com/totobon6125/LocalMingle-BE/assets/140354427/897fd862-6f57-4f43-a2da-0423955f4195)
-
+<br>
+<br>
 
 ## 기술 의사결정
 ### FE
@@ -90,7 +92,7 @@
     - Styled-components는 JavaScript를 사용하여 컴포넌트 기반 스타일을 정의할 수 있는 CSS-in-JS 라이브러리입니다.
     - 리액트와 통합되며, 컴포넌트 내부에 스타일을 직접 정의하므로 CSS 클래스 이름 충돌을 방지하고 컴포넌트 스타일을 보다 모듈화하게 해줍니다.
 - **GitHub Actions**
-
+<br>
 ### BE
 - **Nest.js**
     - **퍼포먼스 관리
