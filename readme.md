@@ -6,7 +6,7 @@
 
 | 이름 | 포지션 | 역할 | 깃허브 | 블로그 |
 |----------|-----|-----|-----|-----|
-| 장소영  | Front-End | 메인페이지(카드뷰, 게시글 검색, 게시글 샐랙터 필터링, 인피니티 스크롤), 게시글 작성 및 수정, 1차 개발 범위에 대한 전체화면 퍼블리싱, 프론트 gitHub 관리, Figma 관리 | [장소영의 GitHub](https://github.com/ddoddiworld) | [장소영의 블로그](https://velog.io/@ddoddiworld) |
+| 장소영  | Front-End | 메인페이지(카드뷰, 게시글 검색, 게시글 샐랙터 필터링, 인피니티 스크롤), 게시글 작성 및 수정,\n 1차 개발 범위에 대한 전체화면 퍼블리싱, 프론트 gitHub 관리, Figma 관리 | [장소영의 GitHub](https://github.com/ddoddiworld) | [장소영의 블로그](https://velog.io/@ddoddiworld) |
 | 김태현  | Front-End | 일반회원가입/로그인페이지, 소셜 로그인, 다국어기능, 실시간 채팅, 게시글 상세 페이지,  마이페이지(회원정보 수정, 작성 이벤트, 참여 이벤트 관리, 회원탈퇴) CRUD | [김태현의 GitHub](https://github.com/kimtaehyun) | [김태현의 블로그](https://velog.io/@taehyun729) |
 | 김대욱  | BackE-nd | 프로젝트 일정 조정, FE & BE CI/CD, AWS 서버 관리(Ec2, S3), 예외처리, Swagger, 각종 문서 작성, UT 관리 및 총무 | [김대욱의 GitHub](https://github.com/totobon6125) | [김대욱의 블로그](https://blog.naver.com/ackrima) |
 | 김종화  | Back-End | 이벤트 CRUD, 참가/ 취소 API 작성, 페이지네이션, 캐싱 기능 적용, test코드 작성, 행정구역 데이터 API 작성, 지역, 카테고리, 키워드별 검색 기능 | [김종화의 GitHub](https://github.com/kimjonghwa230412) | [김종화의 블로그](https://velog.io/@ehdxka3) |
