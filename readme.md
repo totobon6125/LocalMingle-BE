@@ -28,7 +28,7 @@
 <tr>
   <td>김대욱</td>
   <td>Back-End</td>
-  <td>프로젝트 일정 조정, FE & BE CI/CD, AWS 서버 관리(Ec2, S3), 예외처리, Swagger,<br>프로젝트 관련 문서 작업, 총무</td>
+  <td>프로젝트 일정 조정, FE & BE CI/CD, AWS 서버 관리(Ec2, S3), 예외처리, Swagger<br>프로젝트 관련 문서 작업, 총무</td>
   <td><a href="https://github.com/totobon6125">김대욱의 GitHub</a></td>
   <td><a href="https://blog.naver.com/ackrima">김대욱의 블로그</a></td>
 </tr>
