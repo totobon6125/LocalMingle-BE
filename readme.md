@@ -62,7 +62,7 @@
   <td><a href="https://www.behance.net/289871a1">박상현의<br>블로그</a></td>
 </tr>
 </table>
-<br>
+<br><br>
 
 ## 🔎 주요 기능
 
@@ -83,13 +83,12 @@
     - 회원탈퇴
 - 회원 가입 및 로그인 / 소셜 로그인
 - 테스트 서버와 유저 서버의 이원화
-
+<br><br>
 
 ## 기술 아키텍처
 
 ![아키텍처 ver8](https://github.com/totobon6125/LocalMingle-BE/assets/140354427/897fd862-6f57-4f43-a2da-0423955f4195)
-<br>
-<br>
+<br><br>
 
 ## 기술 의사결정
 ### FE
