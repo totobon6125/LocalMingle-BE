@@ -28,7 +28,7 @@
 <tr>
   <td>김대욱</td>
   <td>Back-End</td>
-  <td>프로젝트 일정 조정, FE & BE CI/CD, AWS 서버 관리(CloudFront, Route53, ACM, CodeDeployEc2, S3), 예외처리<br>AWS 사용법 작성, 프로젝트 관련 문서 작업, 총무</td>
+  <td>프로젝트 일정 조정, FE/BE 서버 인프라 조성(CloudFront, Route53, ACM, CodeDeploy, Ec2, S3)<br> FE/BE CICD 구현, AWS 사용법 작성, 프로젝트 관련 문서 작업, 총무</td>
   <td><a href="https://github.com/totobon6125">김대욱의 GitHub</a></td>
   <td><a href="https://blog.naver.com/ackrima">김대욱의 블로그</a></td>
 </tr>
