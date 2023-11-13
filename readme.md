@@ -28,14 +28,14 @@
 <tr>
   <td>김대욱</td>
   <td>Back-End</td>
-  <td>팀 리더, 총무<br> FE/BE 서버 인프라 조성(CloudFront, Route53, ACM, CodeDeploy, Ec2, S3)<br> FE/BE CICD 구현, AWS 사용법 작성, 프로젝트 관련 문서 작업 </td>
+  <td>팀 리더, 총무<br>FE/BE 서버 인프라 조성(CloudFront, Route53, ACM, CodeDeploy, Ec2, S3)<br> FE/BE CICD 구현, AWS 사용법 작성, 프로젝트 관련 문서 작업 </td>
   <td><a href="https://github.com/totobon6125">김대욱의 GitHub</a></td>
   <td><a href="https://blog.naver.com/ackrima">김대욱의 블로그</a></td>
 </tr>
 <tr>
   <td>김종화</td>
   <td>Back-End</td>
-  <td>이벤트 CRUD, 참가/ 취소 API 작성, 페이지네이션, 캐싱 기능 적용, test코드 작성, 행정구역 데이터 API 작성, 지역, 카테고리, 키워드별 검색 기능</td>
+  <td>이벤트 CRUD, 참가/ 취소 API 작성, 페이지네이션, 캐싱 기능 적용<br>test코드 작성, 행정구역 데이터 API 작성, 지역, 카테고리, 키워드별 검색 기능</td>
   <td><a href="https://github.com/kimjonghwa230412">김종화의 GitHub</a></td>
   <td><a href="https://velog.io/@ehdxka3">김종화의 블로그</a></td>
 </tr>
