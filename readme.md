@@ -6,13 +6,13 @@
 
 | 이름     | 포지션  | 역할            | 깃허브                             | 블로그   |
 |---------|--------|----------------|---------------------------------|---------|
-| 장소영  | FrontEnd | 프론트엔드 개발 | [장소영의 GitHub](https://github.com/ddoddiworld) | [장소영의 블로그](https://velog.io/@ddoddiworld) |
-| 김태현  | FrontEnd | 프론트엔드 개발 | [김태현의 GitHub](https://github.com/kimtaehyun) | [김태현의 블로그](https://velog.io/@taehyun729) |
-| 김대욱  | BackEnd | 백엔드 개발     | [김대욱의 GitHub](https://github.com/totobon6125) | [김대욱의 블로그](https://blog.naver.com/ackrima) |
-| 김종화  | BackEnd | 백엔드 개발     | [김종화의 GitHub](https://github.com/kimjonghwa230412) | [김종화의 블로그](https://velog.io/@ehdxka3) |
-| 에릭킴  | BackEnd | 백엔드 개발     | [에릭킴의 GitHub](https://github.com/erickimme/) | [에릭킴의 블로그](https://everyonehasadream.tistory.com/) |
-| 양희용  | BackEnd | 백엔드 개발     | [양희용의 GitHub](https://github.com/HeeDragoN1123) | [양희용의 블로그](https://yhy7952.tistory.com/) |
-| 박상현  | Design | 디자인 | 없음 | [박상현의 블로그](https://www.behance.net/289871a1) |
+| 장소영  | Front-End | 메인페이지(카드뷰, 게시글 검색, 게시글 샐랙터 필터링, 인피니티 스크롤), 게시글 작성 및 수정, 1차 개발 범위에 대한 전체화면 퍼블리싱, 프론트 gitHub 관리, Figma 관리 | [장소영의 GitHub](https://github.com/ddoddiworld) | [장소영의 블로그](https://velog.io/@ddoddiworld) |
+| 김태현  | Front-End | 일반회원가입/로그인페이지, 소셜 로그인, 다국어기능, 실시간 채팅, 게시글 상세 페이지,  마이페이지(회원정보 수정, 작성 이벤트, 참여 이벤트 관리, 회원탈퇴) CRUD | [김태현의 GitHub](https://github.com/kimtaehyun) | [김태현의 블로그](https://velog.io/@taehyun729) |
+| 김대욱  | BackE-nd | 프로젝트 일정 조정, FE & BE CI/CD, AWS 서버 관리(Ec2, S3), 예외처리, Swagger, 각종 문서 작성, UT 관리 및 총무 | [김대욱의 GitHub](https://github.com/totobon6125) | [김대욱의 블로그](https://blog.naver.com/ackrima) |
+| 김종화  | Back-End | 이벤트 CRUD, 참가/ 취소 API 작성, 페이지네이션, 캐싱 기능 적용, test코드 작성, 행정구역 데이터 API 작성, 지역, 카테고리, 키워드별 검색 기능 | [김종화의 GitHub](https://github.com/kimjonghwa230412) | [김종화의 블로그](https://velog.io/@ehdxka3) |
+| 에릭킴  | Back-End | 마이 페이지 CRUD, 내 프로필 조회, 닉네임/한줄 자기소개/비밀번호 수정, 내가 생성한 목록 조회/수정/삭제, 내가 참가한 목록 조회/취소, 회원탈퇴, 테스트 코드 작성 | [에릭킴의 GitHub](https://github.com/erickimme/) | [에릭킴의 블로그](https://everyonehasadream.tistory.com/) |
+| 양희용  | Back-End | OAuthLogin(카카오, 구글 , 네이버), user(로그인, 회원가입, 회원탈퇴, 회원 정보 수정, 카테고리), 회원가입시 이메일 인증및 인증번호 검증 , 실시간채팅(채팅방 생성, 유저리스트 , 입장 ,퇴장 , 오래된 채팅 삭제 스케쥴러) | [양희용의 GitHub](https://github.com/HeeDragoN1123) | [양희용의 블로그](https://yhy7952.tistory.com/) |
+| 박상현  | Design | 페이지 전체 디자인 | 없음 | [박상현의 블로그](https://www.behance.net/289871a1) |
 
 ## 기술 아키텍처
 
