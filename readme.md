@@ -93,6 +93,7 @@
     - 리액트와 통합되며, 컴포넌트 내부에 스타일을 직접 정의하므로 CSS 클래스 이름 충돌을 방지하고 컴포넌트 스타일을 보다 모듈화하게 해줍니다.
 - **GitHub Actions**
 <br>
+
 ### BE
 - **Nest.js**
     - **퍼포먼스 관리
@@ -136,7 +137,7 @@
     : Swagger는 활발한 개발자 커뮤니티를 가지고 있어서 사용 중에 문제가 발생하면 도움을 받기 쉬운 특징이 있습니다.
 - **GitHub Actions**
     - 다른 CD 에 비해서 learning curve 가 낮습니다.
-- **AWS**
+<br>
 
 ## ERD
 <img width="819" alt="erd" src="https://github.com/totobon6125/LocalMingle-BE/assets/140354427/b27726d2-1c05-47bc-8cb1-0442b3ca63eb">
