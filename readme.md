@@ -21,44 +21,44 @@
   <tr>
   <td>김태현</td>
   <td>Front-End</td>
-  <td>마이페이지(회원정보 수정, 작성 이벤트, 참여 이벤트 관리, 회원탈퇴),다국어기능<br>일반회원가입/로그인페이지, 소셜 로그인, 실시간 채팅, 게시글 상세 페이지</td>
+  <td>마이페이지(회원정보 수정, 작성 이벤트, 참여 이벤트 관리, 회원탈퇴),다국어기능,<br>일반회원가입/로그인페이지, 소셜 로그인, 실시간 채팅, 게시글 상세 페이지</td>
   <td><a href="https://github.com/kimtaehyun">김태현의 GitHub</a></td>
   <td><a href="https://velog.io/@taehyun729">김태현의 블로그</a></td>
 </tr>
 <tr>
   <td>김대욱</td>
   <td>Back-End</td>
-  <td>팀 리더, 총무<br>FE/BE 서버 인프라 조성(CloudFront, Route53, ACM, CodeDeploy, Ec2, S3)<br> FE/BE CICD 구현, AWS 사용법 작성, 프로젝트 관련 문서 작업 </td>
+  <td>팀 리더, 총무<br>FE/BE 서버 인프라 조성(CloudFront, Route53, ACM, CodeDeploy, Ec2, S3),<br> FE/BE CICD 구현, AWS 사용법 작성, 프로젝트 관련 문서 작업 </td>
   <td><a href="https://github.com/totobon6125">김대욱의 GitHub</a></td>
   <td><a href="https://blog.naver.com/ackrima">김대욱의 블로그</a></td>
 </tr>
 <tr>
   <td>김종화</td>
   <td>Back-End</td>
-  <td>이벤트 CRUD, 참가/ 취소 API 작성, 페이지네이션, 캐싱 기능 적용<br>test코드 작성, 행정구역 데이터 API 작성, 지역, 카테고리, 키워드별 검색 기능</td>
+  <td>이벤트 CRUD, 참가/ 취소 API 작성, 페이지네이션, 캐싱 기능 적용,<br>test코드 작성, 행정구역 데이터 API 작성, 지역, 카테고리, 키워드별 검색 기능</td>
   <td><a href="https://github.com/kimjonghwa230412">김종화의 GitHub</a></td>
   <td><a href="https://velog.io/@ehdxka3">김종화의 블로그</a></td>
 </tr>
 <tr>
   <td>에릭킴</td>
   <td>Back-End</td>
-  <td>마이 페이지 CRUD, 내 프로필 조회, 닉네임/한줄 자기소개/비밀번호 수정<br>내가 생성한 목록 조회/수정/삭제, 내가 참가한 목록 조회/취소<br>회원탈퇴(soft delete), 테스트 코드 작성</td>
+  <td>마이 페이지 CRUD, 내 프로필 조회, 닉네임/한줄 자기소개/비밀번호 수정,<br>내가 생성한 목록 조회/수정/삭제, 내가 참가한 목록 조회/취소,<br>회원탈퇴(soft delete), 테스트 코드 작성</td>
   <td><a href="https://github.com/erickimme/">에릭킴의 GitHub</a></td>
   <td><a href="https://everyonehasadream.tistory.com/">에릭킴의 블로그</a></td>
 </tr>
 <tr>
   <td>양희용</td>
   <td>Back-End</td>
-  <td>소셜로그인 구현(카카오,네이버,구글), 일반회원가입 구현(이메일 인증번호 및 번호검증, 닉네임 중복검사)<br>실시간채팅(채팅방 생성, 유저리스트, 입장, 퇴장, 시간에 따른 채팅 이력 정리</td>
-  <td><a href="https://github.com/HeeDragoN1123">양희용의 GitHub</a></td>
-  <td><a href="https://yhy7952.tistory.com/">양희용의 블로그</a></td>
+  <td>소셜로그인 구현(카카오,네이버,구글), 일반회원가입 구현(이메일 인증번호 및 번호검증, 닉네임 중복검사),<br>실시간채팅(채팅방 생성, 유저리스트, 입장, 퇴장, 시간에 따른 채팅 이력 정리</td>
+  <td><a href="https://github.com/HeeDragoN1123">양희용의<br>GitHub</a></td>
+  <td><a href="https://yhy7952.tistory.com/">양희용의<br>블로그</a></td>
 </tr>
 <tr>
   <td>박상현</td>
   <td>Design</td>
   <td>페이지 전체 디자인</td>
   <td>없음</td>
-  <td><a href="https://www.behance.net/289871a1">박상현의 블로그</a></td>
+  <td><a href="https://www.behance.net/289871a1">박상현의<br>블로그</a></td>
 </tr>
 </table>
 
